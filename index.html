@@ -119,19 +119,15 @@ a { color: inherit; text-decoration: none; }
 }
 .phone-notch { height: 24px; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; }
 .phone-notch-bar { width: 64px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; }
-.phone-body { padding: 22px 16px 26px; }
+.phone-body { padding: 16px 16px 20px; display: flex; flex-direction: column; align-items: center; }
 .phone-badge {
   display: inline-block; font-size: 8px; font-weight: 600; letter-spacing: 1.5px;
   text-transform: uppercase; color: var(--accent); background: rgba(16,185,129,0.1);
   border: 1px solid rgba(16,185,129,0.25); border-radius: 4px; padding: 3px 8px; margin-bottom: 10px;
 }
-.phone-title { font-family: var(--font-head); font-weight: 900; font-size: 28px; color: #fff; margin-bottom: 3px; }
-.phone-sub { font-size: 9px; color: rgba(255,255,255,0.35); letter-spacing: 0.5px; margin-bottom: 18px; }
-.phone-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 3px; margin-bottom: 16px; }
-.phone-cell { aspect-ratio: 1; border-radius: 4px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); }
-.phone-cell.g { background: rgba(16,185,129,0.32); border-color: rgba(16,185,129,0.5); }
-.phone-cell.p { background: rgba(99,102,241,0.32); border-color: rgba(99,102,241,0.5); }
-.phone-cell.o { background: rgba(245,158,11,0.28); border-color: rgba(245,158,11,0.42); }
+.phone-logo { width: 130px; height: 130px; border-radius: 50%; object-fit: cover; display: block; margin-bottom: 10px; box-shadow: 0 0 24px rgba(139,92,246,0.5), 0 0 8px rgba(16,185,129,0.3); }
+.phone-title { font-family: var(--font-head); font-weight: 900; font-size: 22px; color: #fff; margin-bottom: 2px; text-align: center; }
+.phone-sub { font-size: 9px; color: rgba(255,255,255,0.35); letter-spacing: 0.5px; margin-bottom: 14px; text-align: center; }
 .phone-stores { display: flex; gap: 6px; }
 .phone-store {
   flex: 1; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.11);
@@ -201,30 +197,27 @@ a { color: inherit; text-decoration: none; }
 .project-visual-bg {
   position: absolute; inset: 0;
   background:
-    radial-gradient(ellipse 70% 60% at 40% 30%, rgba(16,185,129,0.28) 0%, transparent 65%),
-    radial-gradient(ellipse 60% 65% at 70% 70%, rgba(99,102,241,0.22) 0%, transparent 60%);
+    radial-gradient(ellipse 70% 60% at 40% 30%, rgba(139,92,246,0.35) 0%, transparent 65%),
+    radial-gradient(ellipse 60% 65% at 70% 70%, rgba(236,72,153,0.25) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 50% at 50% 50%, rgba(16,185,129,0.15) 0%, transparent 70%);
 }
 .project-visual-content {
   position: absolute; inset: 0; z-index: 2;
   display: flex; align-items: center; justify-content: center;
 }
-.pv-phone {
-  width: 155px; border-radius: 28px;
-  background: rgba(9,9,11,0.88); border: 1px solid rgba(255,255,255,0.12);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.55); overflow: hidden;
+.pv-logo-wrap {
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
 }
-.pv-notch { height: 18px; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
-.pv-notch-bar { width: 52px; height: 5px; background: rgba(255,255,255,0.1); border-radius: 3px; }
-.pv-body { padding: 16px 12px 20px; }
-.pv-title { font-family: var(--font-head); font-weight: 900; font-size: 22px; color: #fff; margin-bottom: 12px; }
-.pv-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 2px; margin-bottom: 12px; }
-.pvc { aspect-ratio: 1; border-radius: 3px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.05); }
-.pvc.a { background: rgba(16,185,129,0.3); border-color: rgba(16,185,129,0.45); }
-.pvc.b { background: rgba(245,158,11,0.25); border-color: rgba(245,158,11,0.35); }
-.pv-score-label { font-size: 8px; color: rgba(255,255,255,0.3); letter-spacing: 0.5px; text-transform: uppercase; }
-.pv-score-num { font-family: var(--font-head); font-weight: 800; font-size: 16px; color: var(--accent); }
-.pv-home-bar-wrap { height: 18px; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; }
-.pv-home-bar { width: 52px; height: 3px; background: rgba(255,255,255,0.15); border-radius: 2px; }
+.pv-logo {
+  width: 200px; height: 200px; border-radius: 50%; object-fit: cover;
+  box-shadow: 0 0 60px rgba(139,92,246,0.6), 0 0 20px rgba(236,72,153,0.4), 0 20px 60px rgba(0,0,0,0.6);
+  border: 2px solid rgba(139,92,246,0.4);
+}
+.pv-logo-label {
+  font-family: var(--font-head); font-weight: 900; font-size: 13px;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+}
 
 /* ── FOOTER ── */
 .footer {
@@ -314,14 +307,9 @@ a { color: inherit; text-decoration: none; }
         <div class="phone-notch"><div class="phone-notch-bar"></div></div>
         <div class="phone-body">
           <div class="phone-badge">Coming Soon</div>
+          <img src="/assets/trapman-logo.png" alt="TrapMan" class="phone-logo">
           <div class="phone-title">TrapMan</div>
           <div class="phone-sub">Mobile Game &nbsp;·&nbsp; iOS &amp; Android</div>
-          <div class="phone-grid">
-            <div class="phone-cell"></div><div class="phone-cell g"></div><div class="phone-cell"></div><div class="phone-cell p"></div><div class="phone-cell"></div>
-            <div class="phone-cell g"></div><div class="phone-cell"></div><div class="phone-cell o"></div><div class="phone-cell"></div><div class="phone-cell g"></div>
-            <div class="phone-cell"></div><div class="phone-cell p"></div><div class="phone-cell g"></div><div class="phone-cell"></div><div class="phone-cell o"></div>
-            <div class="phone-cell p"></div><div class="phone-cell"></div><div class="phone-cell"></div><div class="phone-cell g"></div><div class="phone-cell"></div>
-          </div>
           <div class="phone-stores">
             <div class="phone-store">
               <span class="phone-store-small">Download on</span>
@@ -416,20 +404,9 @@ a { color: inherit; text-decoration: none; }
     <div class="project-visual">
       <div class="project-visual-bg"></div>
       <div class="project-visual-content">
-        <div class="pv-phone">
-          <div class="pv-notch"><div class="pv-notch-bar"></div></div>
-          <div class="pv-body">
-            <div class="pv-title">TrapMan</div>
-            <div class="pv-grid">
-              <div class="pvc"></div><div class="pvc a"></div><div class="pvc"></div><div class="pvc"></div>
-              <div class="pvc a"></div><div class="pvc b"></div><div class="pvc a"></div><div class="pvc"></div>
-              <div class="pvc"></div><div class="pvc"></div><div class="pvc a"></div><div class="pvc b"></div>
-              <div class="pvc b"></div><div class="pvc a"></div><div class="pvc"></div><div class="pvc"></div>
-            </div>
-            <div class="pv-score-label">High Score</div>
-            <div class="pv-score-num">48,290</div>
-          </div>
-          <div class="pv-home-bar-wrap"><div class="pv-home-bar"></div></div>
+        <div class="pv-logo-wrap">
+          <img src="/assets/trapman-logo.png" alt="TrapMan" class="pv-logo">
+          <div class="pv-logo-label">Coming Soon</div>
         </div>
       </div>
     </div>
