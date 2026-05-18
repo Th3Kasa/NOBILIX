@@ -1,0 +1,17 @@
+[[redirects]]
+  from = "/privacy-policy"
+  to = "/privacy-policy/"
+  status = 301
+
+[[redirects]]
+  from = "/terms-of-use"
+  to = "/terms-of-use/"
+  status = 301
+
+[[redirects]]
+  from = "/data-compliance"
+  to = "/data-compliance/"
+  status = 301
+
+[build]
+  publish = "."
