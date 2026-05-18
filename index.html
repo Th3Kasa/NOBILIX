@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NOBILIX — Independent Software Studio, NSW</title>
+<meta name="description" content="NOBILIX is an independent software studio in New South Wales, Australia. Building mobile games and applications for iOS and Android.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── RESET & TOKENS ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #ffffff;
+  --fg: #09090b;
+  --border: #e4e4e7;
+  --dark: #09090b;
+  --dark-border: #18181b;
+  --dark-surface: #0d0d12;
+  --muted: #71717a;
+  --muted-dark: rgba(255,255,255,0.45);
+  --accent: #10b981;
+  --accent-hover: #059669;
+  --font-head: 'Archivo', sans-serif;
+  --font-body: 'Space Grotesk', sans-serif;
+}
+html { scroll-behavior: smooth; }
+body { font-family: var(--font-body); background: var(--bg); color: var(--fg); font-size: 15px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+a { color: inherit; text-decoration: none; }
+
+/* ── NAV ── */
+.nav {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 60px; height: 70px;
+  background: rgba(255,255,255,0.95); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { display: flex; align-items: center; gap: 10px; }
+.nav-logo-mark {
+  width: 34px; height: 34px; background: var(--fg); border-radius: 8px;
+  display: grid; place-items: center; flex-shrink: 0;
+}
+.nav-logo-mark svg { width: 18px; height: 18px; fill: #fff; }
+.nav-logo-text { font-family: var(--font-head); font-weight: 800; font-size: 15px; letter-spacing: 3px; }
+.nav-links { display: flex; gap: 36px; list-style: none; }
+.nav-links a { font-size: 13.5px; color: var(--muted); font-weight: 500; transition: color 0.2s; }
+.nav-links a:hover { color: var(--fg); }
+.nav-cta {
+  background: var(--fg); color: #fff; padding: 9px 22px;
+  border-radius: 7px; font-size: 13.5px; font-weight: 600; letter-spacing: 0.2px;
+  transition: opacity 0.2s;
+}
+.nav-cta:hover { opacity: 0.85; }
+
+/* ── HERO ── */
+.hero { display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 70px); }
+
+.hero-left {
+  background: var(--dark); padding: 80px 60px;
+  display: flex; flex-direction: column; justify-content: center;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.38); margin-bottom: 32px;
+}
+.hero-eyebrow-line { width: 24px; height: 1px; background: rgba(255,255,255,0.2); }
+.hero-h1 {
+  font-family: var(--font-head); font-weight: 900;
+  font-size: 58px; line-height: 1.0; letter-spacing: -2.5px;
+  color: #fff; margin-bottom: 24px;
+}
+.hero-h1 em { font-style: normal; color: var(--accent); }
+.hero-p { color: var(--muted-dark); font-size: 16px; line-height: 1.75; max-width: 400px; margin-bottom: 44px; }
+.hero-actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.btn-white {
+  background: #fff; color: var(--fg); padding: 13px 28px; border-radius: 7px;
+  font-family: var(--font-body); font-weight: 700; font-size: 14px; letter-spacing: 0.2px;
+  display: inline-flex; align-items: center; gap: 8px; transition: opacity 0.2s;
+}
+.btn-white:hover { opacity: 0.9; }
+.btn-white svg { width: 14px; height: 14px; stroke: var(--fg); fill: none; stroke-width: 2; stroke-linecap: round; }
+.btn-outline {
+  color: rgba(255,255,255,0.55); padding: 13px 22px;
+  font-size: 14px; font-weight: 500; letter-spacing: 0.2px;
+  border: 1px solid rgba(255,255,255,0.15); border-radius: 7px;
+  transition: border-color 0.2s, color 0.2s;
+}
+.btn-outline:hover { border-color: rgba(255,255,255,0.35); color: rgba(255,255,255,0.8); }
+
+/* Hero right — coloured light visual */
+.hero-right {
+  background: var(--dark); position: relative; overflow: hidden;
+}
+.hero-lights {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 65% 55% at 35% 35%, rgba(16,185,129,0.5) 0%, transparent 65%),
+    radial-gradient(ellipse 55% 60% at 72% 28%, rgba(245,158,11,0.45) 0%, transparent 65%),
+    radial-gradient(ellipse 55% 55% at 68% 72%, rgba(239,68,68,0.4) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 50% at 22% 72%, rgba(99,102,241,0.38) 0%, transparent 58%);
+}
+.hero-lights-overlay {
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 75% 75% at 50% 50%, rgba(9,9,11,0.3) 0%, rgba(9,9,11,0.08) 100%);
+}
+.hero-phone-wrap {
+  position: absolute; inset: 0; z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+}
+.hero-phone {
+  width: 210px; border-radius: 36px;
+  background: rgba(9,9,11,0.82);
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 32px 80px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04), 0 0 60px rgba(16,185,129,0.12);
+  backdrop-filter: blur(16px); overflow: hidden;
+}
+.phone-notch { height: 24px; background: rgba(0,0,0,0.55); display: flex; align-items: center; justify-content: center; }
+.phone-notch-bar { width: 64px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; }
+.phone-body { padding: 22px 16px 26px; }
+.phone-badge {
+  display: inline-block; font-size: 8px; font-weight: 600; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--accent); background: rgba(16,185,129,0.1);
+  border: 1px solid rgba(16,185,129,0.25); border-radius: 4px; padding: 3px 8px; margin-bottom: 10px;
+}
+.phone-title { font-family: var(--font-head); font-weight: 900; font-size: 28px; color: #fff; margin-bottom: 3px; }
+.phone-sub { font-size: 9px; color: rgba(255,255,255,0.35); letter-spacing: 0.5px; margin-bottom: 18px; }
+.phone-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 3px; margin-bottom: 16px; }
+.phone-cell { aspect-ratio: 1; border-radius: 4px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); }
+.phone-cell.g { background: rgba(16,185,129,0.32); border-color: rgba(16,185,129,0.5); }
+.phone-cell.p { background: rgba(99,102,241,0.32); border-color: rgba(99,102,241,0.5); }
+.phone-cell.o { background: rgba(245,158,11,0.28); border-color: rgba(245,158,11,0.42); }
+.phone-stores { display: flex; gap: 6px; }
+.phone-store {
+  flex: 1; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.11);
+  border-radius: 7px; padding: 6px 8px; text-align: center;
+}
+.phone-store-small { display: block; font-size: 7px; color: rgba(255,255,255,0.32); margin-bottom: 1px; }
+.phone-store-name { font-size: 8.5px; font-weight: 700; color: rgba(255,255,255,0.7); }
+.phone-home { height: 24px; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; }
+.phone-home-bar { width: 64px; height: 3px; background: rgba(255,255,255,0.18); border-radius: 2px; }
+
+/* ── FEATURE STRIP ── */
+.feature-strip {
+  display: grid; grid-template-columns: repeat(5,1fr);
+  border-bottom: 1px solid var(--border);
+}
+.feature-item {
+  padding: 28px 24px; display: flex; align-items: flex-start; gap: 14px;
+  border-right: 1px solid var(--border);
+}
+.feature-item:last-child { border-right: none; }
+.feature-icon {
+  width: 38px; height: 38px; background: #f4f4f5; border-radius: 9px;
+  display: grid; place-items: center; flex-shrink: 0;
+}
+.feature-icon svg { width: 17px; height: 17px; stroke: #27272a; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.feature-label { font-size: 13px; font-weight: 700; color: var(--fg); margin-bottom: 3px; }
+.feature-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+/* ── PROJECTS ── */
+.projects-section { padding: 80px 60px; max-width: 1280px; margin: 0 auto; }
+.section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px; }
+.section-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.section-h2 { font-family: var(--font-head); font-weight: 800; font-size: 36px; letter-spacing: -1px; }
+.section-cta { font-size: 13px; color: var(--accent); font-weight: 600; display: flex; align-items: center; gap: 6px; }
+.section-cta:hover { color: var(--accent-hover); }
+
+.project-card {
+  display: grid; grid-template-columns: 1fr 400px;
+  background: var(--dark); border-radius: 16px; overflow: hidden;
+  border: 1px solid var(--dark-border);
+}
+.project-info { padding: 52px 48px; display: flex; flex-direction: column; justify-content: center; }
+.project-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.tag {
+  padding: 4px 12px; border-radius: 20px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+}
+.tag-platform { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.55); }
+.tag-status { background: rgba(16,185,129,0.14); color: #34d399; border: 1px solid rgba(16,185,129,0.25); }
+.tag-location { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.38); }
+.project-name { font-family: var(--font-head); font-weight: 900; font-size: 52px; letter-spacing: -2.5px; color: #fff; margin-bottom: 16px; }
+.project-desc { color: rgba(255,255,255,0.44); font-size: 15px; line-height: 1.75; max-width: 380px; margin-bottom: 32px; }
+.project-legal-links { display: flex; gap: 10px; flex-wrap: wrap; }
+.legal-btn-primary {
+  background: var(--accent); color: #fff; padding: 10px 20px; border-radius: 7px;
+  font-size: 13px; font-weight: 700; transition: background 0.2s;
+}
+.legal-btn-primary:hover { background: var(--accent-hover); }
+.legal-btn-ghost {
+  background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.58);
+  padding: 10px 18px; border-radius: 7px; font-size: 13px; font-weight: 600;
+  border: 1px solid rgba(255,255,255,0.1); transition: background 0.2s, color 0.2s;
+}
+.legal-btn-ghost:hover { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8); }
+
+.project-visual { position: relative; overflow: hidden; background: #0a0a10; }
+.project-visual-bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse 70% 60% at 40% 30%, rgba(16,185,129,0.28) 0%, transparent 65%),
+    radial-gradient(ellipse 60% 65% at 70% 70%, rgba(99,102,241,0.22) 0%, transparent 60%);
+}
+.project-visual-content {
+  position: absolute; inset: 0; z-index: 2;
+  display: flex; align-items: center; justify-content: center;
+}
+.pv-phone {
+  width: 155px; border-radius: 28px;
+  background: rgba(9,9,11,0.88); border: 1px solid rgba(255,255,255,0.12);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.55); overflow: hidden;
+}
+.pv-notch { height: 18px; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; }
+.pv-notch-bar { width: 52px; height: 5px; background: rgba(255,255,255,0.1); border-radius: 3px; }
+.pv-body { padding: 16px 12px 20px; }
+.pv-title { font-family: var(--font-head); font-weight: 900; font-size: 22px; color: #fff; margin-bottom: 12px; }
+.pv-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 2px; margin-bottom: 12px; }
+.pvc { aspect-ratio: 1; border-radius: 3px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.05); }
+.pvc.a { background: rgba(16,185,129,0.3); border-color: rgba(16,185,129,0.45); }
+.pvc.b { background: rgba(245,158,11,0.25); border-color: rgba(245,158,11,0.35); }
+.pv-score-label { font-size: 8px; color: rgba(255,255,255,0.3); letter-spacing: 0.5px; text-transform: uppercase; }
+.pv-score-num { font-family: var(--font-head); font-weight: 800; font-size: 16px; color: var(--accent); }
+.pv-home-bar-wrap { height: 18px; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; }
+.pv-home-bar { width: 52px; height: 3px; background: rgba(255,255,255,0.15); border-radius: 2px; }
+
+/* ── FOOTER ── */
+.footer {
+  background: var(--dark); border-top: 1px solid var(--dark-border);
+  padding: 44px 60px;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 24px;
+}
+.footer-brand { }
+.footer-name { font-family: var(--font-head); font-weight: 800; font-size: 14px; letter-spacing: 3px; color: #fff; margin-bottom: 6px; }
+.footer-meta { font-size: 12px; color: #3f3f46; }
+.footer-links { display: flex; gap: 28px; flex-wrap: wrap; }
+.footer-links a { font-size: 13px; color: #3f3f46; transition: color 0.2s; }
+.footer-links a:hover { color: rgba(255,255,255,0.6); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 1024px) {
+  .nav { padding: 0 32px; }
+  .hero { grid-template-columns: 1fr; }
+  .hero-right { display: none; }
+  .hero-left { padding: 64px 32px; min-height: 80vh; }
+  .hero-h1 { font-size: 44px; letter-spacing: -1.5px; }
+  .feature-strip { grid-template-columns: repeat(3,1fr); }
+  .feature-item:nth-child(3) { border-right: none; }
+  .feature-item:nth-child(4), .feature-item:nth-child(5) { border-top: 1px solid var(--border); }
+  .projects-section { padding: 60px 32px; }
+  .project-card { grid-template-columns: 1fr; }
+  .project-visual { min-height: 260px; }
+  .footer { padding: 36px 32px; flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 640px) {
+  .nav { padding: 0 20px; }
+  .nav-links { display: none; }
+  .hero-left { padding: 48px 20px; }
+  .hero-h1 { font-size: 36px; }
+  .feature-strip { grid-template-columns: 1fr 1fr; }
+  .feature-item:nth-child(2) { border-right: none; }
+  .feature-item:nth-child(3), .feature-item:nth-child(4), .feature-item:nth-child(5) { border-top: 1px solid var(--border); }
+  .projects-section { padding: 48px 20px; }
+  .project-info { padding: 36px 24px; }
+  .project-name { font-size: 40px; }
+  .footer { padding: 32px 20px; }
+  .footer-links { gap: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-logo" href="index.html">
+    <div class="nav-logo-mark">
+      <svg viewBox="0 0 18 18"><rect x="1" y="1" width="7" height="7" rx="1.5"/><rect x="10" y="1" width="7" height="7" rx="1.5"/><rect x="1" y="10" width="7" height="7" rx="1.5"/><rect x="10" y="10" width="7" height="7" rx="1.5"/></svg>
+    </div>
+    <span class="nav-logo-text">NOBILIX</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#projects">Our Work</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#legal">Legal</a></li>
+  </ul>
+  <a href="mailto:support.nobilix@proton.me" class="nav-cta">Get in Touch</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-left">
+    <div class="hero-eyebrow">
+      <span class="hero-eyebrow-line"></span>
+      NSW, Australia &nbsp;·&nbsp; Software Studio
+    </div>
+    <h1 class="hero-h1">We build<br>apps people<br><em>love.</em></h1>
+    <p class="hero-p">NOBILIX is an independent software studio in New South Wales crafting mobile games and applications for iOS and Android.</p>
+    <div class="hero-actions">
+      <a href="#projects" class="btn-white">
+        View Our Projects
+        <svg viewBox="0 0 16 16"><path d="M3 8h10"/><path d="M9 4l4 4-4 4"/></svg>
+      </a>
+      <a href="mailto:support.nobilix@proton.me" class="btn-outline">Contact Us</a>
+    </div>
+  </div>
+  <div class="hero-right">
+    <div class="hero-lights"></div>
+    <div class="hero-lights-overlay"></div>
+    <div class="hero-phone-wrap">
+      <div class="hero-phone">
+        <div class="phone-notch"><div class="phone-notch-bar"></div></div>
+        <div class="phone-body">
+          <div class="phone-badge">Coming Soon</div>
+          <div class="phone-title">TrapMan</div>
+          <div class="phone-sub">Mobile Game &nbsp;·&nbsp; iOS &amp; Android</div>
+          <div class="phone-grid">
+            <div class="phone-cell"></div><div class="phone-cell g"></div><div class="phone-cell"></div><div class="phone-cell p"></div><div class="phone-cell"></div>
+            <div class="phone-cell g"></div><div class="phone-cell"></div><div class="phone-cell o"></div><div class="phone-cell"></div><div class="phone-cell g"></div>
+            <div class="phone-cell"></div><div class="phone-cell p"></div><div class="phone-cell g"></div><div class="phone-cell"></div><div class="phone-cell o"></div>
+            <div class="phone-cell p"></div><div class="phone-cell"></div><div class="phone-cell"></div><div class="phone-cell g"></div><div class="phone-cell"></div>
+          </div>
+          <div class="phone-stores">
+            <div class="phone-store">
+              <span class="phone-store-small">Download on</span>
+              <span class="phone-store-name">App Store</span>
+            </div>
+            <div class="phone-store">
+              <span class="phone-store-small">Get it on</span>
+              <span class="phone-store-name">Google Play</span>
+            </div>
+          </div>
+        </div>
+        <div class="phone-home"><div class="phone-home-bar"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE STRIP -->
+<div class="feature-strip">
+  <div class="feature-item">
+    <div class="feature-icon">
+      <svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+    </div>
+    <div>
+      <div class="feature-label">Mobile-First</div>
+      <div class="feature-desc">iOS &amp; Android native apps</div>
+    </div>
+  </div>
+  <div class="feature-item">
+    <div class="feature-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    </div>
+    <div>
+      <div class="feature-label">Independent Studio</div>
+      <div class="feature-desc">All in-house, NSW-built</div>
+    </div>
+  </div>
+  <div class="feature-item">
+    <div class="feature-icon">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    </div>
+    <div>
+      <div class="feature-label">Rapid Development</div>
+      <div class="feature-desc">From concept to App Store</div>
+    </div>
+  </div>
+  <div class="feature-item">
+    <div class="feature-icon">
+      <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    </div>
+    <div>
+      <div class="feature-label">Privacy Compliant</div>
+      <div class="feature-desc">GDPR, APPs, CCPA aligned</div>
+    </div>
+  </div>
+  <div class="feature-item">
+    <div class="feature-icon">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    </div>
+    <div>
+      <div class="feature-label">Player-Focused</div>
+      <div class="feature-desc">Built for real gamers</div>
+    </div>
+  </div>
+</div>
+
+<!-- PROJECTS -->
+<section id="projects" class="projects-section">
+  <div class="section-header">
+    <div>
+      <div class="section-eyebrow">Our Work</div>
+      <div class="section-h2">Current Projects</div>
+    </div>
+    <a href="mailto:support.nobilix@proton.me" class="section-cta">Get in touch →</a>
+  </div>
+
+  <div class="project-card">
+    <div class="project-info">
+      <div class="project-tags">
+        <span class="tag tag-platform">iOS · Android</span>
+        <span class="tag tag-status">● Coming Soon</span>
+        <span class="tag tag-location">NSW, AU</span>
+      </div>
+      <div class="project-name">TrapMan</div>
+      <p class="project-desc">A fast-paced mobile game built in New South Wales. Navigate traps, climb the global leaderboard, unlock characters and power-ups. Coming to App Store and Google Play.</p>
+      <div id="legal" class="project-legal-links">
+        <a href="privacy-policy.html" class="legal-btn-primary">Privacy Policy</a>
+        <a href="terms-of-use.html" class="legal-btn-ghost">Terms of Use</a>
+        <a href="data-compliance.html" class="legal-btn-ghost">Data &amp; Compliance</a>
+      </div>
+    </div>
+    <div class="project-visual">
+      <div class="project-visual-bg"></div>
+      <div class="project-visual-content">
+        <div class="pv-phone">
+          <div class="pv-notch"><div class="pv-notch-bar"></div></div>
+          <div class="pv-body">
+            <div class="pv-title">TrapMan</div>
+            <div class="pv-grid">
+              <div class="pvc"></div><div class="pvc a"></div><div class="pvc"></div><div class="pvc"></div>
+              <div class="pvc a"></div><div class="pvc b"></div><div class="pvc a"></div><div class="pvc"></div>
+              <div class="pvc"></div><div class="pvc"></div><div class="pvc a"></div><div class="pvc b"></div>
+              <div class="pvc b"></div><div class="pvc a"></div><div class="pvc"></div><div class="pvc"></div>
+            </div>
+            <div class="pv-score-label">High Score</div>
+            <div class="pv-score-num">48,290</div>
+          </div>
+          <div class="pv-home-bar-wrap"><div class="pv-home-bar"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer" id="about">
+  <div class="footer-brand">
+    <div class="footer-name">NOBILIX</div>
+    <div class="footer-meta">NOBILIX PTY LTD &nbsp;·&nbsp; ABN 65 689 067 981 &nbsp;·&nbsp; New South Wales, Australia</div>
+  </div>
+  <div class="footer-links">
+    <a href="mailto:support.nobilix@proton.me">support.nobilix@proton.me</a>
+    <a href="privacy-policy.html">Privacy Policy</a>
+    <a href="terms-of-use.html">Terms of Use</a>
+    <a href="data-compliance.html">Data &amp; Compliance</a>
+  </div>
+</footer>
+
+</body>
+</html>
