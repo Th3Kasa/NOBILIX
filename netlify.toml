@@ -13,5 +13,10 @@
   to = "/data-compliance/"
   status = 301
 
+[[redirects]]
+  from = "/delete-account"
+  to = "/delete-account/"
+  status = 301
+
 [build]
   publish = "."
