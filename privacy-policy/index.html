@@ -8,7 +8,8 @@
 <link rel="canonical" href="https://www.nobilix.com/privacy-policy/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"></noscript>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
@@ -100,12 +101,42 @@ code { font-family: monospace; font-size: 13px; background: #f4f4f5; padding: 2p
   .page-h1 { font-size: 30px; }
   .footer { padding: 32px 20px; flex-direction: column; align-items: flex-start; }
 }
+
+/* ── FOCUS VISIBLE ── */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ── NAV LOGO TOOLTIP ── */
+.nav-logo { position: relative; }
+.nav-logo::after {
+  content: 'Go to homepage';
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--dark);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.12);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+  z-index: 200;
+}
+.nav-logo:hover::after { opacity: 1; }
+
+/* ── WORD BREAK FOR EMAILS ── */
+.footer-links a { word-break: break-all; }
 </style>
 </head>
 <body>
 
 <nav class="nav">
-  <a class="nav-logo" href="/">
+  <a class="nav-logo" href="/" title="Go to homepage" aria-label="NOBILIX — Go to homepage">
     <div class="nav-logo-mark">
       <svg viewBox="0 0 18 18"><rect x="1" y="1" width="7" height="7" rx="1.5"/><rect x="10" y="1" width="7" height="7" rx="1.5"/><rect x="1" y="10" width="7" height="7" rx="1.5"/><rect x="10" y="10" width="7" height="7" rx="1.5"/></svg>
     </div>
@@ -286,7 +317,7 @@ code { font-family: monospace; font-size: 13px; background: #f4f4f5; padding: 2p
         <h2 class="section-h2">Sharing Your Information</h2>
         <p>We do not sell, rent, or trade your personal information. We share it only in the following limited circumstances:</p>
         <ul>
-          <li><strong>Google Firebase (Google LLC / Google Ireland Ltd):</strong> Firebase Authentication, Cloud Firestore, Firebase Cloud Messaging, and Firebase Analytics. Google processes data as our data processor under a Data Processing Agreement. Data may be processed in the United States and other countries where Google operates. See Google's <a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener">Firebase Privacy information</a>.</li>
+          <li><strong>Google Firebase (Google LLC / Google Ireland Ltd):</strong> Firebase Authentication, Cloud Firestore, Firebase Cloud Messaging, and Firebase Analytics. Google processes data as our data processor under a Data Processing Agreement. Data may be processed in the United States and other countries where Google operates. See Google's <a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener noreferrer">Firebase Privacy information</a>.</li>
           <li><strong>Google Play Billing (Google LLC):</strong> handles payment processing for Android in-app purchases. We receive only a purchase confirmation token.</li>
           <li><strong>Apple App Store (Apple Inc.):</strong> handles payment processing for iOS in-app purchases. We receive only a receipt validation response.</li>
           <li><strong>Other players (public leaderboards):</strong> your username, country flag, and score are visible to all players in the Game. Do not use a username that reveals your real identity if you wish to remain anonymous.</li>
@@ -305,7 +336,7 @@ code { font-family: monospace; font-size: 13px; background: #f4f4f5; padding: 2p
           <li>The <strong>EU Standard Contractual Clauses (SCCs)</strong> approved by the European Commission under Implementing Decision (EU) 2021/914; and</li>
           <li>The <strong>UK International Data Transfer Addendum</strong> (IDTA) issued by the UK Information Commissioner's Office.</li>
         </ul>
-        <p>For Australian users, cross-border disclosures to Google are made under Australian Privacy Principle 8.1, and we have taken reasonable steps to ensure Google provides substantially similar privacy protections. For information on Google's data centre locations and transfer safeguards, see Google's <a href="https://cloud.google.com/terms/data-processing-addendum" target="_blank" rel="noopener">Data Processing Addendum</a>.</p>
+        <p>For Australian users, cross-border disclosures to Google are made under Australian Privacy Principle 8.1, and we have taken reasonable steps to ensure Google provides substantially similar privacy protections. For information on Google's data centre locations and transfer safeguards, see Google's <a href="https://cloud.google.com/terms/data-processing-addendum" target="_blank" rel="noopener noreferrer">Data Processing Addendum</a>.</p>
       </div>
 
       <!-- S9 -->
@@ -349,10 +380,10 @@ code { font-family: monospace; font-size: 13px; background: #f4f4f5; padding: 2p
         <p>To exercise any right, email <a href="mailto:help.nobilix@outlook.com">help.nobilix@outlook.com</a> from the address linked to your account. We will verify your identity before actioning the request. We respond within <strong>30 days</strong> (extendable to 60 days for complex requests, with notice to you).</p>
         <p>If we cannot fulfil a request or you are unhappy with our response, you may lodge a complaint with your local supervisory authority:</p>
         <ul>
-          <li><strong>Australia:</strong> Office of the Australian Information Commissioner (OAIC) — <a href="https://www.oaic.gov.au" target="_blank" rel="noopener">oaic.gov.au</a></li>
-          <li><strong>EEA:</strong> Your national Data Protection Authority (list at <a href="https://edpb.europa.eu/about-edpb/about-edpb/members_en" target="_blank" rel="noopener">edpb.europa.eu</a>)</li>
-          <li><strong>UK:</strong> Information Commissioner's Office (ICO) — <a href="https://ico.org.uk" target="_blank" rel="noopener">ico.org.uk</a></li>
-          <li><strong>California:</strong> California Privacy Protection Agency — <a href="https://cppa.ca.gov" target="_blank" rel="noopener">cppa.ca.gov</a></li>
+          <li><strong>Australia:</strong> Office of the Australian Information Commissioner (OAIC) — <a href="https://www.oaic.gov.au" target="_blank" rel="noopener noreferrer">oaic.gov.au</a></li>
+          <li><strong>EEA:</strong> Your national Data Protection Authority (list at <a href="https://edpb.europa.eu/about-edpb/about-edpb/members_en" target="_blank" rel="noopener noreferrer">edpb.europa.eu</a>)</li>
+          <li><strong>UK:</strong> Information Commissioner's Office (ICO) — <a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer">ico.org.uk</a></li>
+          <li><strong>California:</strong> California Privacy Protection Agency — <a href="https://cppa.ca.gov" target="_blank" rel="noopener noreferrer">cppa.ca.gov</a></li>
         </ul>
       </div>
 
@@ -393,7 +424,7 @@ code { font-family: monospace; font-size: 13px; background: #f4f4f5; padding: 2p
         <div class="section-num">Section 14</div>
         <h2 class="section-h2">Third-Party Links &amp; Services</h2>
         <p>The Game may display advertisements or contain links that open third-party websites or applications in your browser. Once you leave the Game or click on a third-party link, this Privacy Policy no longer applies. We have no control over and assume no responsibility for the content, privacy policies, or practices of any third-party sites or services. We encourage you to review the privacy policy of every site you visit.</p>
-        <p>Google's Firebase services are subject to <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google's Privacy Policy</a>. Apple's Sign-in and App Store services are subject to <a href="https://www.apple.com/legal/privacy/" target="_blank" rel="noopener">Apple's Privacy Policy</a>.</p>
+        <p>Google's Firebase services are subject to <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">Google's Privacy Policy</a>. Apple's Sign-in and App Store services are subject to <a href="https://www.apple.com/legal/privacy/" target="_blank" rel="noopener noreferrer">Apple's Privacy Policy</a>.</p>
       </div>
 
       <!-- S15 -->

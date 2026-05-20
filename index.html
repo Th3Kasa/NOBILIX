@@ -7,7 +7,8 @@
 <meta name="description" content="NOBILIX is an independent software studio based in New South Wales, Australia. We make mobile games and apps for iOS and Android.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"></noscript>
 <style>
 /* ── RESET & TOKENS ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -262,13 +263,52 @@ a { color: inherit; text-decoration: none; }
   .footer { padding: 32px 20px; }
   .footer-links { gap: 16px; }
 }
+@media (max-width: 375px) {
+  .hero-h1 { font-size: 30px; letter-spacing: -1px; }
+  .project-name { font-size: 32px; letter-spacing: -1.5px; }
+  .project-info { padding: 28px 16px; }
+  .hero-left { padding: 40px 16px; }
+}
+
+/* ── FOCUS VISIBLE ── */
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ── NAV LOGO TOOLTIP ── */
+.nav-logo { position: relative; }
+.nav-logo::after {
+  content: 'Go to homepage';
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--dark);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.12);
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+  z-index: 200;
+}
+.nav-logo:hover::after { opacity: 1; }
+
+/* ── SCROLL MARGIN ── */
+#projects { scroll-margin-top: 90px; }
+
+/* ── WORD BREAK FOR EMAILS ── */
+.footer-links a { word-break: break-all; }
 </style>
 </head>
 <body>
 
 <!-- NAV -->
 <nav class="nav">
-  <a class="nav-logo" href="index.html">
+  <a class="nav-logo" href="/" title="Go to homepage" aria-label="NOBILIX — Go to homepage">
     <div class="nav-logo-mark">
       <svg viewBox="0 0 18 18"><rect x="1" y="1" width="7" height="7" rx="1.5"/><rect x="10" y="1" width="7" height="7" rx="1.5"/><rect x="1" y="10" width="7" height="7" rx="1.5"/><rect x="10" y="10" width="7" height="7" rx="1.5"/></svg>
     </div>
@@ -306,7 +346,7 @@ a { color: inherit; text-decoration: none; }
         <div class="phone-notch"><div class="phone-notch-bar"></div></div>
         <div class="phone-body">
           <div class="phone-badge">Coming Soon</div>
-          <img src="/assets/trapman-logo.png" alt="TrapMan" class="phone-logo">
+          <img src="/assets/trapman-logo.png" alt="TrapMan game logo" class="phone-logo" width="130" height="130">
           <div class="phone-title">TrapMan</div>
           <div class="phone-sub">Mobile Game &nbsp;·&nbsp; iOS &amp; Android</div>
           <div class="phone-stores">
@@ -405,7 +445,7 @@ a { color: inherit; text-decoration: none; }
       <div class="project-visual-bg"></div>
       <div class="project-visual-content">
         <div class="pv-logo-wrap">
-          <img src="/assets/trapman-logo.png" alt="TrapMan" class="pv-logo">
+          <img src="/assets/trapman-logo.png" alt="TrapMan game logo" class="pv-logo" width="200" height="200" loading="lazy">
           <div class="pv-logo-label">Coming Soon</div>
         </div>
       </div>
