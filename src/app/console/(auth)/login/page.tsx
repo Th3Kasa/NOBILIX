@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Gamepad2 } from "lucide-react";
 import {
   Card,
@@ -21,14 +20,8 @@ export default function LoginPage() {
           Secure sign-in for TrapMan administrators
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent>
         <LoginForm />
-        <p className="text-center text-xs text-muted-foreground">
-          First time here?{" "}
-          <Link href="/console/enroll" className="text-primary hover:underline">
-            Set up two-factor authentication
-          </Link>
-        </p>
       </CardContent>
     </Card>
   );
