@@ -30,7 +30,21 @@ const schema = z.object({
     .default("development"),
 });
 
-function loadEnv() {
+export type Env = z.infer<typeof schema>;
+
+let _cache: Env | null = null;
+
+/**
+ * Validate and cache the environment. Called lazily on first property access
+ * (see the Proxy below) so that simply *importing* a module that references env
+ * never throws at build time — Next.js evaluates route modules during the build
+ * "collect page data" step, and a fresh clone / CI without secrets must still
+ * compile. Validation therefore happens on first real use at runtime, where
+ * callers (Firebase init, crypto) already handle failures gracefully.
+ */
+function loadEnv(): Env {
+  if (_cache) return _cache;
+
   const parsed = schema.safeParse(process.env);
   if (!parsed.success) {
     const issues = parsed.error.issues
@@ -53,8 +67,13 @@ function loadEnv() {
     );
   }
 
+  _cache = env;
   return env;
 }
 
-export const env = loadEnv();
-export type Env = z.infer<typeof schema>;
+/** Lazily-validated environment. Accessing any property triggers validation. */
+export const env: Env = new Proxy({} as Env, {
+  get(_target, prop) {
+    return loadEnv()[prop as keyof Env];
+  },
+});
