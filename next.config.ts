@@ -7,10 +7,11 @@ import type { NextConfig } from "next";
  * admin CRM (Next.js app routes, auth-gated by `src/proxy.ts`).
  */
 const nextConfig: NextConfig = {
-  // firebase-admin is a heavy Node/native package — keep it external so it's
-  // loaded from node_modules at runtime instead of bundled into the serverless
-  // function (bundling it causes "Failed to load external module" at runtime).
-  serverExternalPackages: ["firebase-admin"],
+  // firebase-admin v14 has no native binaries — Turbopack can bundle it
+  // directly. Marking it as external (serverExternalPackages) causes
+  // "Failed to load external module" on Vercel because Turbopack's file
+  // tracer doesn't reliably include all transitive firebase-admin files in
+  // the serverless function bundle. Bundling it is the reliable fix.
 
   async rewrites() {
     return {
