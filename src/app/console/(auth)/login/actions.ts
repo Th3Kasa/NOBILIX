@@ -64,6 +64,7 @@ export async function loginAction(
       return { step: "credentials", error: "Enter a valid email and password." };
     }
 
+    try {
     const admin = await getAdminByEmail(email);
     if (!admin) {
       // Constant-ish timing to avoid trivial user enumeration.
@@ -101,6 +102,13 @@ export async function loginAction(
 
     const qrDataUrl = await buildQrDataUrl(buildOtpAuthUrl(admin.email, secret));
     return { step: "enroll", qrDataUrl, manualKey: secret };
+    } catch (e) {
+      // TEMP DEBUG: surface the real runtime error to diagnose the 500.
+      return {
+        step: "credentials",
+        error: "DEBUG: " + (e instanceof Error ? e.message : String(e)),
+      };
+    }
   }
 
   // ── Phase 2: first-time enrollment — confirm a code, then activate 2FA ──
