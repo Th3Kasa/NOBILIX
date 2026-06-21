@@ -1,6 +1,6 @@
 import "server-only";
 import bcrypt from "bcryptjs";
-import { getDb } from "@/lib/firebase/admin";
+import { getDb } from "@/lib/firebase/firestore";
 import { CRM } from "@/lib/firebase/collections";
 import type { AdminRecord } from "@/types";
 

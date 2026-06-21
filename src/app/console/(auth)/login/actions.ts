@@ -10,7 +10,7 @@ import {
   registerFailedAttempt,
   setTotpEnrollment,
 } from "@/lib/admins";
-import { getDb } from "@/lib/firebase/admin";
+import { getDb } from "@/lib/firebase/firestore";
 import { CRM } from "@/lib/firebase/collections";
 import { encrypt, decrypt } from "@/lib/crypto";
 import {

@@ -1,6 +1,6 @@
 import "server-only";
 import { FieldValue } from "firebase-admin/firestore";
-import { getDb } from "@/lib/firebase/admin";
+import { getDb } from "@/lib/firebase/firestore";
 import { GAME, CRM } from "@/lib/firebase/collections";
 import type {
   LeaderboardEntry,

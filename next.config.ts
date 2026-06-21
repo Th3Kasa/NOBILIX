@@ -7,11 +7,9 @@ import type { NextConfig } from "next";
  * admin CRM (Next.js app routes, auth-gated by `src/proxy.ts`).
  */
 const nextConfig: NextConfig = {
-  // firebase-admin v14 has no native binaries — Turbopack can bundle it
-  // directly. Marking it as external (serverExternalPackages) causes
-  // "Failed to load external module" on Vercel because Turbopack's file
-  // tracer doesn't reliably include all transitive firebase-admin files in
-  // the serverless function bundle. Bundling it is the reliable fix.
+  // Next.js 16 automatically externalizes firebase-admin. Keep Firebase
+  // services in separate modules so Firestore-only routes do not load Auth's
+  // CommonJS dependency graph during server-function initialization.
 
   async rewrites() {
     return {

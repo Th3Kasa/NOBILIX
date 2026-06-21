@@ -31,6 +31,8 @@ export function LoginForm() {
 
   // Advance the visible step whenever the server tells us to.
   useEffect(() => {
+    // The server action is the source of truth for this multi-step form.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (state.step && state.step !== step) setStep(state.step);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.step]);

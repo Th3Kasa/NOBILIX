@@ -1,5 +1,6 @@
 import "server-only";
-import { getDb, getAuthAdmin } from "@/lib/firebase/admin";
+import { getAuthAdmin } from "@/lib/firebase/auth";
+import { getDb } from "@/lib/firebase/firestore";
 import { GAME } from "@/lib/firebase/collections";
 import type { GameUser } from "@/types";
 

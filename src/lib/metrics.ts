@@ -1,5 +1,5 @@
 import "server-only";
-import { getDb } from "@/lib/firebase/admin";
+import { getDb } from "@/lib/firebase/firestore";
 import { GAME } from "@/lib/firebase/collections";
 
 export interface OverviewMetrics {

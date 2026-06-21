@@ -1,5 +1,6 @@
 import "server-only";
-import { getDb, getMessagingAdmin } from "@/lib/firebase/admin";
+import { getDb } from "@/lib/firebase/firestore";
+import { getMessagingAdmin } from "@/lib/firebase/messaging";
 import { GAME } from "@/lib/firebase/collections";
 import type { CampaignAudience } from "@/types";
 

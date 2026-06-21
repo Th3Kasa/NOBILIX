@@ -8,7 +8,6 @@ import {
   Trophy,
   Trash2,
   AlertTriangle,
-  CheckCircle2,
   AlertCircle,
   ChevronDown,
   ChevronUp,
@@ -25,7 +24,7 @@ import {
   type ResetState,
   type RemoveState,
 } from "./actions";
-import type { LeaderboardEntry, CompetitionRecord } from "@/types";
+import type { CompetitionRecord } from "@/types";
 
 // ─── Reset competition button + modal ────────────────────────────────────────
 

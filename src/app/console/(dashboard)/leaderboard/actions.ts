@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { requireAdmin, requireWriteAccess } from "@/lib/authz";
+import { requireWriteAccess } from "@/lib/authz";
 import { recordAudit } from "@/lib/audit";
 import {
   removeLeaderboardEntry,

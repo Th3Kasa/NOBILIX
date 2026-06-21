@@ -1,5 +1,5 @@
 import "server-only";
-import { getDb } from "@/lib/firebase/admin";
+import { getDb } from "@/lib/firebase/firestore";
 import { CRM } from "@/lib/firebase/collections";
 import { resolveAudienceTokens, sendToTokens } from "@/lib/fcm";
 import type { CampaignAudience, CampaignRecord } from "@/types";
