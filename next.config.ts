@@ -7,6 +7,11 @@ import type { NextConfig } from "next";
  * admin CRM (Next.js app routes, auth-gated by `src/proxy.ts`).
  */
 const nextConfig: NextConfig = {
+  // firebase-admin is a heavy Node/native package — keep it external so it's
+  // loaded from node_modules at runtime instead of bundled into the serverless
+  // function (bundling it causes "Failed to load external module" at runtime).
+  serverExternalPackages: ["firebase-admin"],
+
   async rewrites() {
     return {
       beforeFiles: [

@@ -11,6 +11,7 @@ import {
   ShoppingCart,
   FileDown,
   ScrollText,
+  Settings,
   Gamepad2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -24,6 +25,7 @@ const NAV = [
   { href: "/console/purchases", label: "Purchases", icon: ShoppingCart },
   { href: "/console/exports", label: "Exports", icon: FileDown },
   { href: "/console/audit", label: "Audit log", icon: ScrollText },
+  { href: "/console/settings", label: "Settings", icon: Settings },
 ] as const;
 
 export function Sidebar() {

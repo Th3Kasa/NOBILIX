@@ -89,3 +89,12 @@ export async function setTotpEnrollment(
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12);
 }
+
+/** Replace an admin's password (used by the self-service change-password flow). */
+export async function updatePassword(
+  adminId: string,
+  newPassword: string,
+): Promise<void> {
+  const passwordHash = await hashPassword(newPassword);
+  await getDb().collection(CRM.admins).doc(adminId).update({ passwordHash });
+}
