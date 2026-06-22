@@ -1,0 +1,14 @@
+.trapman-site {
+  --tm-black: #030207;
+  --tm-violet: #8c27ff;
+  --tm-magenta: #f144ff;
+  --tm-cyan: #39e9ff;
+  --tm-yellow: #ffd436;
+  min-height: 100vh;
+  background: var(--tm-black);
+  color: #fff;
+  overflow: clip;
+}
+.trapman-site section { padding: clamp(5rem, 10vw, 10rem) clamp(1.25rem, 6vw, 6rem); }
+.trapman-site h2 { font-size: clamp(2.5rem, 7vw, 6rem); line-height: .9; }
+.trapman-header { min-height: 76px; display: flex; justify-content: space-between; align-items: center; padding: .75rem clamp(1rem, 4vw, 4rem); }

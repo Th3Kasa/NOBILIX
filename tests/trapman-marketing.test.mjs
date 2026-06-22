@@ -15,3 +15,10 @@ test("official TrapMan marketing assets are present", () => {
     "public/assets/trapman/screens/leaderboard.png",
   ]) assert.equal(existsSync(resolve(root, path)), true, `${path} missing`);
 });
+
+test("TrapMan marketing route contains required sections", () => {
+  const source = readFileSync(resolve(root, "src/app/(public)/trapman/page.tsx"), "utf8");
+  for (const id of ["the-run", "characters", "music", "leaderboard", "account", "support"]) {
+    assert.match(source, new RegExp(`id="${id}"`));
+  }
+});
