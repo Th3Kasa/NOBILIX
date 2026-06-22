@@ -26,7 +26,7 @@ export function UsersFilter({
     if (q) p.set("q", q);
     if (country) p.set("country", country);
     if (guest && guest !== "all") p.set("guest", guest);
-    router.push(`/console/users${p.toString() ? `?${p}` : ""}`);
+    router.push(`/console/trapman/users${p.toString() ? `?${p}` : ""}`);
   }
 
   return (
