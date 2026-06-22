@@ -141,3 +141,26 @@
   background: var(--border);
   border-radius: 9999px;
 }
+
+/* ─── Public shell ─────────────────────────────────────────────── */
+.public-shell {
+  min-height: 100vh;
+  background: #07090d;
+  color: #f4f0e8;
+}
+.public-header,
+.public-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.25rem clamp(1.25rem, 4vw, 4rem);
+  border-color: rgb(255 255 255 / 0.1);
+}
+.public-header { border-bottom-width: 1px; }
+.public-footer { border-top-width: 1px; flex-wrap: wrap; }
+.public-header nav,
+.public-footer nav { display: flex; flex-wrap: wrap; gap: 1rem; }
+.public-header a,
+.public-footer a { min-height: 44px; display: inline-flex; align-items: center; }
+.public-wordmark { font-weight: 800; letter-spacing: 0.18em; }

@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NOBILIX Admin Console",
-  description: "Internal admin console for the TrapMan game backend.",
-  robots: { index: false, follow: false },
+  metadataBase: new URL("https://nobilix.vercel.app"),
+  title: { default: "Nobilix", template: "%s · Nobilix" },
+  description: "Nobilix builds distinctive games and digital products.",
 };
 
 export default function RootLayout({
