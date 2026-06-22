@@ -142,6 +142,30 @@
   border-radius: 9999px;
 }
 
+/* ─── Console shell semantic tokens ───────────────────────────── */
+.console-shell {
+  --console-bg: #090c10;
+  --console-panel: #10151c;
+  --console-line: rgb(255 255 255 / .09);
+  --console-live: #9de43a;
+  --console-action: #ff632f;
+  --console-violet: #9b5cff;
+}
+
+/* Console motion — 120-240ms, reduced-motion disabled */
+@layer base {
+  .console-shell * {
+    transition-duration: 150ms;
+    transition-timing-function: ease;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .console-shell * {
+      transition-duration: 0ms !important;
+      animation-duration: 0ms !important;
+    }
+  }
+}
+
 /* ─── Public shell ─────────────────────────────────────────────── */
 .public-shell {
   min-height: 100vh;

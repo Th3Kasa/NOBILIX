@@ -10,10 +10,12 @@ export function Topbar({
   name,
   email,
   role,
+  projectName,
 }: {
   name: string;
   email: string;
   role: AdminRole;
+  projectName?: string;
 }) {
   const initials = (name || email)
     .split(" ")
@@ -25,7 +27,15 @@ export function Topbar({
   return (
     <header className="flex h-14 items-center justify-between border-b border-border bg-card/40 px-4 md:px-6">
       <span className="text-sm font-medium text-muted-foreground md:hidden">
-        NOBILIX
+        {projectName ? (
+          <>
+            <span className="text-xs">NOBILIX</span>
+            <span className="mx-1.5 text-muted-foreground/50">/</span>
+            {projectName}
+          </>
+        ) : (
+          "NOBILIX"
+        )}
       </span>
       <div className="ml-auto flex items-center gap-3">
         <div className="hidden text-right sm:block">

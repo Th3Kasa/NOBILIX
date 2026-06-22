@@ -70,7 +70,7 @@ export function UserActions({
     async (prev, fd) => {
       const res = await deleteUserAction(prev, fd);
       if (res.ok) {
-        router.push("/console/users");
+        router.push("/console/trapman/users");
       }
       return res;
     },

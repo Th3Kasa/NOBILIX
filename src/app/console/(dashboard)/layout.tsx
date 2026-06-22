@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
-import { Sidebar } from "@/components/nav/sidebar";
+import { PlatformSidebar } from "@/components/nav/platform-sidebar";
 import { Topbar } from "@/components/nav/topbar";
 
 export default async function DashboardLayout({
@@ -13,7 +13,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-dvh">
-      <Sidebar />
+      <PlatformSidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar
           name={session.user.name ?? ""}
