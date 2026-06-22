@@ -12,3 +12,123 @@
 .trapman-site section { padding: clamp(5rem, 10vw, 10rem) clamp(1.25rem, 6vw, 6rem); }
 .trapman-site h2 { font-size: clamp(2.5rem, 7vw, 6rem); line-height: .9; }
 .trapman-header { min-height: 76px; display: flex; justify-content: space-between; align-items: center; padding: .75rem clamp(1rem, 4vw, 4rem); }
+
+/* ── City Hero ─────────────────────────────────────────────── */
+.city-hero {
+  position: relative;
+  min-height: 900px;
+  isolation: isolate;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+
+/* Decorative layers */
+.starfield,
+.far-skyline,
+.near-skyline,
+.helicopter,
+.runner-stage {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.helicopter {
+  pointer-events: none;
+  z-index: 2;
+}
+
+.searchlight {
+  display: block;
+  pointer-events: none;
+}
+
+/* Hero copy sits above all decorative layers */
+.hero-copy {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: clamp(1.5rem, 6vw, 4rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+.hero-copy h1 {
+  font-size: clamp(2rem, 6vw, 5rem);
+  line-height: 1;
+  font-weight: 900;
+}
+.hero-copy p {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  opacity: 0.8;
+}
+.hero-cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+.hero-cta a {
+  padding: .75rem 2rem;
+  border: 2px solid var(--tm-cyan);
+  color: var(--tm-cyan);
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: .05em;
+  transition: background .2s, color .2s;
+}
+.hero-cta a:first-child {
+  background: var(--tm-violet);
+  border-color: var(--tm-violet);
+  color: #fff;
+}
+.hero-cta a:hover { opacity: .85; }
+
+/* Animations */
+.far-skyline { animation: far-drift 36s ease-in-out infinite alternate; }
+.near-skyline { animation: near-drift 24s ease-in-out infinite alternate; }
+.helicopter { animation: helicopter-flight 18s linear infinite; }
+.rotor { display: block; animation: rotor-spin .18s linear infinite; }
+.searchlight { transform-origin: top center; animation: search-sweep 4.8s ease-in-out infinite alternate; }
+.runner { animation: runner-idle 2.2s steps(4) infinite; }
+.scan-platform::before { content: ''; display: block; animation: platform-scan 2.4s linear infinite; }
+
+/* Pause when tab hidden */
+.city-hero[data-paused] * { animation-play-state: paused !important; }
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .city-hero * { animation: none !important; transform: none !important; }
+}
+
+/* Keyframes */
+@keyframes far-drift {
+  from { transform: translateX(calc(var(--pointer-x, 0) * -12px)); }
+  to   { transform: translateX(calc(var(--pointer-x, 0) * -12px + 16px)); }
+}
+@keyframes near-drift {
+  from { transform: translateX(calc(var(--pointer-x, 0) * -24px)); }
+  to   { transform: translateX(calc(var(--pointer-x, 0) * -24px + 28px)); }
+}
+@keyframes helicopter-flight {
+  0%   { transform: translate(-120%, 10%); }
+  100% { transform: translate(120%, -5%); }
+}
+@keyframes rotor-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes search-sweep {
+  from { transform: rotate(-35deg); }
+  to   { transform: rotate(35deg); }
+}
+@keyframes runner-idle {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-4px); }
+  100% { transform: translateY(0); }
+}
+@keyframes platform-scan {
+  from { transform: scaleX(0); transform-origin: left; }
+  to   { transform: scaleX(1); transform-origin: left; }
+}

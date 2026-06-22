@@ -14,6 +14,7 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Worktrees contain their own .next builds — exclude from root lint
     ".worktrees/**",
+    ".claude/**",
     ".Codex/**",
   ]),
 ]);

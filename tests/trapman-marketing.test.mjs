@@ -22,3 +22,12 @@ test("TrapMan marketing route contains required sections", () => {
     assert.match(source, new RegExp(`id="${id}"`));
   }
 });
+
+test("city hero includes all required motion layers and reduced motion", () => {
+  const hero = readFileSync(resolve(root, "src/components/trapman/city-hero.tsx"), "utf8");
+  const css = readFileSync(resolve(root, "src/app/(public)/trapman/trapman.css"), "utf8");
+  for (const layer of ["starfield", "far-skyline", "near-skyline", "helicopter", "searchlight", "runner", "scan-platform"]) {
+    assert.match(hero, new RegExp(`data-layer="${layer}"`));
+  }
+  assert.match(css, /prefers-reduced-motion:\s*reduce/);
+});
