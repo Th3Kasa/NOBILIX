@@ -13,6 +13,8 @@
 export const GAME = {
   users: "users", // users/{uid}
   leaderboard: "leaderboard",
+  purchases: "purchases", // purchases/{autoId} — filtered by uid field
+  progress: "player_progress", // player_progress/{uid}
 } as const;
 
 // --- CRM-owned (this console only) ---
