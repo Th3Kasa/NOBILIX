@@ -28,6 +28,12 @@ const schema = z.object({
   NODE_ENV: z
     .enum(["development", "test", "production"])
     .default("development"),
+
+  // --- Firebase Player Client (NEXT_PUBLIC_* — safe to expose, optional for console-only builds) ---
+  NEXT_PUBLIC_FIREBASE_API_KEY: z.string().optional(),
+  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: z.string().optional(),
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID: z.string().optional(),
+  NEXT_PUBLIC_FIREBASE_APP_ID: z.string().optional(),
 });
 
 export type Env = z.infer<typeof schema>;
