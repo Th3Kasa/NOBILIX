@@ -31,3 +31,9 @@ test("Nobilix public routes are App Router pages", () => {
     assert.equal(existsSync(resolve(root, path)), true, `${path} must exist`);
   }
 });
+
+test("public metadata routes exist and preview artifacts stay ignored", () => {
+  assert.equal(existsSync(resolve(root, "src/app/sitemap.ts")), true);
+  assert.equal(existsSync(resolve(root, "src/app/robots.ts")), true);
+  assert.match(readFileSync(resolve(root, ".gitignore"), "utf8"), /^\.superpowers\/$/m);
+});

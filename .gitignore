@@ -43,4 +43,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-.vercel
+# service-account credentials — never commit
+trap-man-*.json
+
+# preview/superpowers artifacts
+.superpowers/
