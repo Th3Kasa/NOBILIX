@@ -164,3 +164,28 @@
 .public-header a,
 .public-footer a { min-height: 44px; display: inline-flex; align-items: center; }
 .public-wordmark { font-weight: 800; letter-spacing: 0.18em; }
+
+/* ─── Public pages ──────────────────────────────────────────────── */
+.nobilix-hero {
+  min-height: 72svh;
+  display: grid;
+  align-content: center;
+  padding: clamp(5rem, 12vw, 10rem) clamp(1.25rem, 7vw, 7rem);
+}
+.nobilix-hero h1 {
+  max-width: 12ch;
+  font-size: clamp(3.75rem, 10vw, 9rem);
+  line-height: 0.88;
+  letter-spacing: -0.065em;
+}
+.nobilix-projects,
+.legal-directory,
+.public-not-found {
+  padding: clamp(4rem, 8vw, 8rem) clamp(1.25rem, 7vw, 7rem);
+}
+.project-card {
+  margin-top: 2rem;
+  max-width: 56rem;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border: 1px solid rgb(255 255 255 / 0.12);
+}

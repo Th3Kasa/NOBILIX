@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
@@ -20,4 +20,14 @@ test("public shell is separated from the console shell", () => {
   assert.match(publicLayout, /NobilixHeader/);
   assert.match(publicLayout, /NobilixFooter/);
   assert.doesNotMatch(rootLayout, /robots:\s*\{\s*index:\s*false/);
+});
+
+test("Nobilix public routes are App Router pages", () => {
+  for (const path of [
+    "src/app/(public)/page.tsx",
+    "src/app/(public)/legal/page.tsx",
+    "src/app/(public)/not-found.tsx",
+  ]) {
+    assert.equal(existsSync(resolve(root, path)), true, `${path} must exist`);
+  }
 });
