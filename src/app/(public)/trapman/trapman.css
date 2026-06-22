@@ -132,3 +132,170 @@
   from { transform: scaleX(0); transform-origin: left; }
   to   { transform: scaleX(1); transform-origin: left; }
 }
+
+/* ── Entrance reveal ───────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  translate: 0 24px;
+  transition: opacity .5s ease, translate .5s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  translate: 0 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; translate: none; transition: none; }
+}
+
+/* ── Gameplay Gallery ──────────────────────────────────────── */
+.gameplay-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+.gameplay-figure { margin: 0; }
+.gameplay-frame {
+  border: 2px solid var(--tm-violet);
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 390/844;
+  position: relative;
+}
+.gameplay-img { object-fit: cover; width: 100%; height: 100%; }
+.gameplay-figure figcaption {
+  margin-top: .75rem;
+  text-align: center;
+  font-size: .875rem;
+  color: var(--tm-cyan);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+/* ── Character Showcase ────────────────────────────────────── */
+.character-showcase {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 3rem;
+  margin-top: 3rem;
+}
+.character-card { display: flex; flex-direction: column; gap: 1.5rem; }
+.character-frame {
+  border: 2px solid var(--tm-magenta);
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 390/844;
+  position: relative;
+}
+.character-img { object-fit: cover; width: 100%; height: 100%; }
+.character-name {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 900;
+  color: var(--tm-magenta);
+}
+.character-desc { opacity: .8; line-height: 1.6; }
+
+/* ── Music Strip ───────────────────────────────────────────── */
+.music-strip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 3rem;
+}
+.music-waveform {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 80px;
+}
+.music-bar {
+  display: block;
+  width: 6px;
+  border-radius: 3px;
+  background: var(--tm-cyan);
+  animation: bar-bounce 1.2s ease-in-out infinite alternate;
+  animation-delay: calc(var(--bar-i) * 0.04s);
+  height: 40%;
+}
+@keyframes bar-bounce {
+  from { height: 20%; opacity: .5; }
+  to   { height: 100%; opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .music-bar { animation: none; height: 50%; }
+}
+.music-audio { width: 100%; max-width: 480px; }
+.music-soon {
+  font-size: 1.125rem;
+  color: var(--tm-cyan);
+  opacity: .7;
+  letter-spacing: .04em;
+}
+.music-label { font-size: .875rem; opacity: .5; text-align: center; }
+
+/* ── Leaderboard Preview ───────────────────────────────────── */
+.leaderboard-preview { margin-top: 3rem; width: 100%; max-width: 700px; }
+.leaderboard-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.leaderboard-table th,
+.leaderboard-table td {
+  padding: .75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(255,255,255,.1);
+}
+.leaderboard-table th { color: var(--tm-cyan); font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; }
+.leaderboard-rank { font-weight: 900; color: var(--tm-yellow); font-size: 1.25rem; }
+.leaderboard-score { color: var(--tm-magenta); font-weight: 700; }
+.leaderboard-empty { text-align: center; opacity: .5; padding: 2rem; }
+.leaderboard-cta {
+  display: inline-block;
+  margin-top: 2rem;
+  padding: .75rem 2rem;
+  background: var(--tm-violet);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: .05em;
+}
+.leaderboard-unavailable {
+  padding: 3rem 2rem;
+  border: 1px solid rgba(255,255,255,.1);
+  text-align: center;
+}
+.leaderboard-unavailable-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--tm-yellow);
+  margin-bottom: .5rem;
+}
+.leaderboard-unavailable-msg { opacity: .6; }
+
+/* ── Skip link ─────────────────────────────────────────────── */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  padding: .5rem 1rem;
+  background: var(--tm-violet);
+  color: #fff;
+  z-index: 100;
+  font-weight: 700;
+  text-decoration: none;
+}
+.skip-link:focus { top: 1rem; }
+
+/* ── Utility ───────────────────────────────────────────────── */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
