@@ -247,6 +247,48 @@ test("idempotent retries stop immediately for non-retryable HTTP responses", asy
   assert.equal(waits, 0);
 });
 
+test("HTTP errors omit reflected response bodies and credentials", async () => {
+  const { requestWithRetry } = await importGenerator();
+  const configuredKey = "muapi-live-reflected-secret-123456";
+  const reflectedCredential = "Bearer sk-live-reflected-abcdef123456";
+  let capturedError;
+
+  try {
+    await requestWithRetry("https://example.test/result", {}, {
+      attempts: 1,
+      fetchImpl: async () =>
+        new Response(
+          `upstream rejected ${configuredKey}; authorization=${reflectedCredential}`,
+          { status: 401 },
+        ),
+    });
+  } catch (error) {
+    capturedError = error;
+  }
+
+  assert.ok(capturedError instanceof Error);
+  assert.match(capturedError.message, /MuAPI request failed \(401\)/);
+  assert.ok(!capturedError.message.includes(configuredKey));
+  assert.ok(!capturedError.message.includes(reflectedCredential));
+  assert.doesNotMatch(capturedError.message, /upstream rejected|authorization=/i);
+});
+
+test("stderr formatting redacts configured and plausible credentials", async () => {
+  const { formatErrorForStderr } = await importGenerator();
+  const configuredKey = "muapi-configured-secret-123456";
+  const plausibleCredential = "sk-live-another-secret-abcdef123456";
+  const stderrText = formatErrorForStderr(
+    new Error(
+      `request failed key=${configuredKey} authorization=Bearer ${plausibleCredential}`,
+    ),
+    [configuredKey],
+  );
+
+  assert.ok(!stderrText.includes(configuredKey));
+  assert.ok(!stderrText.includes(plausibleCredential));
+  assert.match(stderrText, /\[REDACTED\]/);
+});
+
 test("idempotent requests retry transient HTTP responses", async () => {
   const { requestWithRetry } = await importGenerator();
   let calls = 0;
@@ -269,6 +311,38 @@ test("idempotent requests retry transient HTTP responses", async () => {
   assert.equal(await response.text(), "ok");
   assert.equal(calls, 2);
   assert.equal(waits, 1);
+});
+
+test("transaction staging and backup paths stay inside a non-public repository temp root", async () => {
+  const { createTransactionPaths } = await importGenerator();
+  const transactionPaths = createTransactionPaths(
+    generatedAssetsRoot,
+    "fixed-transaction-id",
+  );
+  const publicRoot = path.join(repositoryRoot, "public");
+
+  for (const candidatePath of [
+    transactionPaths.stagingPrefix,
+    transactionPaths.backupRoot,
+  ]) {
+    const relativeToRepository = path.relative(repositoryRoot, candidatePath);
+    const relativeToPublic = path.relative(publicRoot, candidatePath);
+
+    assert.ok(
+      relativeToRepository !== "" &&
+        !relativeToRepository.startsWith("..") &&
+        !path.isAbsolute(relativeToRepository),
+      `${candidatePath} must stay inside the repository`,
+    );
+    assert.ok(
+      relativeToPublic.startsWith("..") || path.isAbsolute(relativeToPublic),
+      `${candidatePath} must not be inside or adjacent to public assets`,
+    );
+    assert.equal(
+      path.parse(candidatePath).root.toLowerCase(),
+      path.parse(generatedAssetsRoot).root.toLowerCase(),
+    );
+  }
 });
 
 test("failed approval leaves the prior delivery set unchanged", async () => {

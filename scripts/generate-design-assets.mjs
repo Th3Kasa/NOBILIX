@@ -6,6 +6,7 @@ import {
   readFile,
   rename,
   rm,
+  rmdir,
   writeFile,
 } from "node:fs/promises";
 import os from "node:os";
@@ -24,9 +25,11 @@ const generatedAssetsRoot = path.join(
   "generated",
 );
 const manifestPath = path.join(generatedAssetsRoot, "asset-manifest.json");
+const transactionRoot = path.join(repositoryRoot, ".asset-pipeline-tmp");
 const apiBaseUrl = "https://api.muapi.ai/api/v1";
 const modelEndpoint = "flux-2-dev";
 const modelName = "MuAPI Flux 2 Dev";
+const sensitiveValues = new Set();
 
 export const assets = [
   {
@@ -225,6 +228,7 @@ function loadEnvironmentFile(filePath) {
 
 async function getApiKey() {
   if (process.env.MUAPI_API_KEY) {
+    sensitiveValues.add(process.env.MUAPI_API_KEY);
     return process.env.MUAPI_API_KEY;
   }
 
@@ -232,6 +236,7 @@ async function getApiKey() {
   if (!values.MUAPI_API_KEY) {
     throw new Error("MUAPI_API_KEY is not configured in .env.local");
   }
+  sensitiveValues.add(values.MUAPI_API_KEY);
   return values.MUAPI_API_KEY;
 }
 
@@ -240,10 +245,8 @@ function wait(milliseconds) {
 }
 
 class HttpResponseError extends Error {
-  constructor(status, responseText) {
-    super(
-      `MuAPI request failed (${status}): ${responseText.slice(0, 300)}`,
-    );
+  constructor(status) {
+    super(`MuAPI request failed (${status})`);
     this.name = "HttpResponseError";
     this.status = status;
     this.retryable = status === 429 || status >= 500;
@@ -256,7 +259,34 @@ async function requestOnce(url, options, fetchImpl = fetch) {
     return response;
   }
 
-  throw new HttpResponseError(response.status, await response.text());
+  await response.body?.cancel().catch(() => {});
+  throw new HttpResponseError(response.status);
+}
+
+function replaceAllLiteral(value, searchValue, replacement) {
+  return searchValue ? value.split(searchValue).join(replacement) : value;
+}
+
+export function formatErrorForStderr(error, configuredSecrets = []) {
+  let message =
+    error instanceof Error ? error.message : "Design asset pipeline failed";
+
+  for (const secret of configuredSecrets) {
+    if (typeof secret === "string" && secret.length > 0) {
+      message = replaceAllLiteral(message, secret, "[REDACTED]");
+    }
+  }
+
+  return message
+    .replace(
+      /\b(Bearer)\s+[A-Za-z0-9._~+/=-]{8,}\b/gi,
+      "$1 [REDACTED]",
+    )
+    .replace(
+      /\b((?:authorization|x-api-key|api[_-]?key|key|token|secret)\s*[:=]\s*)(?:Bearer\s+)?[^\s,;]+/gi,
+      "$1[REDACTED]",
+    )
+    .replace(/\b(?:sk|muapi)[-_][A-Za-z0-9._-]{8,}\b/gi, "[REDACTED]");
 }
 
 export async function requestWithRetry(
@@ -517,8 +547,28 @@ async function pathExists(candidatePath) {
   }
 }
 
-async function replaceDeliverySet(stagingRoot, deliveryRoot) {
-  const backupRoot = `${deliveryRoot}.backup-${randomUUID()}`;
+export function createTransactionPaths(
+  deliveryRoot,
+  transactionId = randomUUID(),
+) {
+  const resolvedDeliveryRoot = path.resolve(deliveryRoot);
+  const repositoryVolume = path.parse(repositoryRoot).root.toLowerCase();
+  const deliveryVolume = path.parse(resolvedDeliveryRoot).root.toLowerCase();
+
+  if (repositoryVolume !== deliveryVolume) {
+    throw new Error(
+      "Delivery and repository transaction roots must be on the same volume",
+    );
+  }
+
+  return {
+    root: transactionRoot,
+    stagingPrefix: path.join(transactionRoot, `staging-${transactionId}-`),
+    backupRoot: path.join(transactionRoot, `backup-${transactionId}`),
+  };
+}
+
+async function replaceDeliverySet(stagingRoot, deliveryRoot, backupRoot) {
   const hadExistingDelivery = await pathExists(deliveryRoot);
 
   if (hadExistingDelivery) {
@@ -639,11 +689,9 @@ export async function approveCandidates({
   }
 
   const resolvedDeliveryRoot = path.resolve(deliveryRoot);
-  const deliveryParent = path.dirname(resolvedDeliveryRoot);
-  await mkdir(deliveryParent, { recursive: true });
-  const stagingRoot = await mkdtemp(
-    path.join(deliveryParent, `${path.basename(resolvedDeliveryRoot)}.staging-`),
-  );
+  const transactionPaths = createTransactionPaths(resolvedDeliveryRoot);
+  await mkdir(transactionPaths.root, { recursive: true });
+  const stagingRoot = await mkdtemp(transactionPaths.stagingPrefix);
 
   try {
     const manifestEntries = [];
@@ -697,10 +745,16 @@ export async function approveCandidates({
       )}\n`,
     );
 
-    await replaceDeliverySet(stagingRoot, resolvedDeliveryRoot);
+    await replaceDeliverySet(
+      stagingRoot,
+      resolvedDeliveryRoot,
+      transactionPaths.backupRoot,
+    );
   } catch (error) {
     await rm(stagingRoot, { recursive: true, force: true }).catch(() => {});
     throw error;
+  } finally {
+    await rmdir(transactionPaths.root).catch(() => {});
   }
 
   process.stdout.write(
@@ -742,10 +796,17 @@ const isMainModule =
 
 if (isMainModule) {
   main().catch(async (error) => {
+    const configuredSecrets = [
+      ...sensitiveValues,
+      process.env.MUAPI_API_KEY,
+    ].filter(Boolean);
     if (process.env.MUAPI_API_KEY) {
       delete process.env.MUAPI_API_KEY;
     }
-    process.stderr.write(`${error.message}\n`);
+    process.stderr.write(
+      `${formatErrorForStderr(error, configuredSecrets)}\n`,
+    );
+    sensitiveValues.clear();
     process.exitCode = 1;
   });
 }
