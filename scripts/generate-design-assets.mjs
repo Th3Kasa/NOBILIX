@@ -1,8 +1,11 @@
-import { createHash } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 import {
   access,
   mkdir,
+  mkdtemp,
   readFile,
+  rename,
+  rm,
   writeFile,
 } from "node:fs/promises";
 import os from "node:os";
@@ -25,7 +28,7 @@ const apiBaseUrl = "https://api.muapi.ai/api/v1";
 const modelEndpoint = "flux-2-dev";
 const modelName = "MuAPI Flux 2 Dev";
 
-const assets = [
+export const assets = [
   {
     id: "nobilix-studio-hero",
     kind: "image",
@@ -236,33 +239,52 @@ function wait(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
-async function requestWithRetry(url, options, attempts = 5) {
+class HttpResponseError extends Error {
+  constructor(status, responseText) {
+    super(
+      `MuAPI request failed (${status}): ${responseText.slice(0, 300)}`,
+    );
+    this.name = "HttpResponseError";
+    this.status = status;
+    this.retryable = status === 429 || status >= 500;
+  }
+}
+
+async function requestOnce(url, options, fetchImpl = fetch) {
+  const response = await fetchImpl(url, options);
+  if (response.ok) {
+    return response;
+  }
+
+  throw new HttpResponseError(response.status, await response.text());
+}
+
+export async function requestWithRetry(
+  url,
+  options,
+  {
+    attempts = 5,
+    fetchImpl = fetch,
+    waitImpl = wait,
+  } = {},
+) {
   let lastError;
 
   for (let attempt = 0; attempt < attempts; attempt += 1) {
     try {
-      const response = await fetch(url, options);
-      if (response.ok) {
-        return response;
-      }
-
-      const responseText = await response.text();
-      const retryable = response.status === 429 || response.status >= 500;
-      const error = new Error(
-        `MuAPI request failed (${response.status}): ${responseText.slice(0, 300)}`,
-      );
-      if (!retryable || attempt === attempts - 1) {
+      return await requestOnce(url, options, fetchImpl);
+    } catch (error) {
+      if (error instanceof HttpResponseError && !error.retryable) {
         throw error;
       }
-      lastError = error;
-    } catch (error) {
+
       lastError = error;
       if (attempt === attempts - 1) {
         throw error;
       }
     }
 
-    await wait(1_000 * 2 ** attempt);
+    await waitImpl(1_000 * 2 ** attempt);
   }
 
   throw lastError;
@@ -311,19 +333,29 @@ function findOutputUrls(payload) {
   return [...new Set(urls)];
 }
 
-async function submitGeneration(apiKey, asset) {
-  const response = await requestWithRetry(`${apiBaseUrl}/${modelEndpoint}`, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      "x-api-key": apiKey,
+export async function submitGeneration(
+  apiKey,
+  asset,
+  {
+    fetchImpl = fetch,
+  } = {},
+) {
+  const response = await requestOnce(
+    `${apiBaseUrl}/${modelEndpoint}`,
+    {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-api-key": apiKey,
+      },
+      body: JSON.stringify({
+        prompt: asset.prompt,
+        width: asset.generationWidth,
+        height: asset.generationHeight,
+      }),
     },
-    body: JSON.stringify({
-      prompt: asset.prompt,
-      width: asset.generationWidth,
-      height: asset.generationHeight,
-    }),
-  });
+    fetchImpl,
+  );
   const payload = await response.json();
   const requestId = requestIdFrom(payload);
 
@@ -444,6 +476,7 @@ async function generateCandidates(only) {
       outputUrl,
       bytes: download.bytes,
       sha256: download.sha256,
+      generatedAt: new Date().toISOString(),
       review: {
         approved: false,
         notes: "",
@@ -475,11 +508,44 @@ async function optimizeCandidate(sourcePath, destinationPath, width, height) {
     .toFile(destinationPath);
 }
 
-async function approveCandidates(
+async function pathExists(candidatePath) {
+  try {
+    await access(candidatePath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+async function replaceDeliverySet(stagingRoot, deliveryRoot) {
+  const backupRoot = `${deliveryRoot}.backup-${randomUUID()}`;
+  const hadExistingDelivery = await pathExists(deliveryRoot);
+
+  if (hadExistingDelivery) {
+    await rename(deliveryRoot, backupRoot);
+  }
+
+  try {
+    await rename(stagingRoot, deliveryRoot);
+  } catch (error) {
+    if (hadExistingDelivery) {
+      await rename(backupRoot, deliveryRoot);
+    }
+    throw error;
+  }
+
+  if (hadExistingDelivery) {
+    await rm(backupRoot, { recursive: true, force: true }).catch(() => {});
+  }
+}
+
+export async function approveCandidates({
   runDirectory,
   approvedValue,
   replacementRunDirectory,
-) {
+  deliveryRoot = generatedAssetsRoot,
+  optimizeCandidateImpl = optimizeCandidate,
+}) {
   const resolvedRunDirectory = path.resolve(runDirectory);
   const generationPath = path.join(resolvedRunDirectory, "generation.json");
   const generation = JSON.parse(await readFile(generationPath, "utf8"));
@@ -526,16 +592,16 @@ async function approveCandidates(
     throw new Error("Pass --approved=all or a comma-separated list of reviewed ids");
   }
 
-  const manifestEntries = [];
-  for (const {
-    generation: recordGeneration,
-    record,
-    runDirectory: recordRunDirectory,
-  } of recordsById.values()) {
-    if (!approvedIds.has(record.id)) {
-      continue;
-    }
-
+  const selectedRecords = [...recordsById.values()].filter(({ record }) =>
+    approvedIds.has(record.id),
+  );
+  const validatedRecords = [];
+  for (const selectedRecord of selectedRecords) {
+    const {
+      generation: recordGeneration,
+      record,
+      runDirectory: recordRunDirectory,
+    } = selectedRecord;
     const definition = assets.find((asset) => asset.id === record.id);
     if (!definition) {
       throw new Error(`Generation record has unknown id: ${record.id}`);
@@ -550,34 +616,19 @@ async function approveCandidates(
       throw new Error(`Candidate escapes its run directory: ${record.candidatePath}`);
     }
     await access(sourcePath);
-
-    const deliveryPath = path.resolve(generatedAssetsRoot, definition.path);
-    await optimizeCandidate(
+    validatedRecords.push({
+      definition,
+      generatedAt: record.generatedAt ?? recordGeneration.generatedAt,
+      recordGeneration,
       sourcePath,
-      deliveryPath,
-      definition.width,
-      definition.height,
-    );
-
-    manifestEntries.push({
-      id: definition.id,
-      kind: definition.kind,
-      path: definition.path,
-      width: definition.width,
-      height: definition.height,
-      source: definition.source,
-      purpose: definition.purpose,
-      prompt: definition.prompt,
-      model: recordGeneration.model,
-      endpoint: recordGeneration.endpoint,
-      seed: null,
-      approved: true,
-      approval: "Manual visual review",
     });
   }
 
   const missingRequired = assets.filter(
-    (asset) => !manifestEntries.some((entry) => entry.id === asset.id),
+    (asset) =>
+      !validatedRecords.some(
+        ({ definition }) => definition.id === asset.id,
+      ),
   );
   if (missingRequired.length > 0) {
     throw new Error(
@@ -587,23 +638,73 @@ async function approveCandidates(
     );
   }
 
-  await mkdir(generatedAssetsRoot, { recursive: true });
-  await writeFile(
-    manifestPath,
-    `${JSON.stringify(
-      {
-        version: 1,
-        generatedAt: generation.generatedAt,
-        reviewedAt: new Date().toISOString(),
-        assets: manifestEntries,
-      },
-      null,
-      2,
-    )}\n`,
+  const resolvedDeliveryRoot = path.resolve(deliveryRoot);
+  const deliveryParent = path.dirname(resolvedDeliveryRoot);
+  await mkdir(deliveryParent, { recursive: true });
+  const stagingRoot = await mkdtemp(
+    path.join(deliveryParent, `${path.basename(resolvedDeliveryRoot)}.staging-`),
   );
 
+  try {
+    const manifestEntries = [];
+    for (const {
+      definition,
+      generatedAt,
+      recordGeneration,
+      sourcePath,
+    } of validatedRecords) {
+      const stagedDeliveryPath = path.resolve(stagingRoot, definition.path);
+      await optimizeCandidateImpl(
+        sourcePath,
+        stagedDeliveryPath,
+        definition.width,
+        definition.height,
+      );
+
+      manifestEntries.push({
+        id: definition.id,
+        kind: definition.kind,
+        path: definition.path,
+        width: definition.width,
+        height: definition.height,
+        source: definition.source,
+        purpose: definition.purpose,
+        prompt: definition.prompt,
+        model: recordGeneration.model,
+        endpoint: recordGeneration.endpoint,
+        seed: null,
+        generatedAt,
+        approved: true,
+        approval: "Manual visual review",
+      });
+    }
+
+    const latestGenerationTimestamp = manifestEntries
+      .map((entry) => entry.generatedAt)
+      .sort()
+      .at(-1);
+    await writeFile(
+      path.join(stagingRoot, path.basename(manifestPath)),
+      `${JSON.stringify(
+        {
+          version: 1,
+          generatedAt: latestGenerationTimestamp,
+          reviewedAt: new Date().toISOString(),
+          assets: manifestEntries,
+        },
+        null,
+        2,
+      )}\n`,
+    );
+
+    await replaceDeliverySet(stagingRoot, resolvedDeliveryRoot);
+  } catch (error) {
+    await rm(stagingRoot, { recursive: true, force: true }).catch(() => {});
+    throw error;
+  }
+
   process.stdout.write(
-    `Approved and optimized ${manifestEntries.length} delivery assets.\n`,
+    `Approved and optimized ${validatedRecords.length} delivery assets.\n`,
   );
 }
 
@@ -622,11 +723,11 @@ async function main() {
   }
 
   if (args.has("approve")) {
-    await approveCandidates(
-      args.get("approve"),
-      args.get("approved"),
-      args.get("replacement-run"),
-    );
+    await approveCandidates({
+      runDirectory: args.get("approve"),
+      approvedValue: args.get("approved"),
+      replacementRunDirectory: args.get("replacement-run"),
+    });
     return;
   }
 
@@ -635,10 +736,16 @@ async function main() {
   );
 }
 
-main().catch(async (error) => {
-  if (process.env.MUAPI_API_KEY) {
-    delete process.env.MUAPI_API_KEY;
-  }
-  process.stderr.write(`${error.message}\n`);
-  process.exitCode = 1;
-});
+const isMainModule =
+  process.argv[1] &&
+  path.resolve(process.argv[1]) === path.resolve(fileURLToPath(import.meta.url));
+
+if (isMainModule) {
+  main().catch(async (error) => {
+    if (process.env.MUAPI_API_KEY) {
+      delete process.env.MUAPI_API_KEY;
+    }
+    process.stderr.write(`${error.message}\n`);
+    process.exitCode = 1;
+  });
+}
