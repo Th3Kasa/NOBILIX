@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 /*
-  NOBILIX Admin Console — design system
-  Dark-first, professional admin/CRM aesthetic. WCAG AA contrast.
+  Nobilix shared design system.
+  Warm-neutral company tokens are global; project identities remain scoped.
 */
 
 @theme inline {
@@ -29,6 +29,11 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-surface-canvas: var(--surface-canvas);
+  --color-surface-panel: var(--surface-panel);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-status-info: var(--status-info);
+  --color-status-danger: var(--status-danger);
 
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -48,30 +53,70 @@
 :root {
   --radius: 0.75rem;
 
-  /* Light theme (secondary) */
-  --background: oklch(0.99 0 0);
-  --foreground: oklch(0.18 0.01 260);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.01 260);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.01 260);
-  --primary: oklch(0.55 0.2 264);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.96 0.01 260);
-  --secondary-foreground: oklch(0.25 0.02 260);
-  --muted: oklch(0.96 0.01 260);
-  --muted-foreground: oklch(0.5 0.02 260);
-  --accent: oklch(0.95 0.02 264);
-  --accent-foreground: oklch(0.25 0.05 264);
-  --destructive: oklch(0.58 0.22 25);
-  --destructive-foreground: oklch(0.99 0 0);
-  --success: oklch(0.6 0.16 155);
-  --success-foreground: oklch(0.99 0 0);
-  --warning: oklch(0.75 0.16 75);
-  --warning-foreground: oklch(0.2 0.05 75);
-  --border: oklch(0.9 0.01 260);
-  --input: oklch(0.9 0.01 260);
-  --ring: oklch(0.55 0.2 264);
+  /* Company identity */
+  --company-canvas: oklch(0.985 0.008 78);
+  --company-ink: oklch(0.2 0.018 64);
+  --company-accent: oklch(0.55 0.13 50);
+  --company-accent-contrast: oklch(0.99 0.006 78);
+
+  /* Project identity defaults; projects override these in a scoped root. */
+  --project-accent: var(--company-accent);
+  --project-accent-contrast: var(--company-accent-contrast);
+
+  /* Status */
+  --status-success: oklch(0.55 0.13 150);
+  --status-success-contrast: oklch(0.99 0.01 150);
+  --status-warning: oklch(0.72 0.14 75);
+  --status-warning-contrast: oklch(0.22 0.04 75);
+  --status-danger: oklch(0.56 0.19 27);
+  --status-danger-contrast: oklch(0.99 0.006 78);
+  --status-info: oklch(0.56 0.12 245);
+
+  /* Surfaces */
+  --surface-canvas: var(--company-canvas);
+  --surface-panel: oklch(0.998 0.003 78);
+  --surface-elevated: oklch(1 0 0);
+  --surface-muted: oklch(0.95 0.012 72);
+  --surface-border: oklch(0.86 0.018 70);
+
+  /* Focus, spacing, motion, and layer architecture */
+  --focus-ring: oklch(0.54 0.15 52);
+  --focus-offset: var(--surface-canvas);
+  --space-control: 0.75rem;
+  --space-section: clamp(4rem, 8vw, 8rem);
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 420ms;
+  --z-header: 30;
+  --z-navigation: 40;
+  --z-overlay: 50;
+  --z-modal: 60;
+  --z-toast: 70;
+
+  /* Compatibility aliases consumed by existing pages and components. */
+  --background: var(--surface-canvas);
+  --foreground: var(--company-ink);
+  --card: var(--surface-panel);
+  --card-foreground: var(--company-ink);
+  --popover: var(--surface-elevated);
+  --popover-foreground: var(--company-ink);
+  --primary: var(--project-accent);
+  --primary-foreground: var(--project-accent-contrast);
+  --secondary: var(--surface-muted);
+  --secondary-foreground: var(--company-ink);
+  --muted: var(--surface-muted);
+  --muted-foreground: oklch(0.43 0.025 64);
+  --accent: oklch(0.92 0.03 62);
+  --accent-foreground: var(--company-ink);
+  --destructive: var(--status-danger);
+  --destructive-foreground: var(--status-danger-contrast);
+  --success: var(--status-success);
+  --success-foreground: var(--status-success-contrast);
+  --warning: var(--status-warning);
+  --warning-foreground: var(--status-warning-contrast);
+  --border: var(--surface-border);
+  --input: var(--surface-border);
+  --ring: var(--focus-ring);
 
   --chart-1: oklch(0.6 0.22 264);
   --chart-2: oklch(0.65 0.18 190);
@@ -81,30 +126,50 @@
 }
 
 .dark {
-  /* Dark theme (default) */
-  --background: oklch(0.16 0.012 264);
-  --foreground: oklch(0.96 0.005 260);
-  --card: oklch(0.2 0.014 264);
-  --card-foreground: oklch(0.96 0.005 260);
-  --popover: oklch(0.2 0.014 264);
-  --popover-foreground: oklch(0.96 0.005 260);
-  --primary: oklch(0.68 0.17 264);
-  --primary-foreground: oklch(0.16 0.012 264);
-  --secondary: oklch(0.26 0.015 264);
-  --secondary-foreground: oklch(0.96 0.005 260);
-  --muted: oklch(0.26 0.015 264);
-  --muted-foreground: oklch(0.68 0.012 260);
-  --accent: oklch(0.3 0.03 264);
-  --accent-foreground: oklch(0.96 0.005 260);
-  --destructive: oklch(0.62 0.2 25);
-  --destructive-foreground: oklch(0.98 0 0);
-  --success: oklch(0.68 0.15 155);
-  --success-foreground: oklch(0.14 0.02 155);
-  --warning: oklch(0.78 0.15 75);
-  --warning-foreground: oklch(0.18 0.03 75);
-  --border: oklch(0.3 0.015 264);
-  --input: oklch(0.32 0.015 264);
-  --ring: oklch(0.68 0.17 264);
+  --company-canvas: oklch(0.16 0.012 62);
+  --company-ink: oklch(0.94 0.012 78);
+  --company-accent: oklch(0.72 0.14 55);
+  --company-accent-contrast: oklch(0.17 0.018 55);
+  --project-accent: var(--company-accent);
+  --project-accent-contrast: var(--company-accent-contrast);
+  --status-success: oklch(0.72 0.14 150);
+  --status-success-contrast: oklch(0.16 0.025 150);
+  --status-warning: oklch(0.8 0.14 78);
+  --status-warning-contrast: oklch(0.19 0.04 75);
+  --status-danger: oklch(0.68 0.18 28);
+  --status-danger-contrast: oklch(0.98 0.008 78);
+  --status-info: oklch(0.72 0.12 245);
+  --surface-canvas: var(--company-canvas);
+  --surface-panel: oklch(0.2 0.015 62);
+  --surface-elevated: oklch(0.235 0.018 62);
+  --surface-muted: oklch(0.255 0.018 62);
+  --surface-border: oklch(0.34 0.022 62);
+  --focus-ring: oklch(0.78 0.15 58);
+  --focus-offset: var(--surface-canvas);
+
+  --background: var(--surface-canvas);
+  --foreground: var(--company-ink);
+  --card: var(--surface-panel);
+  --card-foreground: var(--company-ink);
+  --popover: var(--surface-elevated);
+  --popover-foreground: var(--company-ink);
+  --primary: var(--project-accent);
+  --primary-foreground: var(--project-accent-contrast);
+  --secondary: var(--surface-muted);
+  --secondary-foreground: var(--company-ink);
+  --muted: var(--surface-muted);
+  --muted-foreground: oklch(0.72 0.025 72);
+  --accent: oklch(0.3 0.04 58);
+  --accent-foreground: var(--company-ink);
+  --destructive: var(--status-danger);
+  --destructive-foreground: var(--status-danger-contrast);
+  --success: var(--status-success);
+  --success-foreground: var(--status-success-contrast);
+  --warning: var(--status-warning);
+  --warning-foreground: var(--status-warning-contrast);
+  --border: var(--surface-border);
+  --input: var(--surface-border);
+  --ring: var(--focus-ring);
 
   --chart-1: oklch(0.7 0.18 264);
   --chart-2: oklch(0.72 0.15 190);
@@ -126,6 +191,31 @@
   ::selection {
     background: color-mix(in oklch, var(--primary) 30%, transparent);
   }
+}
+
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: var(--z-toast);
+  min-height: 44px;
+  transform: translateY(calc(-100% - 2rem));
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  transition: transform var(--duration-fast) ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+#main-content:focus {
+  outline: none;
 }
 
 /* Thin, themed scrollbars */
@@ -152,6 +242,14 @@
   --console-violet: #9b5cff;
 }
 
+/* TrapMan project identity is intentionally isolated from company UI. */
+.trapman-site {
+  --project-accent: oklch(0.73 0.22 142);
+  --project-accent-contrast: oklch(0.12 0.025 142);
+  --project-surface: oklch(0.1 0.025 265);
+  --project-glow: oklch(0.66 0.2 320);
+}
+
 /* Console motion — 120-240ms, reduced-motion disabled */
 @layer base {
   .console-shell * {
@@ -159,10 +257,30 @@
     transition-timing-function: ease;
   }
   @media (prefers-reduced-motion: reduce) {
-    .console-shell * {
-      transition-duration: 0ms !important;
-      animation-duration: 0ms !important;
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
     }
+  }
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 2px solid CanvasText !important;
+    outline-offset: 3px !important;
+  }
+
+  button,
+  input,
+  textarea,
+  select,
+  [role="button"],
+  [role="dialog"] {
+    border: 1px solid CanvasText;
   }
 }
 

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { MotionProvider } from "@/components/motion/motion-provider";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -28,7 +29,14 @@ export default function RootLayout({
       lang="en"
       className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        <a className="skip-link" href="#main-content">
+          Skip to main content
+        </a>
+        <div id="main-content" tabIndex={-1}>
+          <MotionProvider>{children}</MotionProvider>
+        </div>
+      </body>
     </html>
   );
 }
