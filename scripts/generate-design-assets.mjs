@@ -289,6 +289,14 @@ export function formatErrorForStderr(error, configuredSecrets = []) {
     .replace(/\b(?:sk|muapi)[-_][A-Za-z0-9._-]{8,}\b/gi, "[REDACTED]");
 }
 
+export async function parseJsonResponse(response, context) {
+  try {
+    return await response.json();
+  } catch {
+    throw new Error(`MuAPI ${context} returned invalid JSON`);
+  }
+}
+
 export async function requestWithRetry(
   url,
   options,
@@ -386,7 +394,7 @@ export async function submitGeneration(
     },
     fetchImpl,
   );
-  const payload = await response.json();
+  const payload = await parseJsonResponse(response, "generation submission");
   const requestId = requestIdFrom(payload);
 
   if (!requestId) {
@@ -396,10 +404,19 @@ export async function submitGeneration(
   return requestId;
 }
 
-async function pollGeneration(apiKey, requestId) {
-  const deadline = Date.now() + 12 * 60 * 1_000;
+export async function pollGeneration(
+  apiKey,
+  requestId,
+  {
+    fetchImpl = fetch,
+    waitImpl = wait,
+    nowImpl = Date.now,
+    timeoutMilliseconds = 12 * 60 * 1_000,
+  } = {},
+) {
+  const deadline = nowImpl() + timeoutMilliseconds;
 
-  while (Date.now() < deadline) {
+  while (nowImpl() < deadline) {
     const response = await requestWithRetry(
       `${apiBaseUrl}/predictions/${encodeURIComponent(requestId)}/result`,
       {
@@ -407,8 +424,12 @@ async function pollGeneration(apiKey, requestId) {
           "x-api-key": apiKey,
         },
       },
+      {
+        fetchImpl,
+        waitImpl,
+      },
     );
-    const payload = await response.json();
+    const payload = await parseJsonResponse(response, "prediction status");
     const status = String(payload.status ?? "").toLowerCase();
 
     if (status === "completed") {
@@ -426,7 +447,7 @@ async function pollGeneration(apiKey, requestId) {
       throw new Error(`MuAPI request ${requestId} ended with status ${status}`);
     }
 
-    await wait(3_000);
+    await waitImpl(3_000);
   }
 
   throw new Error(`Timed out waiting for MuAPI request ${requestId}`);

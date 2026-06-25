@@ -224,6 +224,66 @@ test("generation submission does not retry a POST after a network failure", asyn
   assert.equal(calls, 1);
 });
 
+test("malformed successful submission JSON produces a fixed secret-safe stderr message", async () => {
+  const { assets, formatErrorForStderr, submitGeneration } =
+    await importGenerator();
+  const credential = "muapi-malformed-submission-secret-123456";
+  const signedUrl =
+    "https://cdn.example.test/output.webp?X-Amz-Credential=AKIAREFLECTED&X-Amz-Signature=deadbeef";
+  let capturedError;
+
+  try {
+    await submitGeneration(credential, assets[0], {
+      fetchImpl: async () =>
+        new Response(
+          `{"request_id":"broken","url":"${signedUrl}","key":"${credential}"`,
+          {
+            status: 200,
+            headers: { "content-type": "application/json" },
+          },
+        ),
+    });
+  } catch (error) {
+    capturedError = error;
+  }
+
+  const stderrText = formatErrorForStderr(capturedError, [credential]);
+  assert.equal(stderrText, "MuAPI generation submission returned invalid JSON");
+  assert.ok(!stderrText.includes(credential));
+  assert.ok(!stderrText.includes(signedUrl));
+  assert.doesNotMatch(stderrText, /SyntaxError|Unexpected|position|X-Amz/i);
+});
+
+test("malformed successful polling JSON produces a fixed secret-safe stderr message", async () => {
+  const { formatErrorForStderr, pollGeneration } = await importGenerator();
+  const credential = "muapi-malformed-poll-secret-654321";
+  const signedUrl =
+    "https://cdn.example.test/result.webp?token=reflected-secret&signature=abc123";
+  let capturedError;
+
+  try {
+    await pollGeneration(credential, "request-123", {
+      fetchImpl: async () =>
+        new Response(
+          `{"status":"completed","output":"${signedUrl}","authorization":"Bearer ${credential}"`,
+          {
+            status: 200,
+            headers: { "content-type": "application/json" },
+          },
+        ),
+      waitImpl: async () => {},
+    });
+  } catch (error) {
+    capturedError = error;
+  }
+
+  const stderrText = formatErrorForStderr(capturedError, [credential]);
+  assert.equal(stderrText, "MuAPI prediction status returned invalid JSON");
+  assert.ok(!stderrText.includes(credential));
+  assert.ok(!stderrText.includes(signedUrl));
+  assert.doesNotMatch(stderrText, /SyntaxError|Unexpected|position|token=/i);
+});
+
 test("idempotent retries stop immediately for non-retryable HTTP responses", async () => {
   const { requestWithRetry } = await importGenerator();
   let calls = 0;
