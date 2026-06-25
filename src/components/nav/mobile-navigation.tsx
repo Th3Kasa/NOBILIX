@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { Menu, X } from "lucide-react";
+import { lockBodyScroll } from "@/lib/body-scroll-lock";
 import { cn } from "@/lib/utils";
 
 export interface MobileNavigationItem {
@@ -42,7 +43,7 @@ export function MobileNavigation({
     const triggerElement = triggerRef.current;
     const previouslyFocused = document.activeElement as HTMLElement | null;
     panel?.querySelector<HTMLElement>(focusableSelector)?.focus();
-    document.body.style.overflow = "hidden";
+    const releaseBodyScroll = lockBodyScroll();
 
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -70,8 +71,8 @@ export function MobileNavigation({
     document.addEventListener("keydown", onKeyDown);
     return () => {
       document.removeEventListener("keydown", onKeyDown);
-      document.body.style.overflow = "";
-      (previouslyFocused ?? triggerElement)?.focus();
+      releaseBodyScroll();
+      (triggerElement ?? previouslyFocused)?.focus();
     };
   }, [open]);
 
@@ -85,7 +86,7 @@ export function MobileNavigation({
         aria-controls={titleId}
         onClick={() => setOpen(true)}
         className={cn(
-          "inline-flex size-11 items-center justify-center rounded-md border border-border text-foreground transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:translate-y-px",
+          "inline-flex size-11 items-center justify-center rounded-md border border-border text-foreground transition-transform duration-[var(--duration-fast)] hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:translate-y-px",
           triggerClassName,
         )}
       >
@@ -144,7 +145,7 @@ export function MobileNavigation({
                     aria-current={item.active ? "page" : undefined}
                     onClick={() => setOpen(false)}
                     className={cn(
-                      "flex min-h-11 flex-col justify-center rounded-md px-3 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                      "flex min-h-11 flex-col justify-center rounded-md px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                       item.active
                         ? "bg-primary text-primary-foreground"
                         : "text-foreground hover:bg-accent",
@@ -152,7 +153,14 @@ export function MobileNavigation({
                   >
                     <span className="font-medium">{item.label}</span>
                     {item.description && (
-                      <span className="text-xs text-muted-foreground">
+                      <span
+                        className={cn(
+                          "text-xs",
+                          item.active
+                            ? "text-primary-foreground"
+                            : "text-muted-foreground",
+                        )}
+                      >
                         {item.description}
                       </span>
                     )}

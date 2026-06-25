@@ -33,9 +33,7 @@ export default function RootLayout({
         <a className="skip-link" href="#main-content">
           Skip to main content
         </a>
-        <div id="main-content" tabIndex={-1}>
-          <MotionProvider>{children}</MotionProvider>
-        </div>
+        <MotionProvider>{children}</MotionProvider>
       </body>
     </html>
   );

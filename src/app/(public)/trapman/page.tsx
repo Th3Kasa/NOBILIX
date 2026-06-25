@@ -9,9 +9,8 @@ import { RevealObserver } from "@/components/trapman/reveal-observer";
 export default function TrapManPage() {
   return (
     <>
-      <a className="skip-link" href="#trapman-main">Skip to content</a>
       <TrapManHeader />
-      <main id="trapman-main">
+      <div id="trapman-main">
         <RevealObserver />
         <CityHero />
         <section id="the-run" className="reveal"><h2>Run the city</h2><GameplayGallery /></section>
@@ -20,7 +19,7 @@ export default function TrapManPage() {
         <section id="leaderboard" className="reveal"><h2>Own the leaderboard</h2><LeaderboardPreview /></section>
         <section id="account" className="reveal"><h2>Your run continues online</h2><a href="/trapman/account">Track my progression</a></section>
         <section id="support" className="reveal"><h2>Player support</h2><a href="/trapman/privacy-policy">Privacy</a><a href="/trapman/delete-account">Delete account</a></section>
-      </main>
+      </div>
     </>
   );
 }

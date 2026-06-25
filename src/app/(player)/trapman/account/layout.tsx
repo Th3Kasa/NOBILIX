@@ -27,7 +27,9 @@ export default async function PlayerAccountLayout({
           <a href="/trapman/account?action=signout">Sign out</a>
         </nav>
       </header>
-      <main className="player-account-main">{children}</main>
+      <main id="main-content" tabIndex={-1} className="player-account-main">
+        {children}
+      </main>
     </div>
   );
 }

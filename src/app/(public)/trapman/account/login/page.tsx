@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function TrapManLoginPage() {
   return (
-    <main className="trapman-login-page">
+    <div className="trapman-login-page">
       <div className="trapman-login-container">
         <h1>Sign in to TrapMan</h1>
         <p className="trapman-login-subtitle">
@@ -17,6 +17,6 @@ export default function TrapManLoginPage() {
         </p>
         <PlayerLoginForm />
       </div>
-    </main>
+    </div>
   );
 }

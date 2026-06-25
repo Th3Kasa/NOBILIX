@@ -87,9 +87,9 @@ export function LegalShell({ title, lastUpdated, children }: LegalShellProps) {
         </nav>
 
         {/* Main legal content */}
-        <main className="legal-content">
+        <article className="legal-content">
           {children}
-        </main>
+        </article>
       </div>
 
       {/* Footer with support contact */}

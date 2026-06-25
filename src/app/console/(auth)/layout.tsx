@@ -4,7 +4,11 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative flex min-h-dvh items-center justify-center overflow-hidden p-4">
+    <main
+      id="main-content"
+      tabIndex={-1}
+      className="relative flex min-h-dvh items-center justify-center overflow-hidden p-4"
+    >
       {/* Ambient backdrop */}
       <div
         aria-hidden
@@ -15,6 +19,6 @@ export default function AuthLayout({
         className="pointer-events-none absolute -bottom-32 left-1/2 h-72 w-[36rem] -translate-x-1/2 rounded-full bg-primary/10 blur-3xl"
       />
       <div className="relative w-full max-w-sm">{children}</div>
-    </div>
+    </main>
   );
 }
