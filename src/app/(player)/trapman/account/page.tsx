@@ -11,6 +11,7 @@ export default async function PlayerAccountPage() {
   return (
     <div className="player-dashboard">
       <div className="player-dashboard-header">
+        <p className="trapman-kicker">Player dashboard</p>
         <h1 className="player-dashboard-title">
           {snapshot.username ? `${snapshot.username}'s Account` : "My Account"}
         </h1>
@@ -24,9 +25,11 @@ export default async function PlayerAccountPage() {
         </div>
       </div>
 
-      <ProgressionPanel snapshot={snapshot} />
-      <PurchaseHistory purchases={snapshot.purchases} />
-      <AccountActions />
+      <div className="player-dashboard-grid">
+        <ProgressionPanel snapshot={snapshot} />
+        <PurchaseHistory purchases={snapshot.purchases} />
+        <AccountActions />
+      </div>
     </div>
   );
 }

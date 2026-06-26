@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { PlayerLoginForm } from "@/components/trapman/account/player-login-form";
 
 export const metadata: Metadata = {
@@ -10,13 +11,18 @@ export const metadata: Metadata = {
 export default function TrapManLoginPage() {
   return (
     <div className="trapman-login-page">
-      <div className="trapman-login-container">
-        <h1>Sign in to TrapMan</h1>
+      <section className="trapman-login-card" aria-labelledby="player-login-title">
+        <p className="trapman-kicker">Pixel account portal</p>
+        <h1 id="player-login-title">Sign in to TrapMan</h1>
         <p className="trapman-login-subtitle">
-          Track your run, see your stats, and manage your account.
+          Track your run, see your stats, and manage account requests from a
+          secure player surface.
         </p>
         <PlayerLoginForm />
-      </div>
+        <Link className="trapman-login-back" href="/trapman">
+          Back to TrapMan
+        </Link>
+      </section>
     </div>
   );
 }

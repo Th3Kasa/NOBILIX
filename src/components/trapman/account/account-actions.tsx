@@ -20,7 +20,7 @@ export function AccountActions() {
     <section className="player-account-actions" aria-labelledby="actions-heading">
       <h2 id="actions-heading">Account Actions</h2>
 
-      <div className="player-action-list">
+      <div className="player-action-group">
         <a
           href="/api/player/export"
           className="player-action-btn player-action-btn--export"
@@ -28,14 +28,6 @@ export function AccountActions() {
         >
           Download my data (JSON)
         </a>
-
-        <a
-          href="/trapman/delete-account"
-          className="player-action-btn player-action-btn--delete"
-        >
-          Delete my account
-        </a>
-
         <button
           type="button"
           onClick={handleSignOut}
@@ -44,6 +36,16 @@ export function AccountActions() {
         >
           {signingOut ? "Signing out…" : "Sign out"}
         </button>
+      </div>
+
+      <div className="player-danger-zone">
+        <p>Deletion is permanent and has its own confirmation flow.</p>
+        <a
+          href="/trapman/delete-account"
+          className="player-action-btn player-action-btn--delete"
+        >
+          Delete my account
+        </a>
       </div>
     </section>
   );

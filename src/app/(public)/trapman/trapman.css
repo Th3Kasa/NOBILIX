@@ -679,3 +679,313 @@
     animation: none !important;
   }
 }
+
+/* TrapMan player account and legal surfaces */
+.trapman-login-page,
+.player-account-shell,
+.legal-shell {
+  min-height: 100svh;
+  background:
+    radial-gradient(circle at 50% 0%, rgb(57 233 255 / .16), transparent 32rem),
+    linear-gradient(180deg, #030207, #06051a 58%, #030207);
+  color: #fff;
+}
+.trapman-login-page {
+  display: grid;
+  place-items: center;
+  padding: clamp(1rem, 5vw, 4rem);
+}
+.trapman-login-card,
+.player-account-error-card,
+.player-account-loading,
+.player-progression-panel,
+.player-purchase-history,
+.player-account-actions,
+.legal-draft-notice,
+.legal-content,
+.legal-toc {
+  border: 1px solid rgb(57 233 255 / .24);
+  border-radius: 1.4rem;
+  background: linear-gradient(135deg, rgb(7 5 26 / .88), rgb(3 2 7 / .78));
+  box-shadow: 0 2rem 6rem rgb(57 233 255 / .1);
+}
+.trapman-login-card {
+  width: min(100%, 34rem);
+  padding: clamp(1.4rem, 5vw, 3rem);
+}
+.trapman-login-card h1,
+.player-dashboard-title,
+.legal-title {
+  margin-top: .75rem;
+  font-size: clamp(2.8rem, 10vw, 5.5rem);
+  line-height: .86;
+  letter-spacing: -.075em;
+}
+.trapman-login-subtitle,
+.legal-last-updated,
+.player-dashboard-identity,
+.player-empty-state,
+.delete-account-support-note {
+  color: #cdeaff;
+  line-height: 1.65;
+}
+.player-login-form,
+.player-login-email-form {
+  display: grid;
+  gap: .9rem;
+}
+.player-login-form { margin-top: 1.5rem; }
+.player-login-email-form label,
+.delete-account-label {
+  color: var(--tm-cyan);
+  font-size: .78rem;
+  font-weight: 900;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.player-login-email-form input,
+.delete-account-input,
+.player-password-field input {
+  min-height: 48px;
+  width: 100%;
+  border: 1px solid rgb(57 233 255 / .34);
+  border-radius: .85rem;
+  background: rgb(0 0 0 / .38);
+  color: #fff;
+  padding: .75rem .9rem;
+}
+.player-password-field {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: .55rem;
+}
+.player-password-field button,
+.player-login-btn,
+.trapman-login-back,
+.player-action-btn,
+.delete-account-submit-btn,
+.delete-account-signin-btn,
+.player-account-retry-btn,
+.player-account-support-link,
+.legal-toc-link,
+.legal-cross-link {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgb(57 233 255 / .35);
+  border-radius: .85rem;
+  color: var(--tm-cyan);
+  padding-inline: 1rem;
+  font-weight: 800;
+}
+.player-login-btn--email,
+.player-login-btn--google,
+.delete-account-submit-btn {
+  background: linear-gradient(135deg, var(--tm-violet), var(--tm-magenta));
+  color: #fff;
+  border-color: transparent;
+}
+.player-login-error,
+.delete-account-error,
+.delete-account-warning,
+.player-danger-zone {
+  border: 1px solid rgb(255 67 105 / .45);
+  border-radius: 1rem;
+  background: rgb(255 67 105 / .1);
+  padding: 1rem;
+}
+.player-account-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid rgb(57 233 255 / .18);
+  background: rgb(3 2 7 / .78);
+  padding: .9rem clamp(1rem, 5vw, 4rem);
+  backdrop-filter: blur(16px);
+}
+.player-account-logo-link {
+  color: #fff;
+  font-weight: 950;
+  letter-spacing: .08em;
+}
+.player-account-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+.player-account-nav a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgb(57 233 255 / .22);
+  border-radius: .8rem;
+  color: #bff8ff;
+  padding-inline: .8rem;
+}
+.player-account-main,
+.legal-shell {
+  padding: clamp(1.25rem, 5vw, 4rem);
+}
+.player-dashboard-header {
+  max-width: 62rem;
+}
+.player-dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.player-progression-panel,
+.player-purchase-history,
+.player-account-actions,
+.player-account-loading,
+.player-account-error-card {
+  padding: clamp(1.2rem, 4vw, 2rem);
+}
+.player-stats-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .8rem;
+  margin-top: 1rem;
+}
+.player-stat,
+.player-empty-state,
+.delete-account-reauthenticate-notice {
+  border: 1px solid rgb(255 255 255 / .1);
+  border-radius: .9rem;
+  background: rgb(255 255 255 / .04);
+  padding: 1rem;
+}
+.player-stat dt {
+  color: var(--tm-cyan);
+  font-size: .76rem;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+}
+.player-stat dd {
+  margin-top: .35rem;
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 900;
+}
+.player-purchase-list {
+  display: grid;
+  gap: .7rem;
+  margin-top: 1rem;
+}
+.player-purchase-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid rgb(255 255 255 / .12);
+  padding-block: .75rem;
+}
+.player-action-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  margin-top: 1rem;
+}
+.player-danger-zone {
+  margin-top: 1rem;
+}
+.player-account-skeleton {
+  height: 12rem;
+  border-radius: 1rem;
+  background: linear-gradient(90deg, rgb(57 233 255 / .08), rgb(241 68 255 / .16), rgb(57 233 255 / .08));
+  animation: tm-skeleton 1.4s ease-in-out infinite alternate;
+}
+.legal-shell {
+  display: grid;
+  gap: 1.4rem;
+}
+.legal-breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  color: #cdeaff;
+}
+.legal-header {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1rem;
+  align-items: center;
+}
+.legal-draft-notice,
+.legal-content,
+.legal-toc {
+  padding: clamp(1rem, 3vw, 1.5rem);
+}
+.legal-body {
+  display: grid;
+  grid-template-columns: minmax(13rem, 18rem) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+}
+.legal-toc {
+  position: sticky;
+  top: 6rem;
+}
+.legal-toc ul,
+.legal-footer nav {
+  display: grid;
+  gap: .55rem;
+  margin-top: .75rem;
+}
+.legal-content {
+  max-width: 75ch;
+}
+.legal-content section + section {
+  margin-top: 2.2rem;
+}
+.legal-content h2 {
+  color: #fff;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  line-height: 1;
+}
+.legal-content p,
+.legal-content li {
+  color: #d7f6ff;
+  line-height: 1.72;
+}
+.legal-data-table {
+  width: 100%;
+  margin-top: 1rem;
+  border-collapse: collapse;
+  font-size: .9rem;
+}
+.legal-data-table th,
+.legal-data-table td {
+  border-bottom: 1px solid rgb(57 233 255 / .18);
+  padding: .85rem;
+  text-align: left;
+  vertical-align: top;
+}
+.legal-data-table th {
+  color: var(--tm-cyan);
+}
+.delete-account-form {
+  display: grid;
+  gap: 1rem;
+}
+
+@keyframes tm-skeleton {
+  from { opacity: .48; transform: translateY(0); }
+  to { opacity: 1; transform: translateY(-2px); }
+}
+
+@media (max-width: 820px) {
+  .player-account-nav { display: none; }
+  .player-dashboard-grid,
+  .player-stats-list,
+  .legal-body,
+  .legal-header {
+    grid-template-columns: 1fr;
+  }
+  .legal-toc { position: static; }
+}

@@ -13,6 +13,8 @@
 export interface DataInventoryEntry {
   /** Unique key identifying the data field or category */
   key: string;
+  /** User-facing data label */
+  label: string;
   /** The system that stores or processes this data */
   system: string;
   /** The collection/document path or service endpoint */
@@ -28,6 +30,7 @@ export interface DataInventoryEntry {
 export const TRAPMAN_DATA_INVENTORY = [
   {
     key: "username",
+    label: "User Name",
     system: "Firestore",
     location: "users/{uid}",
     purpose: "Display name shown on leaderboards and in the player portal.",
@@ -35,6 +38,7 @@ export const TRAPMAN_DATA_INVENTORY = [
   },
   {
     key: "email",
+    label: "User Email",
     system: "Firebase Authentication + Firestore",
     location: "Firebase Auth record + users/{uid}.email",
     purpose:
@@ -45,6 +49,7 @@ export const TRAPMAN_DATA_INVENTORY = [
   },
   {
     key: "country",
+    label: "User Country",
     system: "Firestore",
     location: "users/{uid}.country",
     purpose:
@@ -53,6 +58,7 @@ export const TRAPMAN_DATA_INVENTORY = [
   },
   {
     key: "competitionsWon",
+    label: "Competitions Won",
     system: "Firestore",
     location: "users/{uid} or player_progress/{uid}",
     purpose: "Tracks competition wins for leaderboard and in-game rewards.",
@@ -60,8 +66,9 @@ export const TRAPMAN_DATA_INVENTORY = [
   },
   {
     key: "purchaseReceiptRecord",
+    label: "Purchases Made",
     system: "Firestore",
-    location: "purchases/{autoId}",
+    location: "purchases/{purchaseId}",
     purpose:
       "Records in-app purchase transactions for receipt and dispute resolution.",
     deletable: false,
@@ -70,8 +77,9 @@ export const TRAPMAN_DATA_INVENTORY = [
   },
   {
     key: "purchasedProductId",
+    label: "Purchased Item",
     system: "Firestore",
-    location: "purchases/{autoId}.productId",
+    location: "purchases/{purchaseId}.productId",
     purpose:
       "Identifies which in-app product was purchased (e.g., character skin, power-up pack).",
     deletable: false,
@@ -80,6 +88,7 @@ export const TRAPMAN_DATA_INVENTORY = [
   },
   {
     key: "sessionEndDurationMs",
+    label: "Time Played",
     system: "Firebase Analytics",
     location: "Analytics event: session_end — parameter: duration_ms",
     purpose:
@@ -90,15 +99,17 @@ export const TRAPMAN_DATA_INVENTORY = [
   },
   {
     key: "adClosed",
+    label: "Ads Watched",
     system: "Firebase Analytics",
     location: "Analytics event: ad_closed",
     purpose:
-      "Recorded when the player closes a rewarded or interstitial ad. Does not confirm the ad was fully completed — engineering verification of the exact trigger is pending.",
+      "The ad_closed event is tracked when the player closes a rewarded or interstitial ad. It means the ad was closed; it does not verify full ad completion.",
     deletable: false,
     deletionNote: "Subject to Firebase Analytics data deletion timelines.",
   },
   {
     key: "adClicked",
+    label: "Ads Clicked",
     system: "Firebase Analytics",
     location: "Analytics event: ad_clicked",
     purpose:

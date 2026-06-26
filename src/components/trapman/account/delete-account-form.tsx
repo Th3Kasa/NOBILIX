@@ -91,7 +91,7 @@ export function DeleteAccountForm() {
         </p>
       )}
 
-      <div className="delete-account-warning">
+      <div id="delete-account-warning" className="delete-account-warning">
         <p>
           <strong>This action is permanent and cannot be undone.</strong> Your
           profile, progress, and leaderboard entry will be deleted.
@@ -111,6 +111,7 @@ export function DeleteAccountForm() {
       </label>
       <input
         id="delete-confirmation"
+        aria-describedby="delete-account-warning"
         type="text"
         value={confirmation}
         onChange={(e) => setConfirmation(e.target.value)}
