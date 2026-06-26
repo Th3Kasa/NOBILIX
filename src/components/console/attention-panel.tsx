@@ -19,7 +19,7 @@ export function AttentionPanel({ items, className }: AttentionPanelProps) {
   return (
     <div
       className={cn(
-        "rounded-xl border border-warning/30 bg-warning/5 p-5",
+        "console-attention-panel rounded-xl border border-warning/30 bg-warning/5 p-5",
         className,
       )}
       role="region"

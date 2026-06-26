@@ -23,7 +23,7 @@ export function ProjectTile({ project }: { project: ProjectDefinition }) {
   const consoleHref = `/console/${project.slug}`;
 
   return (
-    <Card className="group transition-colors hover:border-primary/40">
+    <Card className="console-project-tile group overflow-hidden bg-card/80 transition-transform hover:-translate-y-0.5">
       <CardContent className="flex flex-col gap-4 p-6">
         {/* Header: logo + name + status */}
         <div className="flex items-start justify-between gap-3">
@@ -68,7 +68,7 @@ export function ProjectTile({ project }: { project: ProjectDefinition }) {
           </span>
           <Link
             href={consoleHref}
-            className="flex items-center gap-1 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+            className="flex min-h-11 items-center gap-1 text-sm font-medium text-primary transition-transform hover:translate-x-0.5"
             aria-label={`Open ${project.name} console`}
           >
             Open console

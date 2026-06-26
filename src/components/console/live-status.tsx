@@ -11,7 +11,7 @@ export function LiveStatus({
   return (
     <div
       className={cn(
-        "flex items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-medium",
+        "console-live-status flex min-h-11 items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-medium",
         connected
           ? "border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400"
           : "border-border bg-muted/50 text-muted-foreground",

@@ -25,7 +25,7 @@ export function StatCard({
         : value;
 
   return (
-    <Card className={cn("overflow-hidden", className)}>
+    <Card className={cn("console-stat-card overflow-hidden bg-card/90 shadow-sm", className)}>
       <CardContent className="flex items-start justify-between p-5">
         <div className="space-y-1">
           <p className="text-sm text-muted-foreground">{label}</p>

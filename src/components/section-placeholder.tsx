@@ -3,7 +3,7 @@ import { Hammer } from "lucide-react";
 
 export function SectionPlaceholder({ note }: { note: string }) {
   return (
-    <Card className="border-dashed">
+    <Card className="console-empty-state border-dashed bg-muted/30">
       <CardContent className="flex flex-col items-center justify-center gap-3 py-16 text-center">
         <div className="flex size-10 items-center justify-center rounded-lg bg-muted text-muted-foreground">
           <Hammer className="size-5" />
