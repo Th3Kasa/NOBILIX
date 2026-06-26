@@ -17,11 +17,15 @@ export function PlatformSidebar() {
   return (
     <aside className="hidden w-60 shrink-0 flex-col border-r border-border bg-card/40 md:flex">
       {/* Brand header */}
-      <div className="flex h-14 items-center gap-2 border-b border-border px-5">
-        <div className="flex size-7 items-center justify-center rounded-lg bg-primary/15 text-primary">
-          <Gamepad2 className="size-4" />
+      <div className="console-sidebar-brand">
+        <div className="console-sidebar-brand__icon">
+          <Gamepad2 className="size-4" aria-hidden="true" />
         </div>
-        <span className="text-sm font-semibold">NOBILIX</span>
+        <div className="min-w-0 flex-1">
+          <p className="font-mono text-xs font-semibold tracking-widest text-foreground">NOBILIX</p>
+          <p className="text-[10px] leading-tight text-muted-foreground">Platform console</p>
+        </div>
+        <span className="console-sidebar-brand__live" aria-label="Live" />
       </div>
 
       {/* Navigation — platform level only */}

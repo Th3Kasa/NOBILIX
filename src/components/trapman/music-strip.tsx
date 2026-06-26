@@ -1,6 +1,6 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import Image from "next/image";
+import { CinematicVideo } from "@/components/motion/cinematic-video";
 
 function hasAudioFile(): boolean {
   try {
@@ -16,11 +16,12 @@ export function MusicStrip() {
   return (
     <div className="music-strip">
       <div className="music-strip__art">
-        <Image
-          src="/assets/generated/trapman/music-atmosphere.webp"
+        <CinematicVideo
+          src="/assets/generated/trapman/music-atmosphere.mp4"
+          poster="/assets/generated/trapman/music-atmosphere.webp"
+          posterWidth={1536}
+          posterHeight={864}
           alt="Original TrapMan music atmosphere with speakers, cables, and neon waveform light."
-          width={1536}
-          height={864}
           sizes="(max-width: 900px) 100vw, 48vw"
         />
       </div>

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { CinematicVideo } from "@/components/motion/cinematic-video";
 
 const SCREENS = [
   {
@@ -21,6 +22,15 @@ const SCREENS = [
 export function GameplayGallery() {
   return (
     <div className="gameplay-gallery">
+      {/* Cinematic atmosphere plate — replaces the CSS ::before background-image */}
+      <div className="gameplay-atmosphere" aria-hidden="true">
+        <CinematicVideo
+          src="/assets/generated/trapman/gameplay-atmosphere.mp4"
+          poster="/assets/generated/trapman/gameplay-atmosphere.webp"
+          posterWidth={1536}
+          posterHeight={864}
+        />
+      </div>
       {SCREENS.map(({ src, alt, caption }) => (
         <figure key={src} className="gameplay-figure">
           <div className="gameplay-frame">

@@ -82,14 +82,14 @@ export default function TrapManDataCompliancePage() {
 
       <section id="deletion">
         <h2>{COMPLIANCE_SECTIONS.deletionRights.heading}</h2>
-        <p style={{ whiteSpace: "pre-line" }}>
+        <p className="legal-preline">
           {COMPLIANCE_SECTIONS.deletionRights.body}
         </p>
       </section>
 
       <section id="legal-gate">
         <h2>{COMPLIANCE_SECTIONS.legalGate.heading}</h2>
-        <p style={{ whiteSpace: "pre-line" }}>
+        <p className="legal-preline">
           {COMPLIANCE_SECTIONS.legalGate.body}
         </p>
       </section>

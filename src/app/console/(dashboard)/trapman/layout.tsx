@@ -29,7 +29,7 @@ export default function TrapManLayout({
   }));
 
   return (
-    <div className="flex min-h-dvh">
+    <div className="console-shell flex min-h-dvh">
       <ProjectSidebar
         projectSlug={project.slug}
         projectName={project.name}

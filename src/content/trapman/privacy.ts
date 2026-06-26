@@ -15,7 +15,7 @@ import {
 
 export { TRAPMAN_DATA_INVENTORY, REQUIRES_ENGINEERING_VERIFICATION };
 
-export const PRIVACY_POLICY_LAST_UPDATED = "2026-06-22";
+export const PRIVACY_POLICY_LAST_UPDATED = "2026-06-26";
 
 export const PRIVACY_SECTIONS = {
   introduction: {

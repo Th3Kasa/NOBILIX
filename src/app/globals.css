@@ -48,6 +48,7 @@
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-pixel: var(--font-pixel);
 }
 
 :root {
@@ -92,6 +93,32 @@
   --z-overlay: 50;
   --z-modal: 60;
   --z-toast: 70;
+
+  /* Scene layer tokens — for decorative stacking within isolation: isolate containers */
+  --z-scene-atmosphere: -2;
+  --z-scene-scrim: -1;
+  --z-scene-base: 0;
+  --z-scene-floor: 1;
+  --z-scene-fly: 2;
+  --z-scene-runner: 4;
+  --z-scene-evidence: 6;
+  --z-scene-copy: 10;
+
+  /* Retro-arcade brand palette */
+  --ink-void: #030207;
+  --ink-900: #07090d;
+  --ink-800: #0b0e14;
+  --neon-violet: #8c27ff;
+  --neon-magenta: #f144ff;
+  --neon-cyan: #39e9ff;
+  --neon-yellow: #ffd436;
+  --paper: #f4f0e8;
+
+  /* Neon glow ramps (tight + soft + ambient) */
+  --glow-violet: 0 0 1px #8c27ff, 0 0 10px color-mix(in oklch, #8c27ff 55%, transparent), 0 0 32px color-mix(in oklch, #8c27ff 22%, transparent);
+  --glow-magenta: 0 0 1px #f144ff, 0 0 10px color-mix(in oklch, #f144ff 55%, transparent), 0 0 32px color-mix(in oklch, #f144ff 22%, transparent);
+  --glow-cyan: 0 0 1px #39e9ff, 0 0 10px color-mix(in oklch, #39e9ff 55%, transparent), 0 0 32px color-mix(in oklch, #39e9ff 22%, transparent);
+  --glow-yellow: 0 0 1px #ffd436, 0 0 10px color-mix(in oklch, #ffd436 55%, transparent), 0 0 32px color-mix(in oklch, #ffd436 22%, transparent);
 
   /* Compatibility aliases consumed by existing pages and components. */
   --background: var(--surface-canvas);
@@ -240,6 +267,94 @@
   --console-live: #9de43a;
   --console-action: #ff632f;
   --console-violet: #9b5cff;
+
+  /* Wire console-specific palette into Tailwind's token cascade */
+  --background: var(--console-bg);
+  --card: var(--console-panel);
+  --border: var(--console-line);
+  --surface-canvas: var(--console-bg);
+  --surface-panel: var(--console-panel);
+  --surface-border: var(--console-line);
+  --muted: #141a24;
+  --muted-foreground: color-mix(in oklch, var(--paper) 46%, transparent);
+  /* Neon violet as the console primary accent */
+  --primary: var(--neon-violet);
+  --primary-foreground: #fff;
+  --ring: var(--neon-violet);
+  --focus-ring: var(--neon-violet);
+  /* Keep foreground as paper on the dark console substrate */
+  --foreground: var(--paper);
+  --card-foreground: var(--paper);
+  --popover: #141a24;
+  --popover-foreground: var(--paper);
+  --secondary: #1a2232;
+  --secondary-foreground: color-mix(in oklch, var(--paper) 82%, transparent);
+  --accent: #1a2232;
+  --accent-foreground: var(--paper);
+}
+
+/* Glass sidebar effect */
+.console-shell aside {
+  backdrop-filter: blur(14px);
+}
+
+/* Console metric panel dark glass */
+.console-metric-panel {
+  background: color-mix(in oklch, var(--console-panel) 90%, transparent) !important;
+  border-color: var(--console-line) !important;
+  backdrop-filter: blur(8px);
+}
+.console-metric-panel:hover {
+  border-color: color-mix(in oklch, var(--neon-violet) 40%, var(--console-line)) !important;
+}
+
+/* Console auth surface */
+.console-auth-shell {
+  background: var(--console-bg);
+}
+.console-auth-card {
+  backdrop-filter: blur(16px);
+  background: color-mix(in oklch, var(--console-panel) 88%, transparent) !important;
+  border-color: color-mix(in oklch, var(--neon-violet) 28%, var(--console-line)) !important;
+  box-shadow: 0 0 3rem color-mix(in oklch, var(--neon-violet) 10%, transparent) !important;
+}
+
+/* Console sidebar brand strip */
+.console-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 3.5rem;
+  padding-inline: 1.25rem;
+  border-bottom: 1px solid var(--console-line);
+}
+.console-sidebar-brand__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 0.45rem;
+  background: color-mix(in oklch, var(--neon-violet) 15%, transparent);
+  color: var(--neon-violet);
+  flex-shrink: 0;
+}
+.console-sidebar-brand__live {
+  display: inline-block;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--console-live);
+  box-shadow: 0 0 6px var(--console-live);
+  animation: console-pulse 2s ease-in-out infinite;
+  margin-left: auto;
+}
+@keyframes console-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .console-sidebar-brand__live { animation: none; }
 }
 
 /* TrapMan project identity is intentionally isolated from company UI. */
@@ -333,18 +448,18 @@
   border: 1px solid rgb(255 255 255 / 0.12);
 }
 
-/* Nobilix studio redesign */
+/* ─── Nobilix dark arcade-luxury substrate ──────────────────────── */
 .public-shell {
   background:
-    radial-gradient(circle at top left, rgb(196 255 89 / 0.12), transparent 32rem),
-    linear-gradient(135deg, #f4efe5 0%, #e7dece 55%, #cec3b1 100%);
-  color: #171512;
+    radial-gradient(ellipse at 18% 0%, color-mix(in oklch, var(--neon-violet) 9%, transparent) 0%, transparent 48%),
+    var(--ink-900);
+  color: var(--paper);
   overflow-x: clip;
 }
 .public-header,
 .public-footer {
-  border-color: rgb(23 21 18 / 0.14);
-  background: rgb(244 239 229 / 0.82);
+  border-color: rgb(255 255 255 / 0.08);
+  background: rgb(3 2 7 / 0.84);
   backdrop-filter: blur(18px);
 }
 .public-header { position: sticky; top: 0; z-index: var(--z-header); }
@@ -352,32 +467,32 @@
 .public-wordmark {
   flex-direction: column;
   align-items: flex-start !important;
-  justify-content: center;
   gap: 0;
   font-weight: 800;
   letter-spacing: -0.04em;
   text-transform: none;
+  color: var(--paper);
 }
 .public-wordmark small {
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgb(23 21 18 / 0.58);
+  color: color-mix(in oklch, var(--paper) 46%, transparent);
 }
 .public-header__nav a,
 .public-footer a {
   border-radius: 999px;
   padding-inline: 0.85rem;
   font-size: 0.88rem;
-  color: rgb(23 21 18 / 0.72);
-  transition: transform var(--duration-fast) ease;
+  color: color-mix(in oklch, var(--paper) 66%, transparent);
+  transition: color var(--duration-fast) ease, transform var(--duration-fast) ease;
 }
 .public-header__nav a:hover,
-.public-footer a:hover { transform: translateY(-1px); color: #171512; }
+.public-footer a:hover { color: var(--paper); transform: translateY(-1px); }
 .public-footer__brand { max-width: 22rem; }
-.public-footer__brand strong { font-size: 1.4rem; letter-spacing: -0.05em; }
-.public-footer__brand p { margin-top: .35rem; color: rgb(23 21 18 / 0.64); }
+.public-footer__brand strong { font-size: 1.4rem; letter-spacing: -0.05em; color: var(--paper); }
+.public-footer__brand p { margin-top: .35rem; color: color-mix(in oklch, var(--paper) 50%, transparent); }
 .studio-hero {
   min-height: 78svh;
   display: grid;
@@ -392,7 +507,7 @@
   font-weight: 700;
   letter-spacing: .22em;
   text-transform: uppercase;
-  color: #58730f;
+  color: var(--neon-cyan);
 }
 .studio-hero h1,
 .nobilix-studio-section h2,
@@ -403,6 +518,7 @@
 .legal-directory h1 {
   text-wrap: balance;
   letter-spacing: -0.065em;
+  color: var(--paper);
 }
 .studio-hero h1 {
   max-width: 10.8ch;
@@ -413,7 +529,7 @@
 .studio-hero__lede {
   max-width: 42rem;
   margin-top: 1.4rem;
-  color: rgb(23 21 18 / .72);
+  color: color-mix(in oklch, var(--paper) 68%, transparent);
   font-size: clamp(1rem, 2vw, 1.22rem);
   line-height: 1.7;
 }
@@ -436,7 +552,7 @@
   justify-content: center;
   border-radius: 999px;
   font-weight: 700;
-  transition: transform var(--duration-fast) ease;
+  transition: transform var(--duration-fast) ease, box-shadow var(--duration-base) ease;
 }
 .nobilix-button:hover,
 .nobilix-text-link:hover,
@@ -446,24 +562,30 @@
 .nobilix-button--primary,
 .project-card a:first-child,
 .public-not-found a:first-child {
-  background: #171512;
-  color: #fff8ec;
+  background: var(--neon-violet);
+  color: #fff;
   padding-inline: 1.25rem;
+  box-shadow: var(--glow-violet);
 }
 .nobilix-button--secondary,
 .project-card a,
 .legal-directory a,
 .public-not-found a {
-  border: 1px solid rgb(23 21 18 / .18);
+  border: 1px solid color-mix(in oklch, var(--paper) 20%, transparent);
   padding-inline: 1.05rem;
+  color: var(--paper);
 }
 .studio-hero__media {
   position: relative;
   border-radius: clamp(1.5rem, 4vw, 3rem);
   overflow: hidden;
-  box-shadow: 0 3rem 7rem rgb(40 32 19 / .22);
+  border: 1px solid color-mix(in oklch, var(--neon-violet) 30%, transparent);
+  box-shadow:
+    0 0 2rem color-mix(in oklch, var(--neon-violet) 14%, transparent),
+    0 3rem 7rem rgb(0 0 0 / .42);
 }
 .studio-hero__media img,
+.studio-hero__media video,
 .project-showcase__media img {
   display: block;
   width: 100%;
@@ -474,10 +596,10 @@
   inset: auto 1rem 1rem 1rem;
   display: flex;
   justify-content: space-between;
-  border: 1px solid rgb(255 255 255 / .42);
+  border: 1px solid rgb(255 255 255 / .18);
   border-radius: 1rem;
-  background: rgb(23 21 18 / .62);
-  color: #fff8ec;
+  background: rgb(3 2 7 / .72);
+  color: var(--paper);
   padding: .85rem 1rem;
   backdrop-filter: blur(14px);
   font-size: .78rem;
@@ -511,10 +633,11 @@
 }
 .studio-principle,
 .project-card {
-  border: 1px solid rgb(23 21 18 / .14);
+  border: 1px solid color-mix(in oklch, var(--paper) 10%, transparent);
   border-radius: 1.35rem;
-  background: rgb(255 250 241 / .54);
-  box-shadow: 0 1.5rem 4rem rgb(67 54 31 / .08);
+  background: color-mix(in oklch, var(--ink-800) 55%, transparent);
+  box-shadow: 0 0 2.5rem color-mix(in oklch, var(--neon-violet) 7%, transparent);
+  backdrop-filter: blur(12px);
 }
 .studio-principle { padding: clamp(1.25rem, 3vw, 2rem); }
 .studio-principle p,
@@ -524,13 +647,14 @@
   font-weight: 800;
   letter-spacing: .16em;
   text-transform: uppercase;
-  color: #58730f;
+  color: var(--neon-violet);
 }
 .studio-principle h3 {
   margin-top: 2.5rem;
   font-size: clamp(1.45rem, 3vw, 2.2rem);
   line-height: 1;
   letter-spacing: -.04em;
+  color: var(--paper);
 }
 .studio-principle span,
 .project-showcase p,
@@ -542,7 +666,7 @@
   max-width: 68ch;
   margin-top: 1rem;
   line-height: 1.72;
-  color: rgb(23 21 18 / .68);
+  color: color-mix(in oklch, var(--paper) 62%, transparent);
 }
 .project-showcase {
   display: grid;
@@ -554,12 +678,13 @@
   border-radius: 2rem;
   overflow: hidden;
   transform: rotate(-1deg);
+  border: 1px solid color-mix(in oklch, var(--neon-cyan) 28%, transparent);
+  box-shadow: 0 0 3rem color-mix(in oklch, var(--neon-cyan) 10%, transparent);
 }
 .project-showcase__copy { max-width: 54rem; }
-.nobilix-text-link { margin-top: 1.25rem; color: #171512; }
-.legal-reading {
-  max-width: 72ch;
-}
+.nobilix-text-link { margin-top: 1.25rem; color: var(--neon-cyan); }
+.legal-reading { max-width: 72ch; }
+.legal-preline { white-space: pre-line; }
 .legal-directory__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -567,15 +692,16 @@
   margin-top: 2rem;
 }
 .legal-directory article {
-  border: 1px solid rgb(23 21 18 / .14);
+  border: 1px solid color-mix(in oklch, var(--paper) 10%, transparent);
   border-radius: 1.35rem;
-  background: rgb(255 250 241 / .54);
-  box-shadow: 0 1.5rem 4rem rgb(67 54 31 / .08);
+  background: color-mix(in oklch, var(--ink-800) 55%, transparent);
+  backdrop-filter: blur(12px);
   padding: 1.5rem;
 }
 .legal-directory article h2 {
   margin-top: .6rem;
   font-size: 1.45rem;
+  color: var(--paper);
 }
 .legal-directory article a {
   width: fit-content;
@@ -587,12 +713,10 @@
   display: grid;
   align-content: center;
 }
-.project-card {
-  max-width: 42rem;
-}
+.project-card { max-width: 42rem; }
 .project-card img {
   border-radius: 1rem;
-  background: #0d0b12;
+  background: var(--ink-void);
   padding: .75rem;
 }
 .project-card h3 {
@@ -600,20 +724,167 @@
   font-size: clamp(2rem, 4vw, 3.6rem);
   line-height: .92;
   letter-spacing: -.06em;
+  color: var(--paper);
 }
 
-@media (max-width: 820px) {
-  .public-header__nav { display: none !important; }
-  .studio-hero,
-  .project-showcase,
-  .studio-principles__grid,
-  .legal-directory__grid {
+/* ─── Header console CTA ────────────────────────────────────────── */
+.public-header__right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.header-cta {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding-inline: 1rem;
+  border-radius: 0.6rem;
+  background: var(--neon-violet);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  box-shadow: var(--glow-violet);
+  transition: box-shadow var(--duration-fast) ease, transform var(--duration-fast) ease;
+  white-space: nowrap;
+}
+.header-cta:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--glow-violet), 0 4px 16px color-mix(in oklch, var(--neon-violet) 30%, transparent);
+}
+
+/* ─── Studio brand badge (pixel wordmark) ────────────────────────── */
+.studio-brand-badge {
+  display: inline-block;
+  font-size: clamp(0.52rem, 1.1vw, 0.68rem);
+  color: var(--neon-violet);
+  letter-spacing: 0.18em;
+  margin-bottom: 0.8rem;
+  filter: drop-shadow(0 0 6px color-mix(in oklch, var(--neon-violet) 60%, transparent));
+}
+
+/* ─── Traveling neon border ─────────────────────────────────────── */
+@property --border-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes border-travel {
+  to { --border-angle: 360deg; }
+}
+.neon-border {
+  position: relative;
+  border-radius: inherit;
+}
+.neon-border::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--border-angle),
+    var(--neon-violet),
+    var(--neon-cyan),
+    var(--neon-magenta),
+    var(--neon-violet)
+  );
+  animation: border-travel 4s linear infinite;
+  z-index: -1;
+}
+
+/* ─── CRT scanline overlay ──────────────────────────────────────── */
+.crt-overlay {
+  position: relative;
+}
+.crt-overlay::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: var(--z-scene-evidence);
+  background: repeating-linear-gradient(
+    0deg,
+    rgb(0 0 0 / 0.03) 0px,
+    rgb(0 0 0 / 0.03) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* ─── Perspective grid mesh ─────────────────────────────────────── */
+.grid-mesh-floor {
+  position: relative;
+  overflow: hidden;
+}
+.grid-mesh-floor::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: 28%;
+  pointer-events: none;
+  z-index: var(--z-scene-floor);
+  background:
+    linear-gradient(rgb(57 233 255 / .14) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(241 68 255 / .18) 1px, transparent 1px);
+  background-size: 56px 56px;
+  transform: perspective(380px) rotateX(58deg) translateY(12%);
+  transform-origin: bottom;
+  opacity: .65;
+}
+
+/* ─── Pixel display type ─────────────────────────────────────────── */
+.pixel-type {
+  font-family: var(--font-pixel), monospace;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+}
+
+/* ─── Responsive & legibility ───────────────────────────────────── */
+
+/* Mobile — matches Tailwind md: breakpoint so hamburger ↔ desktop nav never both vanish */
+@media (max-width: 767px) {
+  /* Hide desktop nav; hamburger (md:hidden) takes over below this breakpoint */
+  .public-header__nav { display: none; }
+  /* CTA is already in the hamburger menu; hide it to save header space */
+  .header-cta { display: none; }
+
+  /* Single-column layout collapses */
+  .studio-hero {
     grid-template-columns: 1fr;
+    padding-block-start: clamp(3rem, 8vw, 5rem);
   }
-  .studio-hero h1 { font-size: clamp(3.5rem, 18vw, 6rem); }
-  .project-showcase__media { order: 2; }
+  /* Fluid hero heading — one word per line, large but not overflowing */
+  .studio-hero h1 {
+    font-size: clamp(2.8rem, 10vw, 5rem);
+    max-width: none;
+  }
+
+  .project-showcase { grid-template-columns: 1fr; }
+  /* Put image after copy on mobile */
+  .project-showcase__media { order: 2; transform: none; }
+
+  .legal-directory__grid { grid-template-columns: 1fr; }
+  .studio-principles__grid { grid-template-columns: 1fr; }
+}
+
+/* Narrow tablet (600–767px): 2-col principles grid avoids orphaned card */
+@media (min-width: 600px) and (max-width: 767px) {
+  .studio-principles__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Wide desktop: cap section width so lines never stretch past readable measure */
+@media (min-width: 1440px) {
+  .studio-principles,
+  .nobilix-studio-section,
+  .nobilix-contact-section,
+  .project-showcase {
+    max-width: 100rem;
+    margin-inline: auto;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .project-showcase__media { transform: none; }
+  .neon-border::before { animation: none; }
+  .grid-mesh-floor::after { transform: none; opacity: .28; }
 }

@@ -7,6 +7,7 @@ const links = [
   { href: "/trapman#shop", label: "Shop" },
   { href: "/trapman#leaderboard", label: "Rank" },
   { href: "/trapman/account", label: "Account" },
+  { href: "/console", label: "Console" },
 ];
 
 export function TrapManHeader() {

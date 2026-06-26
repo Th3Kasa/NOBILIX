@@ -29,6 +29,8 @@ const transactionRoot = path.join(repositoryRoot, ".asset-pipeline-tmp");
 const apiBaseUrl = "https://api.muapi.ai/api/v1";
 const modelEndpoint = "flux-2-dev";
 const modelName = "MuAPI Flux 2 Dev";
+const videoModelEndpoint = "kling-v3.0-pro-text-to-video";
+const videoModelName = "MuAPI Kling v3.0 Pro";
 const sensitiveValues = new Set();
 
 export const assets = [
@@ -123,6 +125,83 @@ export const assets = [
     prompt:
       "Original 16-bit pixel-art nocturnal music atmosphere for an arcade runner website. Empty underground rehearsal room with a dark open doorway revealing a deep-indigo neon city at night, stacked speakers, coiled cables, cassette-deck silhouettes, restrained cyan and magenta waveform light reflected on a dark tiled floor, amber practical lamps, and calm dark central negative space for web typography. Handcrafted limited-palette sprite art, crisp pixels, moody editorial composition with controlled highlights. No white void, no daylight, no blown highlights, no people, no album cover, no readable text, no logo, no branded equipment, no interface, no photorealism, no smooth 3D render.",
   },
+
+  // ── Cinematic video loops (Kling v3.0 Pro) ───────────────────────────────
+  {
+    id: "nobilix-studio-hero-video",
+    kind: "video",
+    path: "nobilix/studio-hero.mp4",
+    duration: 5,
+    aspectRatio: "16:9",
+    posterWidth: 1536,
+    posterHeight: 864,
+    purpose: "Nobilix studio hero cinematic atmospheric loop",
+    source: `${videoModelName} original text-to-video generation`,
+    prompt:
+      "Ultra-cinematic slow atmospheric loop for a premium software studio website hero. Abstract dark architectural planes in deep charcoal and obsidian, a single restrained neon-violet light seam drifting slowly across brushed-metal surfaces and glass, soft volumetric ambient breath of luminescence pulsing gently, subtle 16mm film grain, anamorphic lens flare from the light seam, completely still environment except for the light movement. No camera movement. No people, no text, no logos, no interface, no game imagery, no generic office, no product shots, no bright highlights.",
+    negativePrompt:
+      "people, faces, text, letters, logos, UI, interface, games, bright colors, white backgrounds, daylight, camera shake, subtitles, watermarks, photorealism, 3D render",
+  },
+  {
+    id: "trapman-city-hero-video",
+    kind: "video",
+    path: "trapman/city-hero.mp4",
+    duration: 5,
+    aspectRatio: "16:9",
+    posterWidth: 1536,
+    posterHeight: 864,
+    purpose: "TrapMan city hero cinematic pixel loop (desktop)",
+    source: `${videoModelName} original text-to-video generation`,
+    prompt:
+      "Cinematic looping 16-bit pixel-art night cityscape for an arcade runner game website. Wide view across layered rooftops and elevated transit lanes. Cyan windows flickering with subtle life, electric magenta neon bars pulsing rhythmically, amber street-lamp pools glowing, pixel rain drops catching neon light, distant transit lights crossing the upper skyline layer, occasional spark from overhead power lines. Three-layer parallax depth with smooth background drift. Deep indigo sky, crisp hard pixel edges, limited color palette. Perfectly loopable 5-second cycle.",
+    negativePrompt:
+      "characters, enemies, player, HUD, score, text, logos, smooth 3D render, photorealistic, generic cyberpunk, watermarks, camera shake",
+  },
+  {
+    id: "trapman-city-mobile-video",
+    kind: "video",
+    path: "trapman/city-mobile.mp4",
+    duration: 5,
+    aspectRatio: "9:16",
+    posterWidth: 864,
+    posterHeight: 1536,
+    purpose: "TrapMan city hero cinematic pixel loop (mobile portrait)",
+    source: `${videoModelName} original text-to-video generation`,
+    prompt:
+      "Cinematic looping vertical 16-bit pixel-art night city for a mobile arcade runner game website. Dramatic upward view through stacked rooftops and fire escapes toward a narrow deep-indigo sky. Cyan windows flickering, magenta electrical glow pulsing, amber street lamp pools, rain pixel drops catching light, vertical depth parallax with layers moving at different speeds. Handcrafted limited-palette sprite art, crisp hard pixel edges. Perfectly loopable 5-second vertical cycle.",
+    negativePrompt:
+      "characters, HUD, text, logos, smooth 3D, photorealistic, watermarks, camera shake, subtitles",
+  },
+  {
+    id: "trapman-gameplay-video",
+    kind: "video",
+    path: "trapman/gameplay-atmosphere.mp4",
+    duration: 5,
+    aspectRatio: "16:9",
+    posterWidth: 1536,
+    posterHeight: 864,
+    purpose: "TrapMan gameplay section cinematic environment loop",
+    source: `${videoModelName} original text-to-video generation`,
+    prompt:
+      "Cinematic looping side-scrolling 16-bit pixel-art urban environment for an arcade runner game website. Smooth rightward parallax scroll of layered rooftop route: foreground barriers and rails, mid-ground building facades with flickering cyan windows, background skyline slowly drifting. Deep indigo night palette with cyan window accents, magenta light bars, abstract collectible sparkle light trails. Three distinct scroll speeds for foreground, mid, and background. Perfectly loopable 5-second horizontal cycle.",
+    negativePrompt:
+      "player character, enemies, HUD, score, text, logos, smooth 3D render, photorealistic, watermarks, static image, no motion",
+  },
+  {
+    id: "trapman-music-video",
+    kind: "video",
+    path: "trapman/music-atmosphere.mp4",
+    duration: 5,
+    aspectRatio: "16:9",
+    posterWidth: 1536,
+    posterHeight: 864,
+    purpose: "TrapMan music section cinematic atmosphere loop",
+    source: `${videoModelName} original text-to-video generation`,
+    prompt:
+      "Cinematic looping 16-bit pixel-art underground music room atmosphere. Speaker grille pixel lights pulsing to an implied rhythm, abstract equalizer waveform bars rising and falling on dark walls, amber lamp warmth flickering gently, coiled cable shadows swaying slightly, open doorway in background revealing deep-indigo neon city. Restrained cyan and magenta waveform light reflections on dark tiled floor. Handcrafted limited-palette sprite art. Perfectly loopable 5-second atmospheric cycle.",
+    negativePrompt:
+      "people, musicians, text, logos, album art, photorealistic, smooth 3D render, bright daylight, watermarks, camera shake",
+  },
 ];
 
 function parseArguments(argv) {
@@ -177,17 +256,28 @@ function validateAssetDefinitions() {
       throw new Error(`Asset escapes generated root: ${asset.path}`);
     }
 
-    if (!asset.path.endsWith(".webp")) {
-      throw new Error(`Delivery asset must be WebP: ${asset.path}`);
-    }
-
-    if (
-      !Number.isInteger(asset.width) ||
-      !Number.isInteger(asset.height) ||
-      asset.width <= 0 ||
-      asset.height <= 0
-    ) {
-      throw new Error(`Invalid delivery dimensions for ${asset.id}`);
+    if (asset.kind === "video") {
+      if (!asset.path.endsWith(".mp4")) {
+        throw new Error(`Video asset must be .mp4: ${asset.path}`);
+      }
+      if (!Number.isInteger(asset.duration) || (asset.duration !== 5 && asset.duration !== 10)) {
+        throw new Error(`Video duration must be 5 or 10 for ${asset.id}`);
+      }
+      if (!["16:9", "9:16", "1:1"].includes(asset.aspectRatio)) {
+        throw new Error(`Video aspectRatio must be 16:9, 9:16, or 1:1 for ${asset.id}`);
+      }
+    } else {
+      if (!asset.path.endsWith(".webp")) {
+        throw new Error(`Delivery asset must be WebP: ${asset.path}`);
+      }
+      if (
+        !Number.isInteger(asset.width) ||
+        !Number.isInteger(asset.height) ||
+        asset.width <= 0 ||
+        asset.height <= 0
+      ) {
+        throw new Error(`Invalid delivery dimensions for ${asset.id}`);
+      }
     }
 
     if (!asset.prompt.trim() || asset.prompt.includes("MUAPI_API_KEY")) {
@@ -404,6 +494,45 @@ export async function submitGeneration(
   return requestId;
 }
 
+export async function submitVideoGeneration(
+  apiKey,
+  asset,
+  {
+    fetchImpl = fetch,
+  } = {},
+) {
+  const body = {
+    prompt: asset.prompt,
+    duration: asset.duration,
+    aspect_ratio: asset.aspectRatio,
+    cfg_scale: 0.5,
+  };
+  if (asset.negativePrompt) {
+    body.negative_prompt = asset.negativePrompt;
+  }
+
+  const response = await requestOnce(
+    `${apiBaseUrl}/${videoModelEndpoint}`,
+    {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-api-key": apiKey,
+      },
+      body: JSON.stringify(body),
+    },
+    fetchImpl,
+  );
+  const payload = await parseJsonResponse(response, "video generation submission");
+  const requestId = requestIdFrom(payload);
+
+  if (!requestId) {
+    throw new Error(`MuAPI did not return a video request id for ${asset.id}`);
+  }
+
+  return requestId;
+}
+
 export async function pollGeneration(
   apiKey,
   requestId,
@@ -453,15 +582,22 @@ export async function pollGeneration(
   throw new Error(`Timed out waiting for MuAPI request ${requestId}`);
 }
 
-async function downloadCandidate(outputUrl, destinationPath) {
+async function downloadCandidate(outputUrl, destinationPath, kind = "image") {
   const response = await requestWithRetry(outputUrl, {});
   const contentType = response.headers.get("content-type") ?? "";
-  if (!contentType.startsWith("image/")) {
-    throw new Error(`MuAPI output is not an image (${contentType || "unknown"})`);
+  const validContentType =
+    kind === "video"
+      ? contentType.startsWith("video/") || contentType.startsWith("application/octet-stream")
+      : contentType.startsWith("image/");
+  if (!validContentType) {
+    throw new Error(
+      `MuAPI output has unexpected content-type for ${kind} (${contentType || "unknown"})`,
+    );
   }
 
   const bytes = Buffer.from(await response.arrayBuffer());
-  if (bytes.length < 10_000) {
+  const minBytes = kind === "video" ? 100_000 : 10_000;
+  if (bytes.length < minBytes) {
     throw new Error("MuAPI output is unexpectedly small");
   }
 
@@ -514,11 +650,14 @@ async function generateCandidates(only) {
   await saveGenerationRecord();
 
   for (const asset of selectedAssets(only)) {
-    process.stdout.write(`Generating ${asset.id}...\n`);
-    const requestId = await submitGeneration(apiKey, asset);
+    process.stdout.write(`Generating ${asset.id} [${asset.kind ?? "image"}]...\n`);
+    const requestId =
+      asset.kind === "video"
+        ? await submitVideoGeneration(apiKey, asset)
+        : await submitGeneration(apiKey, asset);
     const { outputUrl } = await pollGeneration(apiKey, requestId);
     const candidatePath = path.join(candidateDirectory, `${asset.id}.source`);
-    const download = await downloadCandidate(outputUrl, candidatePath);
+    const download = await downloadCandidate(outputUrl, candidatePath, asset.kind);
 
     generation.assets.push({
       id: asset.id,
@@ -538,6 +677,11 @@ async function generateCandidates(only) {
   }
 
   process.stdout.write(`Candidate run: ${runDirectory}\n`);
+}
+
+async function copyCandidate(sourcePath, destinationPath) {
+  await mkdir(path.dirname(destinationPath), { recursive: true });
+  await writeFile(destinationPath, await readFile(sourcePath));
 }
 
 async function optimizeCandidate(sourcePath, destinationPath, width, height) {
@@ -695,27 +839,37 @@ export async function approveCandidates({
     });
   }
 
-  const missingRequired = assets.filter(
-    (asset) =>
-      !validatedRecords.some(
-        ({ definition }) => definition.id === asset.id,
-      ),
-  );
-  if (missingRequired.length > 0) {
-    throw new Error(
-      `Approval set is incomplete: ${missingRequired
-        .map((asset) => asset.id)
-        .join(", ")}`,
-    );
-  }
-
   const resolvedDeliveryRoot = path.resolve(deliveryRoot);
   const transactionPaths = createTransactionPaths(resolvedDeliveryRoot);
   await mkdir(transactionPaths.root, { recursive: true });
   const stagingRoot = await mkdtemp(transactionPaths.stagingPrefix);
 
   try {
+    // Read existing manifest so we can preserve already-approved assets not being replaced.
+    let existingManifestData = { assets: [] };
+    const existingManifestFile = path.join(resolvedDeliveryRoot, path.basename(manifestPath));
+    if (await pathExists(existingManifestFile)) {
+      try {
+        existingManifestData = JSON.parse(await readFile(existingManifestFile, "utf8"));
+      } catch {
+        // Ignore parse errors — treat as empty
+      }
+    }
+
     const manifestEntries = [];
+
+    // Copy forward any already-approved delivery assets not being replaced this run.
+    for (const existingEntry of existingManifestData.assets ?? []) {
+      if (approvedIds.has(existingEntry.id)) continue;
+      const existingSrc = path.join(resolvedDeliveryRoot, existingEntry.path);
+      const existingDst = path.resolve(stagingRoot, existingEntry.path);
+      if (await pathExists(existingSrc)) {
+        await mkdir(path.dirname(existingDst), { recursive: true });
+        await writeFile(existingDst, await readFile(existingSrc));
+        manifestEntries.push(existingEntry);
+      }
+    }
+
     for (const {
       definition,
       generatedAt,
@@ -723,12 +877,16 @@ export async function approveCandidates({
       sourcePath,
     } of validatedRecords) {
       const stagedDeliveryPath = path.resolve(stagingRoot, definition.path);
-      await optimizeCandidateImpl(
-        sourcePath,
-        stagedDeliveryPath,
-        definition.width,
-        definition.height,
-      );
+      if (definition.kind === "video") {
+        await copyCandidate(sourcePath, stagedDeliveryPath);
+      } else {
+        await optimizeCandidateImpl(
+          sourcePath,
+          stagedDeliveryPath,
+          definition.width,
+          definition.height,
+        );
+      }
 
       manifestEntries.push({
         id: definition.id,

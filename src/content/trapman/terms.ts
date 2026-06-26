@@ -4,7 +4,7 @@
  * Legal Launch Gate: requires qualified legal review before publication.
  */
 
-export const TERMS_LAST_UPDATED = "2026-06-22";
+export const TERMS_LAST_UPDATED = "2026-06-26";
 
 export const TERMS_SECTIONS = {
   eligibility: {

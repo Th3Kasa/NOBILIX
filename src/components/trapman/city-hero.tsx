@@ -1,27 +1,28 @@
 import Image from "next/image";
 import Link from "next/link";
+import { CinematicVideo } from "@/components/motion/cinematic-video";
 import { CityMotion } from "./city-motion";
 
 export function CityHero() {
   return (
     <div className="city-hero" aria-labelledby="trapman-title">
       <CityMotion />
-      <Image
-        src="/assets/generated/trapman/city-hero.webp"
-        alt=""
-        width={1536}
-        height={864}
-        priority
+      <CinematicVideo
+        src="/assets/generated/trapman/city-hero.mp4"
+        poster="/assets/generated/trapman/city-hero.webp"
+        posterWidth={1536}
+        posterHeight={864}
         sizes="100vw"
+        priority
         className="city-hero__atmosphere city-hero__atmosphere--desktop"
       />
-      <Image
-        src="/assets/generated/trapman/city-mobile.webp"
-        alt=""
-        width={864}
-        height={1536}
-        priority
+      <CinematicVideo
+        src="/assets/generated/trapman/city-mobile.mp4"
+        poster="/assets/generated/trapman/city-mobile.webp"
+        posterWidth={864}
+        posterHeight={1536}
         sizes="100vw"
+        priority
         className="city-hero__atmosphere city-hero__atmosphere--mobile"
       />
       <div className="starfield" data-layer="starfield" aria-hidden="true" />

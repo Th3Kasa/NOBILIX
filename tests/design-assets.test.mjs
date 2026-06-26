@@ -203,7 +203,7 @@ test("asset generator validates the full plan without credentials or API calls",
   );
 
   assert.equal(stderr, "");
-  assert.match(stdout, /Validated 7 design asset definitions/);
+  assert.match(stdout, /Validated 12 design asset definitions/);
   assert.doesNotMatch(stdout, /MUAPI_API_KEY/i);
 });
 
@@ -441,35 +441,48 @@ test("failed approval leaves the prior delivery set unchanged", async () => {
   await rm(temporaryRoot, { recursive: true, force: true });
 });
 
-test("approval validates all records before optimization", async () => {
+test("partial approval preserves already-committed delivery assets", async () => {
   const { approveCandidates } = await importGenerator();
   const temporaryRoot = await mkdtemp(
-    path.join(os.tmpdir(), "design-assets-validation-test-"),
+    path.join(os.tmpdir(), "design-assets-partial-approval-test-"),
   );
   const deliveryRoot = path.join(temporaryRoot, "delivery");
   await cp(generatedAssetsRoot, deliveryRoot, { recursive: true });
+
+  // Only submit 6 of the 7 image assets in this run — simulates a video-only generation run
   const incompletePaths = requiredAssets.slice(0, -1);
   const runDirectory = await createGenerationRun(
     temporaryRoot,
-    "incomplete-run",
+    "partial-run",
     "2026-06-24T10:00:00.000Z",
     incompletePaths,
   );
   let optimizationCalls = 0;
 
-  await assert.rejects(
-    approveCandidates({
-      runDirectory,
-      approvedValue: "all",
-      deliveryRoot,
-      optimizeCandidateImpl: async () => {
-        optimizationCalls += 1;
-      },
-    }),
-    /Approval set is incomplete/,
-  );
+  // Must succeed — the missing asset is preserved from the existing delivery root
+  await approveCandidates({
+    runDirectory,
+    approvedValue: "all",
+    deliveryRoot,
+    optimizeCandidateImpl: async (sourcePath, destinationPath) => {
+      optimizationCalls += 1;
+      await mkdir(path.dirname(destinationPath), { recursive: true });
+      await cp(sourcePath, destinationPath);
+    },
+  });
 
-  assert.equal(optimizationCalls, 0);
+  // Only the 6 submitted assets should have been re-optimized
+  assert.equal(optimizationCalls, incompletePaths.length);
+
+  // All 7 image assets must still be present in the delivery root after partial approval
+  for (const assetPath of requiredAssets) {
+    const deliveredPath = path.join(deliveryRoot, assetPath);
+    await assert.doesNotReject(
+      () => access(deliveredPath),
+      `Expected ${assetPath} to survive partial approval`,
+    );
+  }
+
   await rm(temporaryRoot, { recursive: true, force: true });
 });
 

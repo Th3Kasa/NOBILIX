@@ -18,7 +18,7 @@ export default function TrapManTermsPage() {
           id={section.heading.toLowerCase().replace(/\s+/g, "-")}
         >
           <h2>{section.heading}</h2>
-          <p style={{ whiteSpace: "pre-line" }}>{section.body}</p>
+          <p className="legal-preline">{section.body}</p>
         </section>
       ))}
     </LegalShell>

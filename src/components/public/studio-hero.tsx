@@ -1,5 +1,5 @@
-import Image from "next/image";
 import Link from "next/link";
+import { CinematicVideo } from "@/components/motion/cinematic-video";
 import { ParallaxMedia } from "@/components/motion/parallax-media";
 import { Reveal } from "@/components/motion/reveal";
 
@@ -8,35 +8,37 @@ export function StudioHero() {
     <section className="studio-hero" aria-labelledby="company-title">
       <div className="studio-hero__copy">
         <Reveal>
-          <p className="eyebrow">Nobilix / Independent studio</p>
-          <h1 id="company-title">Professional studio. Distinct project worlds.</h1>
+          <p className="studio-brand-badge pixel-type" aria-hidden="true">NOBILIX</p>
+          <p className="eyebrow">Independent game studio</p>
+          <h1 id="company-title">Build worlds. Stay distinct.</h1>
           <p className="studio-hero__lede">
-            Nobilix is the company brand: neutral, reliable, and ready to hold
-            a growing portfolio. TrapMan is the main project right now, with
-            more worlds designed to sit beside it later.
+            Nobilix is a game studio built for distinct project identities.
+            Each title gets its own visual language, data disclosures, and
+            product home — without forcing the studio brand to compete.
           </p>
           <div className="studio-hero__actions" aria-label="Primary actions">
-            <Link className="nobilix-button nobilix-button--primary" href="#projects">
-              View TrapMan
+            <Link className="nobilix-button nobilix-button--primary" href="/trapman">
+              Enter TrapMan
             </Link>
-            <Link className="nobilix-button nobilix-button--secondary" href="/legal">
-              Company legal
+            <Link className="nobilix-button nobilix-button--secondary" href="/console">
+              Launch Console
             </Link>
           </div>
         </Reveal>
       </div>
       <ParallaxMedia className="studio-hero__media" amount={24}>
-        <Image
-          src="/assets/generated/nobilix/studio-hero.webp"
-          alt="Abstract warm studio artwork with black architectural planes and an acid-lime light seam."
-          width={1536}
-          height={864}
-          priority
+        <CinematicVideo
+          src="/assets/generated/nobilix/studio-hero.mp4"
+          poster="/assets/generated/nobilix/studio-hero.webp"
+          posterWidth={1536}
+          posterHeight={864}
+          alt="Original pixel-art studio atmosphere: deep indigo planes with neon violet and cyan light seams."
           sizes="(max-width: 768px) 100vw, 52vw"
+          priority
         />
         <div className="studio-hero__plate" aria-hidden="true">
           <span>01</span>
-          <span>Company brand</span>
+          <span>Studio</span>
         </div>
       </ParallaxMedia>
     </section>

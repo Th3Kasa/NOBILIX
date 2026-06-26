@@ -7,11 +7,11 @@ export default function AuthLayout({
     <main
       id="main-content"
       tabIndex={-1}
-      className="console-auth-shell relative flex min-h-dvh items-center justify-center overflow-hidden p-4"
+      className="console-shell console-auth-shell relative flex min-h-dvh items-center justify-center overflow-hidden p-4"
     >
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_0%,color-mix(in_oklch,var(--primary)_18%,transparent),transparent)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_50%_at_50%_0%,color-mix(in_oklch,var(--neon-violet)_18%,transparent),transparent)]"
       />
       <div
         aria-hidden

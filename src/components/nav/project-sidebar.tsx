@@ -51,17 +51,18 @@ export function ProjectSidebar({
 
   return (
     <aside className="hidden w-60 shrink-0 flex-col border-r border-border bg-card/40 md:flex">
-      {/* Project header with back link */}
-      <div className="flex h-14 items-center gap-2 border-b border-border px-4">
-        <div className="flex size-7 items-center justify-center rounded-lg bg-primary/15 text-primary">
-          <Gamepad2 className="size-4" />
+      {/* Project header */}
+      <div className="console-sidebar-brand">
+        <div className="console-sidebar-brand__icon">
+          <Gamepad2 className="size-4" aria-hidden="true" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="text-xs text-muted-foreground leading-tight">NOBILIX</p>
-          <p className="truncate text-sm font-semibold leading-tight">
+          <p className="font-mono text-[10px] tracking-widest text-muted-foreground leading-tight">NOBILIX</p>
+          <p className="truncate text-sm font-semibold leading-tight text-foreground">
             {projectName}
           </p>
         </div>
+        <span className="console-sidebar-brand__live" aria-label="Live" />
       </div>
 
       {/* Module navigation */}
