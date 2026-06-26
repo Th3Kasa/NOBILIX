@@ -26,19 +26,19 @@ export function Topbar({
 
   return (
     <header className="flex h-14 items-center justify-between border-b border-border bg-card/40 px-4 md:px-6">
-      <span className="text-sm font-medium text-muted-foreground md:hidden">
+      <span className="text-sm font-medium text-muted-foreground">
         {projectName ? (
           <>
-            <span className="text-xs">NOBILIX</span>
+            <span className="text-xs">Nobilix</span>
             <span className="mx-1.5 text-muted-foreground/50">/</span>
             {projectName}
           </>
         ) : (
-          "NOBILIX"
+          "Nobilix"
         )}
       </span>
       <div className="ml-auto flex items-center gap-3">
-        <div className="hidden text-right sm:block">
+        <div className="hidden text-right sm:block" aria-label="Signed in administrator">
           <p className="text-sm font-medium leading-tight">{name}</p>
           <p className="text-xs text-muted-foreground leading-tight">{email}</p>
         </div>

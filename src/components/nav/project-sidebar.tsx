@@ -84,8 +84,9 @@ export function ProjectSidebar({
             <Link
               key={mod}
               href={href}
+              aria-current={active ? "page" : undefined}
               className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-150",
+                "flex min-h-11 items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-transform duration-150",
                 active
                   ? "bg-primary/15 text-primary"
                   : "text-muted-foreground hover:bg-accent hover:text-foreground",
@@ -102,7 +103,7 @@ export function ProjectSidebar({
       <div className="border-t border-border p-3">
         <Link
           href="/console"
-          className="flex items-center gap-2 rounded-md px-3 py-2 text-xs text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          className="flex min-h-11 items-center gap-2 rounded-md px-3 py-2 text-xs text-muted-foreground transition-transform hover:bg-accent hover:text-foreground"
           aria-label="Back to all projects"
         >
           <ChevronLeft className="size-3.5" aria-hidden="true" />
