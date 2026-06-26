@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "generatedAt": "2026-06-24T09:38:41.210Z",
-  "reviewedAt": "2026-06-24T09:39:43.996Z",
+  "generatedAt": "2026-06-26T15:23:26.385Z",
+  "reviewedAt": "2026-06-26T15:25:02.291Z",
   "assets": [
     {
       "id": "nobilix-studio-hero",
@@ -112,6 +112,76 @@
       "endpoint": "flux-2-dev",
       "seed": null,
       "generatedAt": "2026-06-24T09:38:41.210Z",
+      "approved": true,
+      "approval": "Manual visual review"
+    },
+    {
+      "id": "nobilix-studio-hero-video",
+      "kind": "video",
+      "path": "nobilix/studio-hero.mp4",
+      "source": "MuAPI Kling v3.0 Pro original text-to-video generation",
+      "purpose": "Nobilix studio hero cinematic atmospheric loop",
+      "prompt": "Ultra-cinematic slow atmospheric loop for a premium software studio website hero. Abstract dark architectural planes in deep charcoal and obsidian, a single restrained neon-violet light seam drifting slowly across brushed-metal surfaces and glass, soft volumetric ambient breath of luminescence pulsing gently, subtle 16mm film grain, anamorphic lens flare from the light seam, completely still environment except for the light movement. No camera movement. No people, no text, no logos, no interface, no game imagery, no generic office, no product shots, no bright highlights.",
+      "model": "MuAPI Flux 2 Dev",
+      "endpoint": "flux-2-dev",
+      "seed": null,
+      "generatedAt": "2026-06-26T15:09:29.749Z",
+      "approved": true,
+      "approval": "Manual visual review"
+    },
+    {
+      "id": "trapman-city-hero-video",
+      "kind": "video",
+      "path": "trapman/city-hero.mp4",
+      "source": "MuAPI Kling v3.0 Pro original text-to-video generation",
+      "purpose": "TrapMan city hero cinematic pixel loop (desktop)",
+      "prompt": "Cinematic looping 16-bit pixel-art night cityscape for an arcade runner game website. Wide view across layered rooftops and elevated transit lanes. Cyan windows flickering with subtle life, electric magenta neon bars pulsing rhythmically, amber street-lamp pools glowing, pixel rain drops catching neon light, distant transit lights crossing the upper skyline layer, occasional spark from overhead power lines. Three-layer parallax depth with smooth background drift. Deep indigo sky, crisp hard pixel edges, limited color palette. Perfectly loopable 5-second cycle.",
+      "model": "MuAPI Flux 2 Dev",
+      "endpoint": "flux-2-dev",
+      "seed": null,
+      "generatedAt": "2026-06-26T15:13:40.011Z",
+      "approved": true,
+      "approval": "Manual visual review"
+    },
+    {
+      "id": "trapman-city-mobile-video",
+      "kind": "video",
+      "path": "trapman/city-mobile.mp4",
+      "source": "MuAPI Kling v3.0 Pro original text-to-video generation",
+      "purpose": "TrapMan city hero cinematic pixel loop (mobile portrait)",
+      "prompt": "Cinematic looping vertical 16-bit pixel-art night city for a mobile arcade runner game website. Dramatic upward view through stacked rooftops and fire escapes toward a narrow deep-indigo sky. Cyan windows flickering, magenta electrical glow pulsing, amber street lamp pools, rain pixel drops catching light, vertical depth parallax with layers moving at different speeds. Handcrafted limited-palette sprite art, crisp hard pixel edges. Perfectly loopable 5-second vertical cycle.",
+      "model": "MuAPI Flux 2 Dev",
+      "endpoint": "flux-2-dev",
+      "seed": null,
+      "generatedAt": "2026-06-26T15:17:18.128Z",
+      "approved": true,
+      "approval": "Manual visual review"
+    },
+    {
+      "id": "trapman-gameplay-video",
+      "kind": "video",
+      "path": "trapman/gameplay-atmosphere.mp4",
+      "source": "MuAPI Kling v3.0 Pro original text-to-video generation",
+      "purpose": "TrapMan gameplay section cinematic environment loop",
+      "prompt": "Cinematic looping side-scrolling 16-bit pixel-art urban environment for an arcade runner game website. Smooth rightward parallax scroll of layered rooftop route: foreground barriers and rails, mid-ground building facades with flickering cyan windows, background skyline slowly drifting. Deep indigo night palette with cyan window accents, magenta light bars, abstract collectible sparkle light trails. Three distinct scroll speeds for foreground, mid, and background. Perfectly loopable 5-second horizontal cycle.",
+      "model": "MuAPI Flux 2 Dev",
+      "endpoint": "flux-2-dev",
+      "seed": null,
+      "generatedAt": "2026-06-26T15:20:27.242Z",
+      "approved": true,
+      "approval": "Manual visual review"
+    },
+    {
+      "id": "trapman-music-video",
+      "kind": "video",
+      "path": "trapman/music-atmosphere.mp4",
+      "source": "MuAPI Kling v3.0 Pro original text-to-video generation",
+      "purpose": "TrapMan music section cinematic atmosphere loop",
+      "prompt": "Cinematic looping 16-bit pixel-art underground music room atmosphere. Speaker grille pixel lights pulsing to an implied rhythm, abstract equalizer waveform bars rising and falling on dark walls, amber lamp warmth flickering gently, coiled cable shadows swaying slightly, open doorway in background revealing deep-indigo neon city. Restrained cyan and magenta waveform light reflections on dark tiled floor. Handcrafted limited-palette sprite art. Perfectly loopable 5-second atmospheric cycle.",
+      "model": "MuAPI Flux 2 Dev",
+      "endpoint": "flux-2-dev",
+      "seed": null,
+      "generatedAt": "2026-06-26T15:23:26.385Z",
       "approved": true,
       "approval": "Manual visual review"
     }

@@ -51,3 +51,9 @@ trap-man-*.json
 
 # generated asset pipeline transactions
 /.asset-pipeline-tmp/
+
+# AI session artifacts (Codex, Playwright MCP, Claude worktrees)
+.Codex/
+.claude/worktrees/
+.playwright-mcp/
+.codex-dev.*.log
