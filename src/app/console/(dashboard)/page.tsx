@@ -8,7 +8,7 @@ export default function ConsolePage() {
   const projects = Object.values(PROJECTS);
 
   return (
-    <>
+    <main id="main-content" tabIndex={-1}>
       <PageHeader
         title="Projects"
         description="Select a project to open its mission-control workspace."
@@ -19,6 +19,6 @@ export default function ConsolePage() {
           <ProjectTile key={project.slug} project={project} />
         ))}
       </div>
-    </>
+    </main>
   );
 }

@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { MobileNavigation } from "@/components/nav/mobile-navigation";
 import { requirePlayerSession } from "@/lib/player-session";
 
 export const metadata: Metadata = {
@@ -7,27 +9,38 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
+const accountNavigationItems = [
+  { href: "/trapman/account", label: "Dashboard", description: "Progress and purchases" },
+  { href: "/trapman/delete-account", label: "Delete account", description: "Permanent removal" },
+  { href: "/trapman/privacy-policy", label: "Privacy", description: "Project policy" },
+  { href: "/trapman", label: "TrapMan", description: "Project home" },
+];
+
 export default async function PlayerAccountLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // Server-side auth guard — redirects to login if no valid session cookie.
-  // Do not remove or bypass with middleware alone.
   await requirePlayerSession();
 
   return (
     <div className="player-account-shell">
       <header className="player-account-header">
-        <a href="/trapman" className="player-account-logo-link">
-          TrapMan
-        </a>
+        <Link href="/trapman" className="player-account-logo-link">
+          TrapMan Account
+        </Link>
         <nav className="player-account-nav" aria-label="Account navigation">
-          <a href="/trapman/account">Dashboard</a>
-          <a href="/trapman/account?action=signout">Sign out</a>
+          {accountNavigationItems.map((item) => (
+            <Link key={item.href} href={item.href}>
+              {item.label}
+            </Link>
+          ))}
         </nav>
+        <MobileNavigation items={accountNavigationItems} label="Account navigation" />
       </header>
-      <main className="player-account-main">{children}</main>
+      <main id="main-content" tabIndex={-1} className="player-account-main">
+        {children}
+      </main>
     </div>
   );
 }

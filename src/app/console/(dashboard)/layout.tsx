@@ -2,6 +2,12 @@ import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { PlatformSidebar } from "@/components/nav/platform-sidebar";
 import { Topbar } from "@/components/nav/topbar";
+import { ConsoleMobileNav } from "@/components/nav/console-mobile-nav";
+
+const platformNavigationItems = [
+  { href: "/console", label: "Projects", description: "All Nobilix projects" },
+  { href: "/console/trapman", label: "TrapMan", description: "Main project" },
+];
 
 export default async function DashboardLayout({
   children,
@@ -15,12 +21,15 @@ export default async function DashboardLayout({
     <div className="flex min-h-dvh">
       <PlatformSidebar />
       <div className="flex min-w-0 flex-1 flex-col">
+        <div className="border-b border-border bg-card/40 px-4 py-3 md:hidden">
+          <ConsoleMobileNav scopeLabel="Platform" items={platformNavigationItems} />
+        </div>
         <Topbar
           name={session.user.name ?? ""}
           email={session.user.email ?? ""}
           role={session.user.role}
         />
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">{children}</main>
+        <div className="flex-1 overflow-y-auto p-4 md:p-6">{children}</div>
       </div>
     </div>
   );

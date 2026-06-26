@@ -10,7 +10,10 @@ export function PurchaseHistory({ purchases }: PurchaseHistoryProps) {
       <h2 id="purchases-heading">Purchase History</h2>
 
       {purchases.length === 0 ? (
-        <p className="player-no-purchases">No purchases on record for this account.</p>
+        <div className="player-no-purchases player-empty-state">
+          <p>No purchases on record for this account.</p>
+          <span>When purchases exist, product IDs and receipt dates appear here.</span>
+        </div>
       ) : (
         <ul className="player-purchase-list">
           {purchases.map((purchase) => (

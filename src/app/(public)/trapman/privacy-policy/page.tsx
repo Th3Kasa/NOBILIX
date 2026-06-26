@@ -43,7 +43,7 @@ export default function TrapManPrivacyPolicyPage() {
           <tbody>
             {TRAPMAN_DATA_INVENTORY.map((entry) => (
               <tr key={entry.key}>
-                <td>{entry.key}</td>
+                <td>{entry.label}</td>
                 <td>{entry.system}</td>
                 <td>
                   <code>{entry.location}</code>

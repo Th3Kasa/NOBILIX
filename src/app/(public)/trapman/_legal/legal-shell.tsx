@@ -73,9 +73,14 @@ export function LegalShell({ title, lastUpdated, children }: LegalShellProps) {
 
       <div className="legal-body">
         {/* Sticky table of contents for cross-page navigation */}
-        <nav className="legal-toc" aria-label="Legal pages">
+        <nav className="legal-toc legal-contents-nav" aria-label="Legal pages">
           <h2 className="legal-toc-heading">TrapMan Legal</h2>
           <ul>
+            <li>
+              <Link href="/legal" className="legal-toc-link">
+                Company legal
+              </Link>
+            </li>
             {TRAPMAN_LEGAL_PAGES.map(({ href, label }) => (
               <li key={href}>
                 <Link href={href} className="legal-toc-link">
@@ -87,9 +92,9 @@ export function LegalShell({ title, lastUpdated, children }: LegalShellProps) {
         </nav>
 
         {/* Main legal content */}
-        <main className="legal-content">
+        <article className="legal-content">
           {children}
-        </main>
+        </article>
       </div>
 
       {/* Footer with support contact */}

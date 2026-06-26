@@ -7,7 +7,7 @@ export default function PlayerAccountError({
   reset: () => void;
 }) {
   return (
-    <div className="player-account-error" role="alert">
+    <div className="player-account-error player-account-error-card" role="alert">
       <p>
         We could not load your TrapMan account. Try again or contact player
         support.

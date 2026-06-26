@@ -48,3 +48,6 @@ trap-man-*.json
 
 # preview/superpowers artifacts
 .superpowers/
+
+# generated asset pipeline transactions
+/.asset-pipeline-tmp/

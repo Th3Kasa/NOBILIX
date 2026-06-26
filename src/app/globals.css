@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 /*
-  NOBILIX Admin Console — design system
-  Dark-first, professional admin/CRM aesthetic. WCAG AA contrast.
+  Nobilix shared design system.
+  Warm-neutral company tokens are global; project identities remain scoped.
 */
 
 @theme inline {
@@ -29,6 +29,11 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-surface-canvas: var(--surface-canvas);
+  --color-surface-panel: var(--surface-panel);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-status-info: var(--status-info);
+  --color-status-danger: var(--status-danger);
 
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -48,30 +53,70 @@
 :root {
   --radius: 0.75rem;
 
-  /* Light theme (secondary) */
-  --background: oklch(0.99 0 0);
-  --foreground: oklch(0.18 0.01 260);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.18 0.01 260);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.18 0.01 260);
-  --primary: oklch(0.55 0.2 264);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.96 0.01 260);
-  --secondary-foreground: oklch(0.25 0.02 260);
-  --muted: oklch(0.96 0.01 260);
-  --muted-foreground: oklch(0.5 0.02 260);
-  --accent: oklch(0.95 0.02 264);
-  --accent-foreground: oklch(0.25 0.05 264);
-  --destructive: oklch(0.58 0.22 25);
-  --destructive-foreground: oklch(0.99 0 0);
-  --success: oklch(0.6 0.16 155);
-  --success-foreground: oklch(0.99 0 0);
-  --warning: oklch(0.75 0.16 75);
-  --warning-foreground: oklch(0.2 0.05 75);
-  --border: oklch(0.9 0.01 260);
-  --input: oklch(0.9 0.01 260);
-  --ring: oklch(0.55 0.2 264);
+  /* Company identity */
+  --company-canvas: oklch(0.985 0.008 78);
+  --company-ink: oklch(0.2 0.018 64);
+  --company-accent: oklch(0.55 0.13 50);
+  --company-accent-contrast: oklch(0.99 0.006 78);
+
+  /* Project identity defaults; projects override these in a scoped root. */
+  --project-accent: var(--company-accent);
+  --project-accent-contrast: var(--company-accent-contrast);
+
+  /* Status */
+  --status-success: oklch(0.55 0.13 150);
+  --status-success-contrast: oklch(0.99 0.01 150);
+  --status-warning: oklch(0.72 0.14 75);
+  --status-warning-contrast: oklch(0.22 0.04 75);
+  --status-danger: oklch(0.56 0.19 27);
+  --status-danger-contrast: oklch(0.99 0.006 78);
+  --status-info: oklch(0.56 0.12 245);
+
+  /* Surfaces */
+  --surface-canvas: var(--company-canvas);
+  --surface-panel: oklch(0.998 0.003 78);
+  --surface-elevated: oklch(1 0 0);
+  --surface-muted: oklch(0.95 0.012 72);
+  --surface-border: oklch(0.86 0.018 70);
+
+  /* Focus, spacing, motion, and layer architecture */
+  --focus-ring: oklch(0.54 0.15 52);
+  --focus-offset: var(--surface-canvas);
+  --space-control: 0.75rem;
+  --space-section: clamp(4rem, 8vw, 8rem);
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 420ms;
+  --z-header: 30;
+  --z-navigation: 40;
+  --z-overlay: 50;
+  --z-modal: 60;
+  --z-toast: 70;
+
+  /* Compatibility aliases consumed by existing pages and components. */
+  --background: var(--surface-canvas);
+  --foreground: var(--company-ink);
+  --card: var(--surface-panel);
+  --card-foreground: var(--company-ink);
+  --popover: var(--surface-elevated);
+  --popover-foreground: var(--company-ink);
+  --primary: var(--project-accent);
+  --primary-foreground: var(--project-accent-contrast);
+  --secondary: var(--surface-muted);
+  --secondary-foreground: var(--company-ink);
+  --muted: var(--surface-muted);
+  --muted-foreground: oklch(0.43 0.025 64);
+  --accent: oklch(0.92 0.03 62);
+  --accent-foreground: var(--company-ink);
+  --destructive: var(--status-danger);
+  --destructive-foreground: var(--status-danger-contrast);
+  --success: var(--status-success);
+  --success-foreground: var(--status-success-contrast);
+  --warning: var(--status-warning);
+  --warning-foreground: var(--status-warning-contrast);
+  --border: var(--surface-border);
+  --input: var(--surface-border);
+  --ring: var(--focus-ring);
 
   --chart-1: oklch(0.6 0.22 264);
   --chart-2: oklch(0.65 0.18 190);
@@ -81,30 +126,50 @@
 }
 
 .dark {
-  /* Dark theme (default) */
-  --background: oklch(0.16 0.012 264);
-  --foreground: oklch(0.96 0.005 260);
-  --card: oklch(0.2 0.014 264);
-  --card-foreground: oklch(0.96 0.005 260);
-  --popover: oklch(0.2 0.014 264);
-  --popover-foreground: oklch(0.96 0.005 260);
-  --primary: oklch(0.68 0.17 264);
-  --primary-foreground: oklch(0.16 0.012 264);
-  --secondary: oklch(0.26 0.015 264);
-  --secondary-foreground: oklch(0.96 0.005 260);
-  --muted: oklch(0.26 0.015 264);
-  --muted-foreground: oklch(0.68 0.012 260);
-  --accent: oklch(0.3 0.03 264);
-  --accent-foreground: oklch(0.96 0.005 260);
-  --destructive: oklch(0.62 0.2 25);
-  --destructive-foreground: oklch(0.98 0 0);
-  --success: oklch(0.68 0.15 155);
-  --success-foreground: oklch(0.14 0.02 155);
-  --warning: oklch(0.78 0.15 75);
-  --warning-foreground: oklch(0.18 0.03 75);
-  --border: oklch(0.3 0.015 264);
-  --input: oklch(0.32 0.015 264);
-  --ring: oklch(0.68 0.17 264);
+  --company-canvas: oklch(0.16 0.012 62);
+  --company-ink: oklch(0.94 0.012 78);
+  --company-accent: oklch(0.72 0.14 55);
+  --company-accent-contrast: oklch(0.17 0.018 55);
+  --project-accent: var(--company-accent);
+  --project-accent-contrast: var(--company-accent-contrast);
+  --status-success: oklch(0.72 0.14 150);
+  --status-success-contrast: oklch(0.16 0.025 150);
+  --status-warning: oklch(0.8 0.14 78);
+  --status-warning-contrast: oklch(0.19 0.04 75);
+  --status-danger: oklch(0.5 0.16 28);
+  --status-danger-contrast: oklch(0.98 0.008 78);
+  --status-info: oklch(0.72 0.12 245);
+  --surface-canvas: var(--company-canvas);
+  --surface-panel: oklch(0.2 0.015 62);
+  --surface-elevated: oklch(0.235 0.018 62);
+  --surface-muted: oklch(0.255 0.018 62);
+  --surface-border: oklch(0.5 0.02 62);
+  --focus-ring: oklch(0.78 0.15 58);
+  --focus-offset: var(--surface-canvas);
+
+  --background: var(--surface-canvas);
+  --foreground: var(--company-ink);
+  --card: var(--surface-panel);
+  --card-foreground: var(--company-ink);
+  --popover: var(--surface-elevated);
+  --popover-foreground: var(--company-ink);
+  --primary: var(--project-accent);
+  --primary-foreground: var(--project-accent-contrast);
+  --secondary: var(--surface-muted);
+  --secondary-foreground: var(--company-ink);
+  --muted: var(--surface-muted);
+  --muted-foreground: oklch(0.72 0.025 72);
+  --accent: oklch(0.3 0.04 58);
+  --accent-foreground: var(--company-ink);
+  --destructive: var(--status-danger);
+  --destructive-foreground: var(--status-danger-contrast);
+  --success: var(--status-success);
+  --success-foreground: var(--status-success-contrast);
+  --warning: var(--status-warning);
+  --warning-foreground: var(--status-warning-contrast);
+  --border: var(--surface-border);
+  --input: var(--surface-border);
+  --ring: var(--focus-ring);
 
   --chart-1: oklch(0.7 0.18 264);
   --chart-2: oklch(0.72 0.15 190);
@@ -126,6 +191,31 @@
   ::selection {
     background: color-mix(in oklch, var(--primary) 30%, transparent);
   }
+}
+
+.skip-link {
+  position: fixed;
+  left: 1rem;
+  top: 1rem;
+  z-index: var(--z-toast);
+  min-height: 44px;
+  transform: translateY(calc(-100% - 2rem));
+  border-radius: var(--radius);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  transition: transform var(--duration-fast) ease;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
+}
+
+#main-content:focus {
+  outline: none;
 }
 
 /* Thin, themed scrollbars */
@@ -152,17 +242,46 @@
   --console-violet: #9b5cff;
 }
 
+/* TrapMan project identity is intentionally isolated from company UI. */
+.trapman-site {
+  --project-accent: oklch(0.73 0.22 142);
+  --project-accent-contrast: oklch(0.12 0.025 142);
+  --project-surface: oklch(0.1 0.025 265);
+  --project-glow: oklch(0.66 0.2 320);
+}
+
 /* Console motion — 120-240ms, reduced-motion disabled */
 @layer base {
   .console-shell * {
+    transition-property: transform, opacity;
     transition-duration: 150ms;
     transition-timing-function: ease;
   }
   @media (prefers-reduced-motion: reduce) {
-    .console-shell * {
-      transition-duration: 0ms !important;
-      animation-duration: 0ms !important;
+    *,
+    *::before,
+    *::after {
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
     }
+  }
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 2px solid CanvasText !important;
+    outline-offset: 3px !important;
+  }
+
+  button,
+  input,
+  textarea,
+  select,
+  [role="button"],
+  [role="dialog"] {
+    border: 1px solid CanvasText;
   }
 }
 
@@ -212,4 +331,289 @@
   max-width: 56rem;
   padding: clamp(1.5rem, 4vw, 3rem);
   border: 1px solid rgb(255 255 255 / 0.12);
+}
+
+/* Nobilix studio redesign */
+.public-shell {
+  background:
+    radial-gradient(circle at top left, rgb(196 255 89 / 0.12), transparent 32rem),
+    linear-gradient(135deg, #f4efe5 0%, #e7dece 55%, #cec3b1 100%);
+  color: #171512;
+  overflow-x: clip;
+}
+.public-header,
+.public-footer {
+  border-color: rgb(23 21 18 / 0.14);
+  background: rgb(244 239 229 / 0.82);
+  backdrop-filter: blur(18px);
+}
+.public-header { position: sticky; top: 0; z-index: var(--z-header); }
+.public-footer { align-items: flex-start; }
+.public-wordmark {
+  flex-direction: column;
+  align-items: flex-start !important;
+  justify-content: center;
+  gap: 0;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  text-transform: none;
+}
+.public-wordmark small {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgb(23 21 18 / 0.58);
+}
+.public-header__nav a,
+.public-footer a {
+  border-radius: 999px;
+  padding-inline: 0.85rem;
+  font-size: 0.88rem;
+  color: rgb(23 21 18 / 0.72);
+  transition: transform var(--duration-fast) ease;
+}
+.public-header__nav a:hover,
+.public-footer a:hover { transform: translateY(-1px); color: #171512; }
+.public-footer__brand { max-width: 22rem; }
+.public-footer__brand strong { font-size: 1.4rem; letter-spacing: -0.05em; }
+.public-footer__brand p { margin-top: .35rem; color: rgb(23 21 18 / 0.64); }
+.studio-hero {
+  min-height: 78svh;
+  display: grid;
+  grid-template-columns: minmax(0, 0.86fr) minmax(18rem, 1fr);
+  gap: clamp(2rem, 6vw, 6rem);
+  align-items: center;
+  padding: clamp(4.5rem, 10vw, 9rem) clamp(1.25rem, 7vw, 7rem);
+}
+.studio-hero__copy { max-width: 48rem; }
+.eyebrow {
+  font-size: .74rem;
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: #58730f;
+}
+.studio-hero h1,
+.nobilix-studio-section h2,
+.nobilix-contact-section h2,
+.project-showcase h2,
+.section-kicker h2,
+.public-not-found h1,
+.legal-directory h1 {
+  text-wrap: balance;
+  letter-spacing: -0.065em;
+}
+.studio-hero h1 {
+  max-width: 10.8ch;
+  margin-top: 1.1rem;
+  font-size: clamp(4rem, 10vw, 9.5rem);
+  line-height: .86;
+}
+.studio-hero__lede {
+  max-width: 42rem;
+  margin-top: 1.4rem;
+  color: rgb(23 21 18 / .72);
+  font-size: clamp(1rem, 2vw, 1.22rem);
+  line-height: 1.7;
+}
+.studio-hero__actions,
+.public-not-found__actions,
+.project-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  margin-top: 1.75rem;
+}
+.nobilix-button,
+.nobilix-text-link,
+.project-card a,
+.legal-directory a,
+.public-not-found a {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  font-weight: 700;
+  transition: transform var(--duration-fast) ease;
+}
+.nobilix-button:hover,
+.nobilix-text-link:hover,
+.project-card a:hover,
+.legal-directory a:hover,
+.public-not-found a:hover { transform: translateY(-1px); }
+.nobilix-button--primary,
+.project-card a:first-child,
+.public-not-found a:first-child {
+  background: #171512;
+  color: #fff8ec;
+  padding-inline: 1.25rem;
+}
+.nobilix-button--secondary,
+.project-card a,
+.legal-directory a,
+.public-not-found a {
+  border: 1px solid rgb(23 21 18 / .18);
+  padding-inline: 1.05rem;
+}
+.studio-hero__media {
+  position: relative;
+  border-radius: clamp(1.5rem, 4vw, 3rem);
+  overflow: hidden;
+  box-shadow: 0 3rem 7rem rgb(40 32 19 / .22);
+}
+.studio-hero__media img,
+.project-showcase__media img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.studio-hero__plate {
+  position: absolute;
+  inset: auto 1rem 1rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  border: 1px solid rgb(255 255 255 / .42);
+  border-radius: 1rem;
+  background: rgb(23 21 18 / .62);
+  color: #fff8ec;
+  padding: .85rem 1rem;
+  backdrop-filter: blur(14px);
+  font-size: .78rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+}
+.studio-principles,
+.project-showcase,
+.nobilix-studio-section,
+.nobilix-contact-section,
+.legal-directory,
+.public-not-found {
+  padding: clamp(4rem, 8vw, 8rem) clamp(1.25rem, 7vw, 7rem);
+}
+.section-kicker { max-width: 46rem; }
+.section-kicker h2,
+.nobilix-studio-section h2,
+.nobilix-contact-section h2,
+.project-showcase h2,
+.legal-directory h1,
+.public-not-found h1 {
+  margin-top: .8rem;
+  font-size: clamp(2.5rem, 6vw, 5.8rem);
+  line-height: .95;
+}
+.studio-principles__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 2.5rem;
+}
+.studio-principle,
+.project-card {
+  border: 1px solid rgb(23 21 18 / .14);
+  border-radius: 1.35rem;
+  background: rgb(255 250 241 / .54);
+  box-shadow: 0 1.5rem 4rem rgb(67 54 31 / .08);
+}
+.studio-principle { padding: clamp(1.25rem, 3vw, 2rem); }
+.studio-principle p,
+.project-card > p:first-of-type,
+.legal-directory article > p:first-child {
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: #58730f;
+}
+.studio-principle h3 {
+  margin-top: 2.5rem;
+  font-size: clamp(1.45rem, 3vw, 2.2rem);
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+.studio-principle span,
+.project-showcase p,
+.nobilix-studio-section p,
+.nobilix-contact-section p,
+.legal-directory p,
+.public-not-found p {
+  display: block;
+  max-width: 68ch;
+  margin-top: 1rem;
+  line-height: 1.72;
+  color: rgb(23 21 18 / .68);
+}
+.project-showcase {
+  display: grid;
+  grid-template-columns: minmax(16rem, .8fr) minmax(0, 1fr);
+  gap: clamp(2rem, 6vw, 5rem);
+  align-items: center;
+}
+.project-showcase__media {
+  border-radius: 2rem;
+  overflow: hidden;
+  transform: rotate(-1deg);
+}
+.project-showcase__copy { max-width: 54rem; }
+.nobilix-text-link { margin-top: 1.25rem; color: #171512; }
+.legal-reading {
+  max-width: 72ch;
+}
+.legal-directory__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+.legal-directory article {
+  border: 1px solid rgb(23 21 18 / .14);
+  border-radius: 1.35rem;
+  background: rgb(255 250 241 / .54);
+  box-shadow: 0 1.5rem 4rem rgb(67 54 31 / .08);
+  padding: 1.5rem;
+}
+.legal-directory article h2 {
+  margin-top: .6rem;
+  font-size: 1.45rem;
+}
+.legal-directory article a {
+  width: fit-content;
+  margin-top: .7rem;
+  margin-right: .45rem;
+}
+.public-not-found {
+  min-height: 70svh;
+  display: grid;
+  align-content: center;
+}
+.project-card {
+  max-width: 42rem;
+}
+.project-card img {
+  border-radius: 1rem;
+  background: #0d0b12;
+  padding: .75rem;
+}
+.project-card h3 {
+  margin-top: .8rem;
+  font-size: clamp(2rem, 4vw, 3.6rem);
+  line-height: .92;
+  letter-spacing: -.06em;
+}
+
+@media (max-width: 820px) {
+  .public-header__nav { display: none !important; }
+  .studio-hero,
+  .project-showcase,
+  .studio-principles__grid,
+  .legal-directory__grid {
+    grid-template-columns: 1fr;
+  }
+  .studio-hero h1 { font-size: clamp(3.5rem, 18vw, 6rem); }
+  .project-showcase__media { order: 2; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-showcase__media { transform: none; }
 }

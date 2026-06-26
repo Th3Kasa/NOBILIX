@@ -42,6 +42,20 @@ export function LoginForm() {
   return (
     <form action={formAction} className="space-y-4">
       <input type="hidden" name="phase" value={step} />
+      <ol className="console-step-list grid grid-cols-2 gap-2 text-xs font-semibold">
+        <li
+          aria-current={step === "credentials" ? "step" : undefined}
+          className={onCredentials ? "text-primary" : "text-muted-foreground"}
+        >
+          Credentials
+        </li>
+        <li
+          aria-current={step !== "credentials" ? "step" : undefined}
+          className={!onCredentials ? "text-primary" : "text-muted-foreground"}
+        >
+          Two-factor
+        </li>
+      </ol>
 
       {onCredentials ? (
         <>

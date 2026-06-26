@@ -30,7 +30,7 @@ export function MetricPanel({
   return (
     <div
       className={cn(
-        "flex flex-col gap-2 rounded-xl border border-border bg-card p-5 transition-colors duration-150 hover:border-border/80",
+        "console-metric-panel flex flex-col gap-2 rounded-xl border border-border bg-card/90 p-5 shadow-sm transition-transform duration-150 hover:-translate-y-0.5",
         primary && "col-span-2 row-span-2 sm:col-span-1",
         className,
       )}

@@ -34,6 +34,7 @@ export function PlayerLoginForm() {
   const [state, setState] = useState<LoginState>({ status: "idle" });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   function setError(message: string) {
     setState({ status: "error", message });
@@ -62,9 +63,7 @@ export function PlayerLoginForm() {
       await exchangeForSession(credential.user);
       router.replace("/trapman/account");
     } catch (err) {
-      setError(
-        "We could not sign you in. Please check your email and password."
-      );
+      setError("We could not sign you in. Please check your email and password.");
       console.error("[PlayerLoginForm Email]", err);
     }
   }
@@ -72,7 +71,7 @@ export function PlayerLoginForm() {
   const isLoading = state.status === "loading";
 
   return (
-    <div className="player-login-form">
+    <div className="player-login-form" aria-live="polite">
       {state.status === "error" && (
         <p className="player-login-error" role="alert">
           {state.message}
@@ -105,15 +104,25 @@ export function PlayerLoginForm() {
         />
 
         <label htmlFor="player-password">Password</label>
-        <input
-          id="player-password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          autoComplete="current-password"
-          disabled={isLoading}
-        />
+        <div className="player-password-field">
+          <input
+            id="player-password"
+            type={showPassword ? "text" : "password"}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            autoComplete="current-password"
+            disabled={isLoading}
+          />
+          <button
+            type="button"
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            onClick={() => setShowPassword((value) => !value)}
+            disabled={isLoading}
+          >
+            {showPassword ? "Hide" : "Show"}
+          </button>
+        </div>
 
         <button
           type="submit"

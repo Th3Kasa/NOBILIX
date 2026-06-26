@@ -36,7 +36,7 @@ export default function TrapManDataCompliancePage() {
           <caption>TrapMan confirmed data inventory</caption>
           <thead>
             <tr>
-              <th scope="col">Key</th>
+              <th scope="col">Data</th>
               <th scope="col">System</th>
               <th scope="col">Location</th>
               <th scope="col">Purpose</th>
@@ -48,7 +48,7 @@ export default function TrapManDataCompliancePage() {
             {TRAPMAN_DATA_INVENTORY.map((entry) => (
               <tr key={entry.key}>
                 <td>
-                  <code>{entry.key}</code>
+                  <code>{entry.label}</code>
                 </td>
                 <td>{entry.system}</td>
                 <td>
