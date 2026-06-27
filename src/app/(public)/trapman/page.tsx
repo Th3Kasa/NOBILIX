@@ -20,11 +20,11 @@ export default function TrapManPage() {
         <Reveal>
           <section id="the-run" className="trapman-story-section trapman-run-section">
             <p className="trapman-kicker">Pixel soul. Premium stage.</p>
-            <h2>Run the city without copying the game menu.</h2>
+            <h2>A neon city runner built for the streets.</h2>
             <p>
-              The website turns TrapMan’s neon Sydney mood, cyan-magenta HUD
-              geometry, collectibles, and crisp pixel motion into a cinematic
-              project home.
+              TrapMan is the endless pixel sprint through Sydney underground —
+              a ranked mobile game where every run is a personal best waiting
+              to be broken.
             </p>
             <GameplayGallery />
           </section>
@@ -32,7 +32,7 @@ export default function TrapManPage() {
         <Reveal>
           <section id="characters" className="trapman-story-section">
             <p className="trapman-kicker">Runner roster</p>
-            <h2>Characters stay framed as game evidence.</h2>
+            <h2>Pick your runner. Own your style.</h2>
             <CharacterShowcase />
           </section>
         </Reveal>

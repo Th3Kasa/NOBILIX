@@ -590,10 +590,145 @@
   opacity: .82;
   animation: portal-float 4.4s ease-in-out infinite alternate-reverse;
 }
-.shop-showcase__screen {
+/* ── Gameplay feature cards (replace screenshot grid) ─────── */
+.gameplay-features {
   position: relative;
-  width: min(58%, 18rem);
-  height: auto;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+.gameplay-feature-card {
+  padding: 2rem 1.75rem;
+  border: 1px solid rgb(57 233 255 / .22);
+  border-radius: 1.4rem;
+  background: linear-gradient(135deg, rgb(3 2 7 / .72), rgb(22 5 38 / .56));
+  backdrop-filter: blur(12px);
+  box-shadow: 0 1rem 3rem rgb(0 0 0 / .38);
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.gameplay-feature-card:hover {
+  border-color: rgb(57 233 255 / .48);
+  box-shadow: 0 1rem 3rem rgb(57 233 255 / .12);
+}
+.gameplay-feature-icon {
+  width: 3rem;
+  height: 3rem;
+  display: grid;
+  place-items: center;
+  border-radius: .8rem;
+  background: rgb(57 233 255 / .12);
+  color: var(--tm-cyan);
+  margin-bottom: 1.1rem;
+}
+.gameplay-feature-card h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: .5rem;
+  letter-spacing: -.02em;
+}
+.gameplay-feature-card p {
+  font-size: .9rem;
+  color: #cdeaff;
+  line-height: 1.65;
+}
+
+/* ── Character cards (replace game screenshots) ───────────── */
+.character-showcase {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: 2rem;
+  margin-top: 2.5rem;
+  position: relative;
+  z-index: var(--z-scene-floor);
+}
+.character-card {
+  display: flex;
+  gap: 1.75rem;
+  align-items: flex-start;
+  padding: 2rem;
+  border: 1px solid rgb(var(--char-accent, 57 233 255) / .28);
+  border-radius: 1.6rem;
+  background: linear-gradient(135deg, rgb(3 2 7 / .78), rgb(10 2 22 / .62));
+  backdrop-filter: blur(14px);
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / .38);
+  transition: border-color .2s ease;
+}
+.character-card:hover { border-color: rgb(var(--char-accent, 57 233 255) / .55); }
+.character-avatar {
+  flex-shrink: 0;
+  position: relative;
+  width: 5rem;
+  height: 5rem;
+  display: grid;
+  place-items: center;
+}
+.character-avatar__letter {
+  position: relative;
+  z-index: 1;
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: var(--char-accent, var(--tm-cyan));
+  letter-spacing: -.05em;
+  line-height: 1;
+  text-shadow: 0 0 1.5rem var(--char-accent, var(--tm-cyan));
+}
+.character-avatar__ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 1.2rem;
+  border: 2px solid color-mix(in srgb, var(--char-accent, var(--tm-cyan)) 40%, transparent);
+  background: color-mix(in srgb, var(--char-accent, var(--tm-cyan)) 10%, transparent);
+}
+.character-info { flex: 1; }
+.character-tag {
+  font-size: .72rem;
+  font-weight: 900;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--char-accent, var(--tm-cyan));
+  margin-bottom: .4rem;
+}
+.character-name {
+  font-size: 1.55rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: .95;
+  letter-spacing: -.04em;
+  margin-bottom: .65rem;
+}
+.character-desc {
+  font-size: .88rem;
+  color: #cdeaff;
+  line-height: 1.68;
+}
+
+/* ── Shop feature list ────────────────────────────────────── */
+.shop-feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: .65rem;
+}
+.shop-feature-list li {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  font-size: .92rem;
+  color: #cdeaff;
+}
+.shop-feature-list li::before {
+  content: '';
+  flex-shrink: 0;
+  width: .5rem;
+  height: .5rem;
+  border-radius: 50%;
+  background: var(--tm-cyan);
+  box-shadow: 0 0 .6rem var(--tm-cyan);
 }
 .music-strip__player {
   display: flex;

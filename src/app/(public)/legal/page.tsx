@@ -21,7 +21,8 @@ export default function LegalDirectoryPage() {
             Studio-level notices cover Nobilix as the company, portfolio owner,
             and console operator in New South Wales, Australia.
           </p>
-          <Link href="/legal">Company legal directory</Link>
+          <Link href="/legal/privacy-policy">Privacy Policy</Link>
+          <Link href="/legal/terms-of-use">Terms of Use</Link>
         </article>
         <article>
           <p>Project policies</p>

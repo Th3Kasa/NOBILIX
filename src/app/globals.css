@@ -888,3 +888,202 @@
   .neon-border::before { animation: none; }
   .grid-mesh-floor::after { transform: none; opacity: .28; }
 }
+
+/* ─── Nobilix legal pages ──────────────────────────────────────── */
+.nobilix-legal-shell {
+  max-width: 90rem;
+  margin-inline: auto;
+  padding: clamp(1.5rem, 5vw, 4rem) clamp(1.25rem, 6vw, 6rem) 6rem;
+}
+.nobilix-legal-breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem .6rem;
+  list-style: none;
+  padding: 0;
+  font-size: .8rem;
+  color: color-mix(in oklch, var(--paper) 45%, transparent);
+  margin-bottom: 2.5rem;
+}
+.nobilix-legal-breadcrumb ol li + li::before {
+  content: '/';
+  margin-right: .6rem;
+  opacity: .45;
+}
+.nobilix-legal-breadcrumb a { color: inherit; text-decoration: none; }
+.nobilix-legal-breadcrumb a:hover { color: var(--neon-violet); }
+.nobilix-legal-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1.5rem 3rem;
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid color-mix(in oklch, var(--paper) 10%, transparent);
+}
+.nobilix-legal-entity {
+  display: flex;
+  flex-direction: column;
+  gap: .25rem;
+}
+.nobilix-legal-company {
+  font-size: .72rem;
+  font-weight: 900;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--neon-violet);
+}
+.nobilix-legal-jurisdiction {
+  font-size: .78rem;
+  color: color-mix(in oklch, var(--paper) 48%, transparent);
+}
+.nobilix-legal-title {
+  font-size: clamp(2rem, 5vw, 3.8rem);
+  line-height: .92;
+  letter-spacing: -.05em;
+  color: var(--paper);
+  margin: 0;
+}
+.nobilix-legal-updated {
+  font-size: .78rem;
+  color: color-mix(in oklch, var(--paper) 45%, transparent);
+  margin-top: .4rem;
+}
+.nobilix-legal-draft-notice {
+  padding: 1rem 1.4rem;
+  border-left: 3px solid color-mix(in oklch, var(--neon-violet) 55%, transparent);
+  background: color-mix(in oklch, var(--neon-violet) 6%, transparent);
+  border-radius: 0 .75rem .75rem 0;
+  margin-bottom: 3rem;
+  font-size: .82rem;
+  color: color-mix(in oklch, var(--paper) 62%, transparent);
+  line-height: 1.6;
+}
+.nobilix-legal-draft-notice strong { color: var(--paper); }
+.nobilix-legal-body {
+  display: grid;
+  grid-template-columns: 14rem 1fr;
+  gap: 4rem;
+  align-items: start;
+}
+.nobilix-legal-toc {
+  position: sticky;
+  top: 5rem;
+  padding: 1.4rem 1.25rem;
+  border: 1px solid color-mix(in oklch, var(--paper) 9%, transparent);
+  border-radius: 1.2rem;
+  background: color-mix(in oklch, var(--ink-800) 55%, transparent);
+  backdrop-filter: blur(12px);
+}
+.nobilix-legal-toc-heading {
+  font-size: .7rem;
+  font-weight: 900;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--neon-violet);
+  margin: 0 0 .7rem;
+}
+.nobilix-legal-toc ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+}
+.nobilix-legal-toc-link {
+  display: block;
+  padding: .35rem .6rem;
+  font-size: .82rem;
+  color: color-mix(in oklch, var(--paper) 62%, transparent);
+  text-decoration: none;
+  border-radius: .5rem;
+  transition: background .15s ease, color .15s ease;
+}
+.nobilix-legal-toc-link:hover,
+.nobilix-legal-toc-link[aria-current="page"] {
+  background: color-mix(in oklch, var(--neon-violet) 12%, transparent);
+  color: var(--paper);
+}
+.nobilix-legal-toc-divider {
+  height: 1px;
+  background: color-mix(in oklch, var(--paper) 9%, transparent);
+  margin: .85rem 0;
+}
+.nobilix-legal-content {
+  min-width: 0;
+}
+.nobilix-legal-content section + section {
+  margin-top: 3rem;
+  padding-top: 2.5rem;
+  border-top: 1px solid color-mix(in oklch, var(--paper) 7%, transparent);
+}
+.nobilix-legal-content h2 {
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  letter-spacing: -.035em;
+  color: var(--paper);
+  margin-bottom: 1rem;
+}
+.nobilix-legal-content h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -.02em;
+  color: color-mix(in oklch, var(--paper) 82%, transparent);
+  margin: 1.5rem 0 .6rem;
+}
+.nobilix-legal-content p,
+.nobilix-legal-content li {
+  font-size: .94rem;
+  color: color-mix(in oklch, var(--paper) 62%, transparent);
+  line-height: 1.78;
+  max-width: 72ch;
+}
+.nobilix-legal-content p + p { margin-top: .85rem; }
+.nobilix-legal-content ul {
+  margin: .85rem 0 .85rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: .45rem;
+}
+.nobilix-legal-content a {
+  color: var(--neon-violet);
+  text-underline-offset: .2em;
+}
+.nobilix-legal-content a:hover { opacity: .8; }
+.nobilix-legal-content strong { color: color-mix(in oklch, var(--paper) 82%, transparent); }
+.nobilix-legal-content em { font-style: italic; }
+.nobilix-legal-address {
+  font-style: normal;
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+  font-size: .9rem;
+  color: color-mix(in oklch, var(--paper) 65%, transparent);
+  line-height: 1.6;
+}
+.nobilix-legal-footer {
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid color-mix(in oklch, var(--paper) 8%, transparent);
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  font-size: .82rem;
+  color: color-mix(in oklch, var(--paper) 42%, transparent);
+}
+.nobilix-legal-footer a { color: inherit; }
+.nobilix-legal-footer a:hover { color: var(--neon-violet); }
+.nobilix-legal-cross-link {
+  margin-left: 1rem;
+  text-decoration: none;
+  color: color-mix(in oklch, var(--paper) 48%, transparent);
+}
+.nobilix-legal-cross-link:hover { color: var(--neon-violet); }
+
+@media (max-width: 840px) {
+  .nobilix-legal-body { grid-template-columns: 1fr; }
+  .nobilix-legal-toc { position: static; }
+}

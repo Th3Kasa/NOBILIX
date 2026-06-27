@@ -29,9 +29,10 @@ test("TrapMan route presents the complete animated project world", () => {
   assert.match(page, /Pixel soul\. Premium stage\./);
 });
 
-test("TrapMan uses generated atmosphere assets and official screenshot evidence", () => {
+test("TrapMan uses generated atmosphere assets and no game screenshots", () => {
   const hero = read("src/components/trapman/city-hero.tsx");
   const gallery = read("src/components/trapman/gameplay-gallery.tsx");
+  const characters = read("src/components/trapman/character-showcase.tsx");
   const world = read("src/components/trapman/world-system.tsx");
   const shop = read("src/components/trapman/shop-showcase.tsx");
   const music = read("src/components/trapman/music-strip.tsx");
@@ -43,9 +44,10 @@ test("TrapMan uses generated atmosphere assets and official screenshot evidence"
     "gameplay-atmosphere.webp",
     "music-atmosphere.webp",
   ]) {
-    assert.match(`${hero}\n${world}\n${shop}\n${music}`, new RegExp(asset));
+    assert.match(`${hero}\n${world}\n${shop}\n${music}\n${gallery}`, new RegExp(asset));
   }
 
+  const allSources = `${hero}\n${gallery}\n${characters}\n${shop}`;
   for (const screenshot of [
     "home-lil-golo.png",
     "home-shotta.png",
@@ -53,7 +55,7 @@ test("TrapMan uses generated atmosphere assets and official screenshot evidence"
     "shop.png",
     "leaderboard.png",
   ]) {
-    assert.match(`${hero}\n${gallery}\n${shop}`, new RegExp(screenshot));
+    assert.doesNotMatch(allSources, new RegExp(screenshot), `Game screenshot must not appear: ${screenshot}`);
   }
 
   assert.match(hero, /trapman-logo\.png/);

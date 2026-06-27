@@ -1,28 +1,27 @@
-import Image from "next/image";
+import { Gamepad2, ShoppingBag, Trophy } from "lucide-react";
 import { CinematicVideo } from "@/components/motion/cinematic-video";
 
-const SCREENS = [
+const FEATURES = [
   {
-    src: "/assets/trapman/screens/gameplay.png",
-    alt: "TrapMan gameplay — runner navigating neon city obstacles",
-    caption: "Run the neon streets",
+    Icon: Gamepad2,
+    title: "Run the city",
+    body: "Navigate neon corridors, collect coins, and dodge barriers in an endless pixel sprint through Sydney underground.",
   },
   {
-    src: "/assets/trapman/screens/shop.png",
-    alt: "TrapMan in-game shop showing character skins and power-ups",
-    caption: "Gear up in the shop",
+    Icon: Trophy,
+    title: "Claim the leaderboard",
+    body: "Every run is ranked globally. Compete across sessions and see your best scores stack against the world.",
   },
   {
-    src: "/assets/trapman/screens/leaderboard.png",
-    alt: "TrapMan leaderboard displaying top ranked players",
-    caption: "Climb the leaderboard",
+    Icon: ShoppingBag,
+    title: "Unlock your runner",
+    body: "Earn currency on every run. Spend it on characters, skins, and music tracks. No paywalls on progression.",
   },
 ] as const;
 
 export function GameplayGallery() {
   return (
     <div className="gameplay-gallery">
-      {/* Cinematic atmosphere plate — replaces the CSS ::before background-image */}
       <div className="gameplay-atmosphere" aria-hidden="true">
         <CinematicVideo
           src="/assets/generated/trapman/gameplay-atmosphere.mp4"
@@ -31,21 +30,17 @@ export function GameplayGallery() {
           posterHeight={864}
         />
       </div>
-      {SCREENS.map(({ src, alt, caption }) => (
-        <figure key={src} className="gameplay-figure">
-          <div className="gameplay-frame">
-            <Image
-              src={src}
-              alt={alt}
-              width={390}
-              height={844}
-              sizes="(max-width: 640px) 90vw, (max-width: 1024px) 45vw, 30vw"
-              className="gameplay-img"
-            />
+      <div className="gameplay-features">
+        {FEATURES.map(({ Icon, title, body }) => (
+          <div key={title} className="gameplay-feature-card">
+            <div className="gameplay-feature-icon" aria-hidden="true">
+              <Icon size={28} />
+            </div>
+            <h3>{title}</h3>
+            <p>{body}</p>
           </div>
-          <figcaption>{caption}</figcaption>
-        </figure>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }

@@ -45,23 +45,7 @@ export function CityHero() {
           <Link href="/trapman/account">My account</Link>
         </div>
       </div>
-      <div className="hero-evidence" aria-label="TrapMan character evidence">
-        <Image
-          src="/assets/trapman/screens/home-lil-golo.png"
-          alt="TrapMan home screen showing Lil Golo."
-          width={390}
-          height={844}
-          sizes="(max-width: 700px) 36vw, 11rem"
-        />
-        <Image
-          src="/assets/trapman/screens/home-shotta.png"
-          alt="TrapMan home screen showing Shotta."
-          width={390}
-          height={844}
-          sizes="(max-width: 700px) 36vw, 11rem"
-        />
-      </div>
-      <div className="runner-stage" aria-hidden="true">
+<div className="runner-stage" aria-hidden="true">
         <div className="runner" data-layer="runner" />
         <div className="scan-platform" data-layer="scan-platform" />
       </div>

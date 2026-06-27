@@ -1,34 +1,39 @@
-import Image from "next/image";
+import type React from "react";
 
 const CHARACTERS = [
   {
-    src: "/assets/trapman/screens/home-lil-golo.png",
+    initial: "G",
+    accent: "#39e9ff",
     name: "Lil Golo",
-    description: "Fast and fearless. Lil Golo hits the streets with style, slipping through tight corridors and never slowing down.",
+    tag: "Speed · Agility",
+    description:
+      "Fast and fearless. Lil Golo slips through tight corridors at full sprint, collecting coins others can't reach.",
   },
   {
-    src: "/assets/trapman/screens/home-shotta.png",
+    initial: "S",
+    accent: "#f144ff",
     name: "Shotta",
-    description: "Built different. Shotta brings raw power to every run, breaking through barriers the others can't touch.",
+    tag: "Power · Endurance",
+    description:
+      "Built different. Shotta breaks through barriers the others can't touch, turning every obstacle into a shortcut.",
   },
 ] as const;
 
 export function CharacterShowcase() {
   return (
     <div className="character-showcase">
-      {CHARACTERS.map(({ src, name, description }) => (
-        <article key={name} className="character-card">
-          <div className="character-frame">
-            <Image
-              src={src}
-              alt={`${name} — TrapMan character`}
-              width={390}
-              height={844}
-              sizes="(max-width: 640px) 85vw, (max-width: 1024px) 42vw, 28vw"
-              className="character-img"
-            />
+      {CHARACTERS.map(({ initial, accent, name, tag, description }) => (
+        <article
+          key={name}
+          className="character-card"
+          style={{ "--char-accent": accent } as React.CSSProperties}
+        >
+          <div className="character-avatar" aria-hidden="true">
+            <span className="character-avatar__letter">{initial}</span>
+            <div className="character-avatar__ring" />
           </div>
           <div className="character-info">
+            <p className="character-tag">{tag}</p>
             <h3 className="character-name">{name}</h3>
             <p className="character-desc">{description}</p>
           </div>
