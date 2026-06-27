@@ -40,12 +40,12 @@ test("TrapMan uses generated atmosphere assets and no game screenshots", () => {
   for (const asset of [
     "city-hero.webp",
     "city-mobile.webp",
-    "portal.webp",
     "gameplay-atmosphere.webp",
     "music-atmosphere.webp",
   ]) {
     assert.match(`${hero}\n${world}\n${shop}\n${music}\n${gallery}`, new RegExp(asset));
   }
+  assert.doesNotMatch(`${hero}\n${world}\n${shop}\n${gallery}`, /portal\.webp/, "portal.webp must not appear (removed)");
 
   const allSources = `${hero}\n${gallery}\n${characters}\n${shop}`;
   for (const screenshot of [

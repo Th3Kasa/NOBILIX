@@ -53,7 +53,7 @@ export function DeleteAccountForm() {
           status: "error",
           message:
             data.error ??
-            "We could not process your deletion request. Please try again or contact support@nobilix.com.",
+            "We could not process your deletion request. Please try again or contact help.nobilix@outlook.com.",
         });
         return;
       }
@@ -67,7 +67,7 @@ export function DeleteAccountForm() {
       setState({
         status: "error",
         message:
-          "A network error occurred. Please try again or contact support@nobilix.com.",
+          "A network error occurred. Please try again or contact help.nobilix@outlook.com.",
       });
     }
   }
@@ -137,7 +137,7 @@ export function DeleteAccountForm() {
 
       <p className="delete-account-support-note">
         Need help? Contact{" "}
-        <a href="mailto:support@nobilix.com">support@nobilix.com</a>.
+        <a href="mailto:help.nobilix@outlook.com">help.nobilix@outlook.com</a>.
       </p>
     </form>
   );

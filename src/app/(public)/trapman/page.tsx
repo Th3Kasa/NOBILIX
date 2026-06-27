@@ -65,16 +65,22 @@ export default function TrapManPage() {
             <p className="trapman-kicker">Player account</p>
             <h2>Your run continues online.</h2>
             <p>Track progression and manage your TrapMan account from a mobile-friendly player surface.</p>
-            <Link href="/trapman/account">Track my progression</Link>
+            <div className="trapman-cta-links">
+              <Link href="/trapman/account" className="trapman-btn trapman-btn--primary">Track my progression</Link>
+            </div>
           </section>
         </Reveal>
         <Reveal>
           <section id="support" className="trapman-story-section trapman-support">
             <p className="trapman-kicker">Support</p>
             <h2>Clear paths for players and parents.</h2>
-            <Link href="/trapman/privacy-policy">Privacy</Link>
-            <Link href="/trapman/data-compliance">Data &amp; compliance</Link>
-            <Link href="/trapman/delete-account">Delete account</Link>
+            <p className="trapman-support__desc">Questions, data requests, or account issues — we&apos;re reachable at <a href="mailto:help.nobilix@outlook.com">help.nobilix@outlook.com</a></p>
+            <div className="trapman-support__links">
+              <Link href="/trapman/privacy-policy" className="trapman-btn">Privacy policy</Link>
+              <Link href="/trapman/terms-of-use" className="trapman-btn">Terms of use</Link>
+              <Link href="/trapman/data-compliance" className="trapman-btn">Data &amp; compliance</Link>
+              <Link href="/trapman/delete-account" className="trapman-btn trapman-btn--danger">Delete account</Link>
+            </div>
           </section>
         </Reveal>
       </div>

@@ -18,7 +18,7 @@ export const TERMS_SECTIONS = {
     heading: "Account Security",
     body: `You are responsible for maintaining the confidentiality of your account credentials
     and for all activity that occurs under your account. Notify us immediately at
-    support@nobilix.com if you suspect unauthorised access to your account.`,
+    help.nobilix@outlook.com if you suspect unauthorised access to your account.`,
   },
 
   licence: {
@@ -51,7 +51,7 @@ export const TERMS_SECTIONS = {
     transferred or exchanged for cash.
 
     For Australian Consumer Law (ACL) rights regarding faulty or misdescribed purchases,
-    contact support@nobilix.com. Nothing in these terms limits your ACL rights as a consumer.`,
+    contact help.nobilix@outlook.com. Nothing in these terms limits your ACL rights as a consumer.`,
   },
 
   advertising: {
@@ -86,7 +86,7 @@ export const TERMS_SECTIONS = {
   disputes: {
     heading: "Disputes",
     body: `These terms are governed by the laws of New South Wales, Australia. You agree to
-    first contact support@nobilix.com to resolve any dispute informally. If the dispute
+    first contact help.nobilix@outlook.com to resolve any dispute informally. If the dispute
     cannot be resolved within 30 days, either party may seek resolution through the courts
     of New South Wales.`,
   },
@@ -100,6 +100,6 @@ export const TERMS_SECTIONS = {
 
   contact: {
     heading: "Contact",
-    body: `Questions about these terms: support@nobilix.com`,
+    body: `Questions about these terms: help.nobilix@outlook.com`,
   },
 } as const;

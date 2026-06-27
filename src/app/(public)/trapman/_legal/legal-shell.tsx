@@ -101,7 +101,7 @@ export function LegalShell({ title, lastUpdated, children }: LegalShellProps) {
       <footer className="legal-footer">
         <p>
           Questions about this policy? Contact player support at{" "}
-          <a href="mailto:support@nobilix.com">support@nobilix.com</a>.
+          <a href="mailto:help.nobilix@outlook.com">help.nobilix@outlook.com</a>.
         </p>
         <nav aria-label="Other legal documents">
           {TRAPMAN_LEGAL_PAGES.map(({ href, label }) => (

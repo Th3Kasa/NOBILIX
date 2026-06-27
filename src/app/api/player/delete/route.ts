@@ -84,7 +84,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json(
       {
         error:
-          "Deletion failed. Please try again or contact support@nobilix.com.",
+          "Deletion failed. Please try again or contact help.nobilix@outlook.com.",
       },
       { status: 500 }
     );

@@ -143,7 +143,7 @@ export default function NobilixPrivacyPolicyPage() {
           No transmission of data over the internet is entirely secure. If you
           believe your personal information has been compromised, contact us
           immediately at{" "}
-          <a href="mailto:support@nobilix.com">support@nobilix.com</a>.
+          <a href="mailto:help.nobilix@outlook.com">help.nobilix@outlook.com</a>.
         </p>
       </section>
 
@@ -180,7 +180,7 @@ export default function NobilixPrivacyPolicyPage() {
         </ul>
         <p>
           To exercise any of these rights, contact us at{" "}
-          <a href="mailto:legal@nobilix.com">legal@nobilix.com</a>. We will
+          <a href="mailto:help.nobilix@outlook.com">help.nobilix@outlook.com</a>. We will
           respond within 30 days.
         </p>
       </section>
@@ -255,9 +255,9 @@ export default function NobilixPrivacyPolicyPage() {
           <br />
           New South Wales, Australia
           <br />
-          <a href="mailto:legal@nobilix.com">legal@nobilix.com</a>
+          <a href="mailto:help.nobilix@outlook.com">help.nobilix@outlook.com</a>
           <br />
-          <a href="mailto:support@nobilix.com">support@nobilix.com</a>
+          <a href="mailto:help.nobilix@outlook.com">help.nobilix@outlook.com</a>
         </address>
       </section>
     </NobilixLegalShell>

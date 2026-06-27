@@ -15,7 +15,7 @@ export default function PlayerAccountError({
       <button type="button" onClick={reset} className="player-account-retry-btn">
         Try again
       </button>
-      <a href="mailto:support@nobilix.com" className="player-account-support-link">
+      <a href="mailto:help.nobilix@outlook.com" className="player-account-support-link">
         Contact player support
       </a>
     </div>

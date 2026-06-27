@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 const SHOP_ITEMS = [
   "Playable character unlocks",
   "Cosmetic skins and trail effects",
@@ -25,14 +23,12 @@ export function ShopShowcase() {
         </ul>
       </div>
       <div className="shop-showcase__stage">
-        <Image
-          src="/assets/generated/trapman/portal.webp"
-          alt="TrapMan neon portal — gateway to the shop and character select"
-          width={1200}
-          height={1200}
-          sizes="(max-width: 900px) 90vw, 40vw"
-          className="shop-showcase__portal"
-        />
+        <div className="shop-glow-orb" aria-hidden="true">
+          <span className="shop-glow-orb__ring shop-glow-orb__ring--outer" />
+          <span className="shop-glow-orb__ring shop-glow-orb__ring--mid" />
+          <span className="shop-glow-orb__ring shop-glow-orb__ring--inner" />
+          <span className="shop-glow-orb__core" />
+        </div>
       </div>
     </div>
   );

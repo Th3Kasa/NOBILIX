@@ -100,9 +100,7 @@ export function NobilixLegalShell({
       <footer className="nobilix-legal-footer">
         <p>
           Legal enquiries:{" "}
-          <a href="mailto:legal@nobilix.com">legal@nobilix.com</a>
-          {" · "}
-          <a href="mailto:support@nobilix.com">support@nobilix.com</a>
+          <a href="mailto:help.nobilix@outlook.com">help.nobilix@outlook.com</a>
         </p>
         <nav aria-label="Other Nobilix legal documents">
           {NOBILIX_LEGAL_PAGES.map(({ href, label }) => (

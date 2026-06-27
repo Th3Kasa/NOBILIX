@@ -81,7 +81,7 @@ export default function NobilixTermsOfUsePage() {
           Authorised users must keep credentials confidential, enable
           multi-factor authentication, and immediately report any suspected
           compromise to{" "}
-          <a href="mailto:security@nobilix.com">security@nobilix.com</a>.
+          <a href="mailto:help.nobilix@outlook.com">help.nobilix@outlook.com</a>.
         </p>
       </section>
 
@@ -206,7 +206,7 @@ export default function NobilixTermsOfUsePage() {
           <br />
           New South Wales, Australia
           <br />
-          <a href="mailto:legal@nobilix.com">legal@nobilix.com</a>
+          <a href="mailto:help.nobilix@outlook.com">help.nobilix@outlook.com</a>
         </address>
       </section>
     </NobilixLegalShell>

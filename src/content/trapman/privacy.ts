@@ -27,11 +27,11 @@ export const PRIVACY_SECTIONS = {
     TrapMan is intended for players aged 13 and over. We do not knowingly collect personal
     information from children under 13 without verifiable parental consent. If you believe
     your child under 13 has provided us with personal data, please contact us at
-    support@nobilix.com so we can take appropriate action, including deletion.
+    help.nobilix@outlook.com so we can take appropriate action, including deletion.
 
     No date of birth is collected. By creating an account, you confirm you are at least 13
     years old. Parents or guardians wishing to request deletion of a child's account may
-    contact support@nobilix.com.`,
+    contact help.nobilix@outlook.com.`,
   },
 
   dataWeCollect: {
@@ -83,7 +83,7 @@ export const PRIVACY_SECTIONS = {
     - Delete your account and associated personal data (see /trapman/delete-account)
     - Lodge a complaint with a relevant data protection authority
 
-    To exercise any of these rights, contact support@nobilix.com.`,
+    To exercise any of these rights, contact help.nobilix@outlook.com.`,
   },
 
   childrenPolicy: {
@@ -93,13 +93,13 @@ export const PRIVACY_SECTIONS = {
     knowingly collect personal information from children under 13.
 
     Parents or guardians who believe their child under 13 has created a TrapMan account
-    may contact support@nobilix.com to request account deletion. We will process
+    may contact help.nobilix@outlook.com to request account deletion. We will process
     such requests in accordance with applicable law.`,
   },
 
   contact: {
     heading: "Contact Us",
     body: `For privacy questions or to exercise your rights, contact:
-    Nobilix Pty Ltd — support@nobilix.com`,
+    Nobilix Pty Ltd — help.nobilix@outlook.com`,
   },
 } as const;

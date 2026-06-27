@@ -44,7 +44,7 @@ export default async function TrapManDeleteAccountPage() {
         <p>
           TrapMan is intended for players aged 13 and over. If you believe your
           child under 13 has created a TrapMan account, please contact us at{" "}
-          <a href="mailto:support@nobilix.com">support@nobilix.com</a>. We will
+          <a href="mailto:help.nobilix@outlook.com">help.nobilix@outlook.com</a>. We will
           process deletion requests from parents and guardians in accordance
           with applicable law.
         </p>
@@ -71,7 +71,7 @@ export default async function TrapManDeleteAccountPage() {
             </a>
             <p className="delete-account-support-note">
               If you no longer have access to your account, contact{" "}
-              <a href="mailto:support@nobilix.com">support@nobilix.com</a> for
+              <a href="mailto:help.nobilix@outlook.com">help.nobilix@outlook.com</a> for
               assisted deletion.
             </p>
           </div>
