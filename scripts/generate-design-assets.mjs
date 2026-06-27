@@ -45,7 +45,7 @@ export const assets = [
     purpose: "Nobilix studio homepage hero material",
     source: `${modelName} original text-to-image generation`,
     prompt:
-      "Original abstract editorial studio landscape for a premium independent software company. Warm bone paper, soft mineral plaster, charcoal-black architectural planes, brushed aluminium, translucent acrylic, and one restrained acid-lime light seam. Wide cinematic composition with generous negative space for web typography, tactile macro detail, quiet directional daylight, sophisticated Swiss editorial art direction, materially believable but not photorealistic. No people, no text, no letters, no logos, no interface, no game imagery, no neon cyberpunk, no gradients, no stock-photo look.",
+      "Original dark editorial hero image for a premium independent game studio based in Sydney, Australia. Abstract top-down isometric view of a pristine pixel-art city grid — some tiles placed, some still void — suggesting a world under active construction. A single restrained neon-violet column of light rises from the active build point. Deep matte black background, precise geometric obsidian forms, minimal palette of charcoal and violet with one acid-lime construction-cursor accent. Wide cinematic 16:9 composition with generous negative space for web typography. Studio craft, pixel precision, dark Swiss editorial restraint. No people, no text, no logos, no generic office interior, no photorealism, no stock CGI, no cliché gaming props, no keyboards or monitors.",
   },
   {
     id: "nobilix-project-transition",
@@ -58,7 +58,7 @@ export const assets = [
     purpose: "Nobilix portfolio transition plate",
     source: `${modelName} original text-to-image generation`,
     prompt:
-      "Original editorial transition artwork for a software studio portfolio. An asymmetric field of folded warm-white paper, precision-cut black card, slim stainless-steel rails, subtle registration marks made only from abstract lines, and a small acid-lime translucent panel. Gallery-catalogue composition, calm neutral palette, tactile printmaking grain, disciplined negative space, premium art-direction still life. No text, no letters, no logos, no products, no game characters, no synthwave, no photorealistic office, no generic 3D blobs.",
+      "Original editorial transition plate for an independent game studio portfolio page. Abstract dark cinematic composition: the left two-thirds is deep obsidian studio space with subtle charcoal geometric texture, the right third shows 16-bit pixel-art city fragments materialising from darkness — tiny rooftop silhouettes, a harbour waterline, distant glass towers beginning to appear as if a digital world is rendering into existence. A single thin violet-to-cyan gradient seam marks the transition zone. Gallery-catalogue restraint, disciplined dark negative space, no accidental brightness. No text, no letters, no logos, no people, no photorealistic office, no stationery, no rulers, no notepads, no paper, no craft materials.",
   },
   {
     id: "trapman-city-hero",
@@ -71,7 +71,7 @@ export const assets = [
     purpose: "TrapMan wide neon-city hero atmosphere",
     source: `${modelName} original text-to-image generation`,
     prompt:
-      "Original wide 16-bit pixel-art night city for an arcade runner website, viewed across layered rooftops and elevated transit lanes. Deep indigo sky, distant blocky skyline, cyan window rhythm, electric magenta light bars with no signage, amber street pools, wet pixel reflections, foreground fire escapes framing a clear central route. Graphic hand-authored sprite aesthetic, limited color clusters, crisp hard pixel edges, cinematic depth through three distinct skyline layers. Absolutely no signs, glyphs, symbols, letters, numbers, characters, gameplay UI, scores, logos, copyrighted landmarks, photorealism, smooth 3D rendering, or generic cyberpunk portrait.",
+      "Original wide 16-bit pixel-art night cityscape representing Sydney, Australia, for an arcade runner game website. Wide view across layered rooftops and elevated rail lines. Left waterfront features an abstracted curved shell-roof silhouette evoking an opera house in chunky pixel blocks. Centre-right shows a slim tapering tower spire inspired by Sydney's CBD landmark. Clustered glass-tower blocks reflect cyan neon in dark harbour pixel water below. Deep indigo sky, amber street-lamp pools, cyan window rhythm, electric magenta light bars, wet pixel harbour reflections. Three distinct parallax layers: distant harbour-and-skyline, mid-ground rooftop route with elevated train tracks, foreground balustrades and fire-escape rails framing a clear horizontal running corridor. Graphic hand-authored sprite aesthetic, limited colour clusters, crisp hard pixel edges, cinematic depth. Absolutely no signs, glyphs, symbols, letters, numbers, characters, gameplay UI, scores, logos, photorealism, smooth 3D rendering, or generic cyberpunk portrait.",
   },
   {
     id: "trapman-city-mobile",
@@ -84,7 +84,7 @@ export const assets = [
     purpose: "TrapMan mobile portrait city atmosphere",
     source: `${modelName} original text-to-image generation`,
     prompt:
-      "Original vertical 16-bit pixel-art night city for a mobile arcade runner website. A dramatic upward view through stacked rooftops, fire escapes, overhead rails, distant towers and a narrow indigo sky. Cyan windows, magenta electrical glow, amber street light, wet pixel reflections, strong vertical depth, uncluttered center for web copy, handcrafted limited-palette sprite art with crisp hard edges. No characters, no gameplay UI, no scores, no readable text, no logos, no copyrighted landmarks, no photorealism, no smooth 3D render, no generic cyberpunk portrait.",
+      "Original vertical 16-bit pixel-art night cityscape representing Sydney, Australia, for a mobile arcade runner website. Dramatic upward view through a narrow Sydney laneway: wrought-iron lace balconies on terrace houses either side, sandstone colonial wall texture in chunky pixel blocks, modern glass CBD towers above reflecting cyan neon. Narrow strip of deep indigo sky at the top shows pixel Southern Cross constellation stars. Magenta electrical glow, amber street-lamp pools, pixel rain drops catching neon light, strong vertical depth, uncluttered centre for web copy. Handcrafted limited-palette sprite art with crisp hard edges. No characters, no gameplay UI, no scores, no readable text, no logos, no photorealism, no smooth 3D render, no generic cyberpunk portrait.",
   },
   {
     id: "trapman-portal",
@@ -110,7 +110,7 @@ export const assets = [
     purpose: "TrapMan gameplay section environmental plate",
     source: `${modelName} original text-to-image generation`,
     prompt:
-      "Original side-scrolling 16-bit pixel-art urban route plate for an arcade runner website: layered rooftops, train platform edges, ventilation units, barriers, collectible-like light trails that remain abstract, distant apartment windows and a clear horizontal running lane. Indigo-black base with cyan, violet, magenta and amber accents, crisp limited-palette pixel clusters, strong parallax separation, atmospheric night haze represented with dithering. Environment only. No player character, no enemies, no invented gameplay event, no HUD, no score, no readable text, no logo, no photorealism, no smooth vector art.",
+      "Original side-scrolling 16-bit pixel-art street route through Sydney, Australia at night, for an arcade runner game website. A horizontal running corridor inspired by Sydney's streets: wrought-iron lace-balcony terrace houses as backdrop, sandstone wall texture on pixel blocks to the right, overhead Metro rail lines, a brief harbour water glimpse in the distance with pixel ferry lights. Cyan window rhythm, magenta neon bars, amber lamp pools, abstract collectible sparkle light trails along the route. Indigo-black base with cyan, violet, magenta and amber accents, crisp limited-palette pixel clusters, strong parallax separation. Environment only. No player character, no enemies, no HUD, no score, no readable text, no logo, no photorealism, no smooth vector art.",
   },
   {
     id: "trapman-music-atmosphere",
@@ -123,7 +123,7 @@ export const assets = [
     purpose: "TrapMan music section atmospheric plate",
     source: `${modelName} original text-to-image generation`,
     prompt:
-      "Original 16-bit pixel-art nocturnal music atmosphere for an arcade runner website. Empty underground rehearsal room with a dark open doorway revealing a deep-indigo neon city at night, stacked speakers, coiled cables, cassette-deck silhouettes, restrained cyan and magenta waveform light reflected on a dark tiled floor, amber practical lamps, and calm dark central negative space for web typography. Handcrafted limited-palette sprite art, crisp pixels, moody editorial composition with controlled highlights. No white void, no daylight, no blown highlights, no people, no album cover, no readable text, no logo, no branded equipment, no interface, no photorealism, no smooth 3D render.",
+      "Original 16-bit pixel-art nocturnal music atmosphere representing Sydney's underground music scene, for an arcade runner game website. Empty basement venue with exposed sandstone colonial-era walls lit by magenta and cyan neon strips, a vintage pub stage setup with chunky pixel speaker stacks and cable coils, a dark open doorway revealing Sydney's CBD neon skyline at night with a harbour glimpse beyond. Restrained cyan and magenta waveform light reflecting on a dark tiled pub floor, amber warm lamp pools, and calm dark central negative space for web typography. Handcrafted limited-palette sprite art, crisp pixels, moody editorial composition. No white void, no daylight, no people, no album cover, no readable text, no logo, no branded equipment, no interface, no photorealism, no smooth 3D render.",
   },
 
   // ── Cinematic video loops (Kling v3.0 Pro) ───────────────────────────────
@@ -138,7 +138,7 @@ export const assets = [
     purpose: "Nobilix studio hero cinematic atmospheric loop",
     source: `${videoModelName} original text-to-video generation`,
     prompt:
-      "Ultra-cinematic slow atmospheric loop for a premium software studio website hero. Abstract dark architectural planes in deep charcoal and obsidian, a single restrained neon-violet light seam drifting slowly across brushed-metal surfaces and glass, soft volumetric ambient breath of luminescence pulsing gently, subtle 16mm film grain, anamorphic lens flare from the light seam, completely still environment except for the light movement. No camera movement. No people, no text, no logos, no interface, no game imagery, no generic office, no product shots, no bright highlights.",
+      "Ultra-cinematic slow atmospheric loop for a premium independent game studio website hero. Abstract top-down isometric dark pixel-art city grid being built tile by tile in slow motion — obsidian tiles materialising out of black void, a single neon-violet light column pulsing gently where construction is active, one acid-lime cursor spark floating above the active tile. Deep charcoal and void-black palette, soft volumetric glow from the violet build light, subtle 16mm film grain. Completely still except for the gentle violet light pulse and new tiles quietly appearing. No camera movement. No people, no text, no logos, no generic office, no product shots, no generic cyberpunk, no bright highlights.",
     negativePrompt:
       "people, faces, text, letters, logos, UI, interface, games, bright colors, white backgrounds, daylight, camera shake, subtitles, watermarks, photorealism, 3D render",
   },
@@ -153,7 +153,7 @@ export const assets = [
     purpose: "TrapMan city hero cinematic pixel loop (desktop)",
     source: `${videoModelName} original text-to-video generation`,
     prompt:
-      "Cinematic looping 16-bit pixel-art night cityscape for an arcade runner game website. Wide view across layered rooftops and elevated transit lanes. Cyan windows flickering with subtle life, electric magenta neon bars pulsing rhythmically, amber street-lamp pools glowing, pixel rain drops catching neon light, distant transit lights crossing the upper skyline layer, occasional spark from overhead power lines. Three-layer parallax depth with smooth background drift. Deep indigo sky, crisp hard pixel edges, limited color palette. Perfectly loopable 5-second cycle.",
+      "Cinematic looping 16-bit pixel-art Sydney night cityscape for an arcade runner game website. Wide view across layered rooftops and elevated rail lines. Left waterfront: an abstracted curved shell-roof pixel silhouette evoking an opera house. Centre: slim tapering CBD tower spire. Harbour pixel water below with neon reflections rippling as animated pixels. Cyan windows flickering with subtle life, electric magenta neon bars pulsing rhythmically, amber street-lamp pools glowing, pixel train lights crossing the upper skyline. Three-layer parallax depth with smooth background drift. Deep indigo sky, crisp hard pixel edges, limited Sydney night colour palette. Perfectly loopable 5-second cycle.",
     negativePrompt:
       "characters, enemies, player, HUD, score, text, logos, smooth 3D render, photorealistic, generic cyberpunk, watermarks, camera shake",
   },
@@ -168,7 +168,7 @@ export const assets = [
     purpose: "TrapMan city hero cinematic pixel loop (mobile portrait)",
     source: `${videoModelName} original text-to-video generation`,
     prompt:
-      "Cinematic looping vertical 16-bit pixel-art night city for a mobile arcade runner game website. Dramatic upward view through stacked rooftops and fire escapes toward a narrow deep-indigo sky. Cyan windows flickering, magenta electrical glow pulsing, amber street lamp pools, rain pixel drops catching light, vertical depth parallax with layers moving at different speeds. Handcrafted limited-palette sprite art, crisp hard pixel edges. Perfectly loopable 5-second vertical cycle.",
+      "Cinematic looping vertical 16-bit pixel-art Sydney night cityscape for a mobile arcade runner game website. Dramatic upward view through a narrow Sydney laneway: wrought-iron lace balconies on terrace houses either side, chunky sandstone colonial pixel walls, modern CBD glass towers above with cyan neon reflections. Pixel Southern Cross stars visible in the narrow deep-indigo sky strip at top. Cyan windows flickering, magenta electrical glow pulsing, amber street lamp pools, pixel rain drops catching neon light. Vertical depth parallax with layers moving at different speeds. Handcrafted limited-palette sprite art, crisp hard pixel edges. Perfectly loopable 5-second vertical cycle.",
     negativePrompt:
       "characters, HUD, text, logos, smooth 3D, photorealistic, watermarks, camera shake, subtitles",
   },
@@ -183,7 +183,7 @@ export const assets = [
     purpose: "TrapMan gameplay section cinematic environment loop",
     source: `${videoModelName} original text-to-video generation`,
     prompt:
-      "Cinematic looping side-scrolling 16-bit pixel-art urban environment for an arcade runner game website. Smooth rightward parallax scroll of layered rooftop route: foreground barriers and rails, mid-ground building facades with flickering cyan windows, background skyline slowly drifting. Deep indigo night palette with cyan window accents, magenta light bars, abstract collectible sparkle light trails. Three distinct scroll speeds for foreground, mid, and background. Perfectly loopable 5-second horizontal cycle.",
+      "Cinematic looping side-scrolling 16-bit pixel-art Sydney street route for an arcade runner game website. Smooth rightward parallax scroll: foreground wrought-iron lace-balcony terrace house rails and sandstone wall fragments, mid-ground colonial terrace facades with flickering cyan windows, overhead Metro rail lines, background Sydney harbour water with tiny pixel ferry lights and distant CBD skyline drifting slowly. Deep indigo night palette with cyan window accents, magenta neon bars, amber street lamps, abstract collectible sparkle trails along the running route. Three distinct scroll speeds. Perfectly loopable 5-second horizontal cycle.",
     negativePrompt:
       "player character, enemies, HUD, score, text, logos, smooth 3D render, photorealistic, watermarks, static image, no motion",
   },
@@ -198,7 +198,7 @@ export const assets = [
     purpose: "TrapMan music section cinematic atmosphere loop",
     source: `${videoModelName} original text-to-video generation`,
     prompt:
-      "Cinematic looping 16-bit pixel-art underground music room atmosphere. Speaker grille pixel lights pulsing to an implied rhythm, abstract equalizer waveform bars rising and falling on dark walls, amber lamp warmth flickering gently, coiled cable shadows swaying slightly, open doorway in background revealing deep-indigo neon city. Restrained cyan and magenta waveform light reflections on dark tiled floor. Handcrafted limited-palette sprite art. Perfectly loopable 5-second atmospheric cycle.",
+      "Cinematic looping 16-bit pixel-art Sydney underground music venue atmosphere. Exposed sandstone colonial pixel walls lit by pulsing magenta and cyan neon strips, vintage pub stage speaker grille pixel lights gently pulsing to an implied rhythm, abstract equalizer waveform bars rising and falling, amber pub lamp warmth flickering gently, coiled cable shadows, open doorway in background revealing Sydney CBD neon skyline with harbour glimpse. Restrained cyan and magenta waveform light reflections on dark tiled pub floor. Handcrafted limited-palette sprite art. Perfectly loopable 5-second atmospheric cycle.",
     negativePrompt:
       "people, musicians, text, logos, album art, photorealistic, smooth 3D render, bright daylight, watermarks, camera shake",
   },
