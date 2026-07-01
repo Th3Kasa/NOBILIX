@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
@@ -39,23 +39,47 @@ test("public header offers responsive company navigation", () => {
   assert.match(header, /aria-label="Nobilix home"/);
 });
 
-test("Console is not a prominent nav item on Nobilix or TrapMan headers", () => {
-  const nobilixHeader = read("src/components/public/nobilix-header.tsx");
-  const trapmanHeader = read("src/components/trapman/trapman-header.tsx");
+test("Console is only linked from the footer across every public-facing page", () => {
   const footer = read("src/components/public/nobilix-footer.tsx");
-
-  assert.doesNotMatch(
-    nobilixHeader,
-    /Console/,
-    "Console must not appear in the Nobilix header nav or CTA",
-  );
-  assert.doesNotMatch(
-    trapmanHeader,
-    /Console/,
-    "Console must not appear in the TrapMan header nav",
-  );
   // Discoverability is preserved via the footer and the direct /console URL.
   assert.match(footer, /href="\/console"/);
+
+  const allowedFiles = new Set([
+    resolve(root, "src/components/public/nobilix-footer.tsx"),
+  ]);
+
+  function collectFiles(dir) {
+    const results = [];
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const fullPath = resolve(dir, entry.name);
+      if (entry.isDirectory()) {
+        results.push(...collectFiles(fullPath));
+      } else if (entry.isFile() && /\.(tsx|ts)$/.test(entry.name)) {
+        results.push(fullPath);
+      }
+    }
+    return results;
+  }
+
+  const publicFacingDirs = [
+    resolve(root, "src/app/(public)"),
+    resolve(root, "src/components/public"),
+    resolve(root, "src/components/trapman"),
+    resolve(root, "src/app/(player)"),
+  ];
+
+  for (const dir of publicFacingDirs) {
+    if (!existsSync(dir)) continue;
+    for (const filePath of collectFiles(dir)) {
+      if (allowedFiles.has(filePath)) continue;
+      const contents = readFileSync(filePath, "utf8");
+      assert.doesNotMatch(
+        contents,
+        /["'(]\/console(["')#?]|$)/m,
+        `${filePath.replace(root, "")} must not link to /console — only the footer and direct URL entry are allowed`,
+      );
+    }
+  }
 });
 
 test("portfolio remains scalable without inventing future projects", () => {
@@ -88,13 +112,25 @@ test("company legal directory separates company and TrapMan legal destinations",
 });
 
 test("custom 404 offers useful recovery paths", () => {
-  const notFound = read("src/app/(public)/not-found.tsx");
+  const content = read("src/components/public/not-found-content.tsx");
 
-  assert.match(notFound, /Page not found/);
-  assert.match(notFound, /Return to Nobilix/);
-  assert.match(notFound, /View TrapMan/);
-  assert.match(notFound, /Open console/);
-  assert.match(notFound, /Contact Nobilix/);
+  assert.match(content, /Page not found/);
+  assert.match(content, /Return to Nobilix/);
+  assert.match(content, /View TrapMan/);
+  assert.match(content, /Contact Nobilix/);
+  assert.doesNotMatch(
+    content,
+    /\/console/,
+    "Console must not be a recovery path on the 404 page",
+  );
+});
+
+test("root-level not-found.tsx exists so arbitrary unmatched URLs get the styled 404, not Next's default", () => {
+  const rootNotFound = read("src/app/not-found.tsx");
+
+  assert.match(rootNotFound, /NotFoundContent/);
+  assert.match(rootNotFound, /NobilixHeader/);
+  assert.match(rootNotFound, /NobilixFooter/);
 });
 
 test("Task 3 component files exist", () => {

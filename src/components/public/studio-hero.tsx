@@ -28,8 +28,8 @@ export function StudioHero() {
             <Link className="nobilix-button nobilix-button--primary" href="/trapman">
               Enter TrapMan
             </Link>
-            <Link className="nobilix-button nobilix-button--secondary" href="/console">
-              Launch Console
+            <Link className="nobilix-button nobilix-button--secondary" href="/#projects">
+              View projects
             </Link>
           </div>
         </Reveal>

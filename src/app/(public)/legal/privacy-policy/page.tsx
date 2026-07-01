@@ -256,8 +256,6 @@ export default function NobilixPrivacyPolicyPage() {
           New South Wales, Australia
           <br />
           <a href="mailto:help.nobilix@outlook.com">help.nobilix@outlook.com</a>
-          <br />
-          <a href="mailto:help.nobilix@outlook.com">help.nobilix@outlook.com</a>
         </address>
       </section>
     </NobilixLegalShell>

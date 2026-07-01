@@ -1682,10 +1682,13 @@
   line-height: 1.72;
 }
 .legal-data-table {
+  display: block;
   width: 100%;
   margin-top: 1rem;
   border-collapse: collapse;
   font-size: .9rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .legal-data-table th,
 .legal-data-table td {
@@ -1713,11 +1716,14 @@
 .legal-breadcrumb a:hover { opacity: 1; }
 .legal-breadcrumb li + li::before { content: '/'; margin: 0 .35rem; opacity: .35; }
 .legal-draft-notice p { color: #ffe082; font-size: .88rem; }
-.legal-toc-heading {
+h2.legal-toc-heading {
+  max-width: none;
   font-size: .72rem;
-  font-weight: 900;
+  line-height: 1.4;
   letter-spacing: .16em;
+  font-weight: 900;
   text-transform: uppercase;
+  text-shadow: none;
   color: var(--tm-cyan);
   opacity: .7;
 }
@@ -1813,5 +1819,4 @@
       "actions";
   }
   .legal-toc { position: static; }
-  .legal-data-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
 }

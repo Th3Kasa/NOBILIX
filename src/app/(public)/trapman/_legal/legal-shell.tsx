@@ -71,16 +71,6 @@ export function LegalShell({ title, lastUpdated, children }: LegalShellProps) {
         </div>
       </header>
 
-      {/* Legal launch gate notice */}
-      <aside className="legal-draft-notice" role="note">
-        <p>
-          <strong>Draft — Pending Legal Review.</strong> This document is an
-          informational draft and is not yet reviewed by qualified legal counsel.
-          It should not be relied upon as final legal advice until the Legal
-          Launch Gate conditions are met.
-        </p>
-      </aside>
-
       <div className="legal-body">
         {/* Sticky table of contents for cross-page navigation */}
         <nav className="legal-toc legal-contents-nav" aria-label="Legal pages">

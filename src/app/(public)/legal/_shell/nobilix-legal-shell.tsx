@@ -59,15 +59,6 @@ export function NobilixLegalShell({
         </div>
       </header>
 
-      <aside className="nobilix-legal-draft-notice" role="note">
-        <p>
-          <strong>Draft — Pending Legal Review.</strong> This document is an
-          informational draft and has not yet been reviewed by qualified legal
-          counsel. Do not rely on it as final legal advice until qualified review
-          is complete.
-        </p>
-      </aside>
-
       <div className="nobilix-legal-body">
         <nav className="nobilix-legal-toc" aria-label="Nobilix legal documents">
           <h2 className="nobilix-legal-toc-heading">Nobilix Legal</h2>
