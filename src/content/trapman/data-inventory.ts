@@ -117,6 +117,44 @@ export const TRAPMAN_DATA_INVENTORY = [
     deletable: false,
     deletionNote: "Subject to Firebase Analytics data deletion timelines.",
   },
+  {
+    key: "fcmToken",
+    label: "Push Notification Token",
+    system: "Firestore",
+    location: "users/{uid}.fcmToken",
+    purpose:
+      "Firebase Cloud Messaging token used to deliver push notifications to the player's device. Confirmed present via engineering schema review.",
+    deletable: true,
+    deletionNote:
+      "Removed on account deletion; also cleared if the player revokes notification permission on-device.",
+  },
+  {
+    key: "currentLevel",
+    label: "Current Level",
+    system: "Firestore",
+    location: "users/{uid}.currentLevel",
+    purpose:
+      "Tracks the player's current progression level for leaderboard ranking and gameplay state.",
+    deletable: true,
+  },
+  {
+    key: "completedLevels",
+    label: "Completed Levels",
+    system: "Firestore",
+    location: "users/{uid}.completedLevels",
+    purpose:
+      "List of level numbers the player has completed. Used for progression tracking and aggregate level-distribution analytics.",
+    deletable: true,
+  },
+  {
+    key: "isGuest",
+    label: "Guest Account Flag",
+    system: "Firestore",
+    location: "users/{uid}.isGuest",
+    purpose:
+      "Indicates whether the player is using a guest (non-authenticated) account. Confirmed via engineering schema review: guest accounts receive the same persistent Firestore profile document as registered accounts.",
+    deletable: true,
+  },
 ] as const satisfies DataInventoryEntry[];
 
 /**
@@ -132,8 +170,8 @@ export const TRAPMAN_DATA_INVENTORY = [
 export const REQUIRES_ENGINEERING_VERIFICATION = [
   "Firebase Analytics automatic events and user properties (e.g., first_open, app_update, os_version, country derived from IP)",
   "Device identifiers including Google Advertising ID (GAID) and Apple IDFA — depends on consent and attribution SDK",
-  "FCM tokens and push notification delivery data",
   "Crash reporting data (e.g., Firebase Crashlytics — stack traces, device model, OS version)",
-  "Guest account behavior and data — whether guest sessions generate any persistent storage",
   "Advertising SDKs and their destination processors — depends on which SDKs are integrated and their data sharing practices",
+  "An embedded purchases object exists directly on some user documents (users/{uid}.purchases, observed on a portion of sampled profiles) in addition to the separate purchases collection referenced by product/receipt records above — its internal field shape has not been inspected; do not assume it duplicates or supersedes the dedicated purchases collection until confirmed",
+  "The dedicated purchases/{purchaseId} and player_progress/{uid} collections contained no documents at the time of the most recent engineering schema review — purchase and progression data currently observed lives on the users/{uid} document itself (see purchases, currentLevel, completedLevels above); this may change as the collections are populated",
 ] as const;

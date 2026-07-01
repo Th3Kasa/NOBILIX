@@ -87,19 +87,6 @@ export const assets = [
       "Original vertical 16-bit pixel-art night cityscape representing Sydney, Australia, for a mobile arcade runner website. Dramatic upward view through a narrow Sydney laneway: wrought-iron lace balconies on terrace houses either side, sandstone colonial wall texture in chunky pixel blocks, modern glass CBD towers above reflecting cyan neon. Narrow strip of deep indigo sky at the top shows pixel Southern Cross constellation stars. Magenta electrical glow, amber street-lamp pools, pixel rain drops catching neon light, strong vertical depth, uncluttered centre for web copy. Handcrafted limited-palette sprite art with crisp hard edges. No characters, no gameplay UI, no scores, no readable text, no logos, no photorealism, no smooth 3D render, no generic cyberpunk portrait.",
   },
   {
-    id: "trapman-portal",
-    kind: "image",
-    path: "trapman/portal.webp",
-    width: 1200,
-    height: 1200,
-    generationWidth: 1200,
-    generationHeight: 1200,
-    purpose: "TrapMan pixel-energy portal transition",
-    source: `${modelName} original text-to-image generation`,
-    prompt:
-      "Original square pixel-art energy portal suspended in a dark urban service tunnel. Concentric broken rings of cyan, hot magenta, violet and white pixel sparks, black center with usable negative space, chunky 16-bit clusters, subtle brick and cable silhouettes, energetic but readable composition, handcrafted arcade sprite-sheet aesthetic. No character, no creature, no weapon, no interface, no readable text, no logo, no photorealism, no glossy 3D render.",
-  },
-  {
     id: "trapman-gameplay-atmosphere",
     kind: "image",
     path: "trapman/gameplay-atmosphere.webp",
@@ -124,6 +111,157 @@ export const assets = [
     source: `${modelName} original text-to-image generation`,
     prompt:
       "Original 16-bit pixel-art nocturnal music atmosphere representing Sydney's underground music scene, for an arcade runner game website. Empty basement venue with exposed sandstone colonial-era walls lit by magenta and cyan neon strips, a vintage pub stage setup with chunky pixel speaker stacks and cable coils, a dark open doorway revealing Sydney's CBD neon skyline at night with a harbour glimpse beyond. Restrained cyan and magenta waveform light reflecting on a dark tiled pub floor, amber warm lamp pools, and calm dark central negative space for web typography. Handcrafted limited-palette sprite art, crisp pixels, moody editorial composition. No white void, no daylight, no people, no album cover, no readable text, no logo, no branded equipment, no interface, no photorealism, no smooth 3D render.",
+  },
+
+  // ── Nobilix editorial section plates ─────────────────────────────────────
+  {
+    id: "nobilix-principles-plate",
+    kind: "image",
+    path: "nobilix/principles-plate.webp",
+    width: 1536,
+    height: 864,
+    generationWidth: 1536,
+    generationHeight: 864,
+    purpose: "Nobilix studio-principles section editorial plate",
+    source: `${modelName} original text-to-image generation`,
+    prompt:
+      "Original dark editorial photograph-style composition, pure architectural still life, completely free of any signage or lettering. A macro study of a single obsidian drafting-table corner under a low raking light: a folded charcoal blueprint sheet showing only abstract grid lines and dots (never words or letterforms), a thin acid-lime laser-level line crossing the frame, deep shadow gradients, one sharp specular highlight. Extremely restrained, gallery-catalogue minimalism, the entire left two-thirds of the frame is pure empty black negative space with absolutely nothing drawn in it. Cold, precise, architectural mood.",
+    negativePrompt:
+      "text, letters, words, typography, labels, signage, captions, numbers, UI, interface elements, buttons, icons, logos, watermarks, people, hands, coffee cups, pens, stationery clutter, photorealism, stock photography",
+  },
+  {
+    id: "nobilix-contact-plate",
+    kind: "image",
+    path: "nobilix/contact-plate.webp",
+    width: 1536,
+    height: 864,
+    generationWidth: 1536,
+    generationHeight: 864,
+    purpose: "Nobilix homepage contact section editorial plate",
+    source: `${modelName} original text-to-image generation`,
+    prompt:
+      "Original dark editorial architectural photograph, completely free of any signage, lettering, or interface elements. A single narrow beam of acid-lime light entering a pitch-black obsidian corridor from an unseen source, illuminating faint architectural seams in the bare wall texture, soft violet ambient bounce light at the edges. Quiet, spacious, gallery-opening mood — evokes 'a door is open' without showing a literal door, person, or any drawn shapes. The entire right half of the frame is pure empty black negative space with absolutely nothing drawn, written, or outlined in it — no boxes, no lines, no shapes, no form fields.",
+    negativePrompt:
+      "text, letters, words, typography, labels, form fields, input boxes, buttons, UI, interface elements, icons, logos, watermarks, people, reception desk, stock office photography, photorealism",
+  },
+  {
+    id: "nobilix-legal-header-plate",
+    kind: "image",
+    path: "nobilix/legal-header-plate.webp",
+    width: 1440,
+    height: 480,
+    generationWidth: 1440,
+    generationHeight: 480,
+    purpose: "Nobilix legal shell header band (shared across all Nobilix legal pages)",
+    source: `${modelName} original text-to-image generation`,
+    prompt:
+      "Original extremely restrained dark editorial header band for a legal/policy document page. A thin horizontal obsidian architectural cross-section with a single faint violet hairline seam running the full width, extremely subtle charcoal grain texture, calm and quiet, almost entirely negative space. Built for a wide short banner crop above document typography. No people, no logos, no readable text, no icons, no gavels or scales-of-justice clichés, no bright highlights, no photorealism.",
+  },
+
+  // ── TrapMan per-section environmental plates ─────────────────────────────
+  {
+    id: "trapman-characters-plate",
+    kind: "image",
+    path: "trapman/characters-plate.webp",
+    width: 1536,
+    height: 864,
+    generationWidth: 1536,
+    generationHeight: 864,
+    purpose: "TrapMan character-roster section backdrop",
+    source: `${modelName} original text-to-image generation`,
+    prompt:
+      "Original 16-bit pixel-art backstage backdrop for a runner-character selection screen, Sydney night theme. A dim sandstone-walled alcove with two spotlight pools of neon light (one cyan, one magenta) hitting empty pixel-art character-display podiums side by side, suggesting 'choose your runner' without showing characters. Distant Sydney harbour skyline glow visible through a narrow gap above. Deep indigo shadow, crisp hard pixel edges, dramatic rim lighting on the podium edges. No characters, no faces, no readable text, no UI, no logos, no photorealism, no smooth 3D render.",
+  },
+  {
+    id: "trapman-world-plate",
+    kind: "image",
+    path: "trapman/world-plate.webp",
+    width: 1536,
+    height: 864,
+    generationWidth: 1536,
+    generationHeight: 864,
+    purpose: "TrapMan world-system section full-bleed environment",
+    source: `${modelName} original text-to-image generation`,
+    prompt:
+      "Original wide 16-bit pixel-art aerial-angled Sydney rooftop route at night, for a game-world overview section. Elevated view across terracotta and corrugated-iron pixel rooftops connected by narrow running planks and fire-escape ladders, a cyan HUD-style grid overlay faintly etched into the pavement below suggesting a game map without literal UI, distant Opera House shell silhouette and harbour water glowing on the horizon. Magenta and violet neon accents on cable runs, amber window glow. Strong sense of an explorable layered world. Crisp hard pixel edges, cinematic depth. No characters, no readable UI text, no logos, no photorealism.",
+  },
+  {
+    id: "trapman-shop-plate",
+    kind: "image",
+    path: "trapman/shop-plate.webp",
+    width: 1536,
+    height: 864,
+    generationWidth: 1536,
+    generationHeight: 864,
+    purpose: "TrapMan shop section backdrop",
+    source: `${modelName} original text-to-image generation`,
+    prompt:
+      "Original 16-bit pixel-art night-market backdrop for an in-game shop section, Sydney theme. A row of small shuttered pixel-art market-stall silhouettes lit from within by warm amber light, cyan and magenta neon signage glow reflecting on a wet pixel pavement, folded awnings, hanging string lights. Sydney CBD tower glow in the background haze. Inviting but uncluttered, generous flat pavement area in the foreground for product-card overlay. Crisp hard pixel edges, limited palette. No readable shop signage text, no characters, no logos, no photorealism.",
+  },
+  {
+    id: "trapman-leaderboard-plate",
+    kind: "image",
+    path: "trapman/leaderboard-plate.webp",
+    width: 1536,
+    height: 864,
+    generationWidth: 1536,
+    generationHeight: 864,
+    purpose: "TrapMan leaderboard section backdrop",
+    source: `${modelName} original text-to-image generation`,
+    prompt:
+      "Original 16-bit pixel-art championship-podium backdrop for a competitive leaderboard section, Sydney night theme. Three empty pixel-art podium blocks of ascending height bathed in a single dramatic amber-gold spotlight cone from above, cyan and magenta ambient rim glow at the edges, distant Sydney harbour and CBD skyline silhouette glowing faintly behind, confetti-like sparkle particles frozen mid-air. Triumphant but restrained composition with clear flat space above the podiums for a ranked-list overlay. Crisp hard pixel edges. No characters, no trophies with readable text, no logos, no photorealism.",
+  },
+  {
+    id: "trapman-account-cta-plate",
+    kind: "image",
+    path: "trapman/account-cta-plate.webp",
+    width: 1536,
+    height: 864,
+    generationWidth: 1536,
+    generationHeight: 864,
+    purpose: "TrapMan player-account CTA section backdrop",
+    source: `${modelName} original text-to-image generation`,
+    prompt:
+      "Original 16-bit pixel-art backdrop suggesting 'your progress continues', Sydney night theme. A softly glowing cyan pixel-art save-point beacon standing alone on a rooftop running path, faint upward light column, distant Sydney skyline and harbour glow on the horizon, a single trailing light-streak suggesting a runner just passed through. Calm, hopeful, forward-looking mood. Generous flat dark sky area above for CTA text overlay. Crisp hard pixel edges, restrained palette. No characters, no readable text, no logos, no photorealism.",
+  },
+  {
+    id: "trapman-support-plate",
+    kind: "image",
+    path: "trapman/support-plate.webp",
+    width: 1536,
+    height: 864,
+    generationWidth: 1536,
+    generationHeight: 864,
+    purpose: "TrapMan support section backdrop (calmer register)",
+    source: `${modelName} original text-to-image generation`,
+    prompt:
+      "Original 16-bit pixel-art calm night scene for a player-support section, Sydney theme. A single softly lit pixel-art information kiosk or lamp-post at a quiet rooftop junction, gentle cyan glow only (no magenta or violet saturation), distant harbour skyline barely visible through soft haze, sense of quiet reassurance rather than arcade energy. Deliberately lower contrast and lower saturation than other TrapMan section plates — this is the calm, legible, legal-adjacent register. Generous flat space for support copy overlay. Crisp hard pixel edges. No characters, no readable text, no logos, no photorealism.",
+  },
+  {
+    id: "trapman-legal-header-plate",
+    kind: "image",
+    path: "trapman/legal-header-plate.webp",
+    width: 1440,
+    height: 480,
+    generationWidth: 1440,
+    generationHeight: 480,
+    purpose: "TrapMan legal shell header band (shared across all 4 TrapMan legal/compliance pages)",
+    source: `${modelName} original text-to-image generation`,
+    prompt:
+      "Original wide short 16-bit pixel-art header banner, Sydney night theme, deliberately calm and low-saturation. A distant, hazy Sydney skyline silhouette along the bottom edge with only soft cyan window glow (no magenta, no violet), deep indigo-black sky filling most of the frame, a few faint Southern Cross pixel stars. Built for a short wide crop above legal document typography — mostly negative space, quiet and legible. Crisp hard pixel edges, restrained palette. No characters, no readable text, no logos, no photorealism.",
+  },
+  {
+    id: "trapman-account-shell-plate",
+    kind: "image",
+    path: "trapman/account-shell-plate.webp",
+    width: 1536,
+    height: 864,
+    generationWidth: 1536,
+    generationHeight: 864,
+    purpose: "TrapMan player account/login shell backdrop (calmer register)",
+    source: `${modelName} original text-to-image generation`,
+    prompt:
+      "Original 16-bit pixel-art calm backdrop for a player account/login screen, Sydney night theme. A quiet rooftop terrace overlooking a distant hazy harbour skyline, single soft cyan lamp glow, gentle upward mist, sense of a private personal space rather than arcade energy. Deliberately lower contrast and saturation than the main marketing page plates. Generous dark flat area for a login-card overlay in the center-right. Crisp hard pixel edges. No characters, no readable text, no logos, no photorealism.",
   },
 
   // ── Cinematic video loops (Kling v3.0 Pro) ───────────────────────────────

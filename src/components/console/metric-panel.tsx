@@ -52,7 +52,7 @@ export function MetricPanel({
       </div>
       <p
         className={cn(
-          "font-semibold tabular-nums tracking-tight",
+          "font-mono font-semibold tabular-nums tracking-tight",
           primary ? "text-4xl" : "text-2xl",
           value == null && "text-muted-foreground/60",
         )}

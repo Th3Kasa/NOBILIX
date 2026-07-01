@@ -10,7 +10,7 @@ export function ConsoleMobileNav({
   return (
     <div className="flex min-h-11 items-center gap-3 md:hidden">
       <MobileNavigation items={items} label={`${scopeLabel} navigation`} />
-      <span className="text-sm font-semibold text-muted-foreground">
+      <span className="font-mono text-sm font-semibold uppercase tracking-wide text-muted-foreground">
         Nobilix / {scopeLabel}
       </span>
     </div>

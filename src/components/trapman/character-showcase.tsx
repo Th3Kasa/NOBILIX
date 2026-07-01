@@ -1,4 +1,5 @@
 import type React from "react";
+import Image from "next/image";
 
 const CHARACTERS = [
   {
@@ -21,24 +22,35 @@ const CHARACTERS = [
 
 export function CharacterShowcase() {
   return (
-    <div className="character-showcase">
-      {CHARACTERS.map(({ initial, accent, name, tag, description }) => (
-        <article
-          key={name}
-          className="character-card"
-          style={{ "--char-accent": accent } as React.CSSProperties}
-        >
-          <div className="character-avatar" aria-hidden="true">
-            <span className="character-avatar__letter">{initial}</span>
-            <div className="character-avatar__ring" />
-          </div>
-          <div className="character-info">
-            <p className="character-tag">{tag}</p>
-            <h3 className="character-name">{name}</h3>
-            <p className="character-desc">{description}</p>
-          </div>
-        </article>
-      ))}
+    <div className="character-stage">
+      <div className="character-stage__plate" aria-hidden="true">
+        <Image
+          src="/assets/generated/trapman/characters-plate.webp"
+          alt=""
+          width={1536}
+          height={864}
+          sizes="(max-width: 900px) 100vw, 68vw"
+        />
+      </div>
+      <div className="character-showcase">
+        {CHARACTERS.map(({ initial, accent, name, tag, description }) => (
+          <article
+            key={name}
+            className="character-card"
+            style={{ "--char-accent": accent } as React.CSSProperties}
+          >
+            <div className="character-avatar" aria-hidden="true">
+              <span className="character-avatar__letter">{initial}</span>
+              <div className="character-avatar__ring" />
+            </div>
+            <div className="character-info">
+              <p className="character-tag">{tag}</p>
+              <h3 className="character-name">{name}</h3>
+              <p className="character-desc">{description}</p>
+            </div>
+          </article>
+        ))}
+      </div>
     </div>
   );
 }

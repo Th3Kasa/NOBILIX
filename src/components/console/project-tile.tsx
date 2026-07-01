@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Circle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import type { ProjectDefinition } from "@/types/projects";
 
 const STATUS_LABELS: Record<ProjectDefinition["status"], string> = {
@@ -10,13 +10,11 @@ const STATUS_LABELS: Record<ProjectDefinition["status"], string> = {
   planned: "Planned",
 };
 
-const STATUS_VARIANT: Record<
-  ProjectDefinition["status"],
-  "default" | "secondary" | "outline"
-> = {
-  live: "default",
-  development: "secondary",
-  planned: "outline",
+const STATUS_CLASSES: Record<ProjectDefinition["status"], string> = {
+  live: "border-[var(--console-live-border)] bg-[var(--console-live-tint)] text-[var(--console-live)]",
+  development:
+    "border-[var(--console-violet-border)] bg-[var(--console-violet-tint)] text-[var(--console-violet)]",
+  planned: "border-border bg-muted/40 text-muted-foreground",
 };
 
 export function ProjectTile({ project }: { project: ProjectDefinition }) {
@@ -48,12 +46,15 @@ export function ProjectTile({ project }: { project: ProjectDefinition }) {
               </p>
             </div>
           </div>
-          <Badge variant={STATUS_VARIANT[project.status]}>
-            <Circle
-              className={`mr-1 size-1.5 fill-current ${project.status === "live" ? "text-green-500" : ""}`}
-            />
+          <span
+            className={cn(
+              "inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 font-mono text-[10px] font-medium uppercase tracking-wide",
+              STATUS_CLASSES[project.status],
+            )}
+          >
+            <Circle className="size-1.5 fill-current" aria-hidden="true" />
             {STATUS_LABELS[project.status]}
-          </Badge>
+          </span>
         </div>
 
         {/* Description */}
@@ -63,7 +64,7 @@ export function ProjectTile({ project }: { project: ProjectDefinition }) {
 
         {/* Module count + CTA */}
         <div className="flex items-center justify-between">
-          <span className="text-xs text-muted-foreground">
+          <span className="font-mono text-xs text-muted-foreground">
             {project.consoleModules.length} modules
           </span>
           <Link

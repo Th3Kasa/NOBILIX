@@ -41,8 +41,18 @@ export function LegalShell({ title, lastUpdated, children }: LegalShellProps) {
         </ol>
       </nav>
 
-      {/* Header with official logo */}
+      {/* Header with official logo, over a calm bespoke plate */}
       <header className="legal-header">
+        <div className="legal-header__plate" aria-hidden="true">
+          <Image
+            src="/assets/generated/trapman/legal-header-plate.webp"
+            alt=""
+            width={1440}
+            height={480}
+            sizes="100vw"
+            priority
+          />
+        </div>
         <Link href="/trapman" className="legal-logo-link">
           <Image
             src="/assets/trapman-logo.png"

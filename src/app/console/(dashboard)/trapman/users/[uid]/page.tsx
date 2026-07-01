@@ -90,21 +90,31 @@ export default async function UserDetailPage({
             <Field label="Character" value={user.character ?? "—"} />
             <Field
               label="Level"
-              value={user.level != null ? formatNumber(user.level) : "—"}
+              value={
+                <span className="font-mono tabular-nums">
+                  {user.level != null ? formatNumber(user.level) : "—"}
+                </span>
+              }
             />
             <Field
               label="High score"
               value={
-                user.highScore != null ? formatNumber(user.highScore) : "—"
+                <span className="font-mono tabular-nums">
+                  {user.highScore != null ? formatNumber(user.highScore) : "—"}
+                </span>
               }
             />
             <Field
               label="Account type"
               value={
                 user.isGuest ? (
-                  <Badge variant="secondary">Guest</Badge>
+                  <Badge variant="secondary" className="font-mono uppercase tracking-wide">
+                    Guest
+                  </Badge>
                 ) : (
-                  <Badge variant="success">Registered</Badge>
+                  <Badge variant="success" className="font-mono uppercase tracking-wide">
+                    Registered
+                  </Badge>
                 )
               }
             />
@@ -112,7 +122,7 @@ export default async function UserDetailPage({
               label="Push enabled"
               value={
                 user.fcmToken ? (
-                  <span className="inline-flex items-center gap-1 text-success">
+                  <span className="inline-flex items-center gap-1 text-[var(--console-live)]">
                     <Bell className="size-3.5" /> Yes
                   </span>
                 ) : (

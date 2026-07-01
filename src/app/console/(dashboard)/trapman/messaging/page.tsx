@@ -71,14 +71,21 @@ export default async function MessagingPage({
                           {c.body}
                         </p>
                       </div>
-                      <Badge variant={statusVariant(c.status)}>{c.status}</Badge>
+                      <Badge
+                        variant={statusVariant(c.status)}
+                        className="font-mono uppercase tracking-wide"
+                      >
+                        {c.status}
+                      </Badge>
                     </div>
-                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 font-mono text-xs text-muted-foreground">
                       <span>{audienceLabel(c.audience)}</span>
-                      <span>{c.recipientCount} recipients</span>
-                      <span className="text-success">{c.successCount} ✓</span>
+                      <span className="tabular-nums">{c.recipientCount} recipients</span>
+                      <span className="tabular-nums text-[var(--console-live)]">
+                        {c.successCount} ✓
+                      </span>
                       {c.failureCount > 0 && (
-                        <span className="text-destructive">
+                        <span className="tabular-nums text-[var(--console-action)]">
                           {c.failureCount} ✗
                         </span>
                       )}

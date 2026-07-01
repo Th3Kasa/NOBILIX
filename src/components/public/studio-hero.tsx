@@ -10,7 +10,15 @@ export function StudioHero() {
         <Reveal>
           <p className="studio-brand-badge pixel-type" aria-hidden="true">NOBILIX</p>
           <p className="eyebrow">Independent game studio</p>
-          <h1 id="company-title">Build worlds. Stay distinct.</h1>
+        </Reveal>
+        <Reveal delay={0.08}>
+          <h1 id="company-title">
+            Build worlds.
+            <br />
+            <em>Stay distinct.</em>
+          </h1>
+        </Reveal>
+        <Reveal delay={0.16}>
           <p className="studio-hero__lede">
             Nobilix is a game studio built for distinct project identities.
             Each title gets its own visual language, data disclosures, and
@@ -37,8 +45,8 @@ export function StudioHero() {
           priority
         />
         <div className="studio-hero__plate" aria-hidden="true">
-          <span>01</span>
-          <span>Studio</span>
+          <span>Plate 01</span>
+          <span>Studio, in progress</span>
         </div>
       </ParallaxMedia>
     </section>

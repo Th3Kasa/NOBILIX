@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
-import { formatNumber, countryFlag } from "@/lib/utils";
+import { formatNumber, countryFlag, cn } from "@/lib/utils";
 import { listLeaderboard, getCompetitionHistory } from "@/lib/leaderboard";
 import {
   ResetCompetitionModal,
@@ -38,7 +38,7 @@ export default async function LeaderboardPage() {
       />
 
       {!connected && (
-        <div className="mb-4 rounded-lg border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-warning">
+        <div className="mb-4 rounded-lg border border-[var(--console-action-border)] bg-[var(--console-action-tint)] px-4 py-3 text-sm text-[var(--console-action)]">
           Firebase connection failed: {error ?? "unknown error"}. Add your
           service-account credentials to .env.local to connect.
         </div>
@@ -50,7 +50,7 @@ export default async function LeaderboardPage() {
           <div className="flex items-center gap-2 border-b border-border px-5 py-4">
             <h2 className="font-semibold">Current standings</h2>
             {connected && (
-              <Badge variant="success" className="ml-auto">
+              <Badge variant="success" className="ml-auto font-mono uppercase tracking-wide">
                 Live
               </Badge>
             )}
@@ -66,12 +66,12 @@ export default async function LeaderboardPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border text-left text-xs text-muted-foreground">
+                  <tr className="border-b border-border text-left font-mono text-xs uppercase tracking-wide text-muted-foreground">
                     <th className="px-5 py-3 w-14">#</th>
                     <th className="px-3 py-3">Player</th>
                     <th className="px-3 py-3 hidden sm:table-cell">Country</th>
                     <th className="px-3 py-3 hidden md:table-cell">Character</th>
-                    <th className="px-3 py-3 text-right font-mono">Score</th>
+                    <th className="px-3 py-3 text-right">Score</th>
                     {canWrite && <th className="px-3 py-3 w-10" />}
                   </tr>
                 </thead>
@@ -83,15 +83,16 @@ export default async function LeaderboardPage() {
                     >
                       <td className="px-5 py-3">
                         <span
-                          className={
+                          className={cn(
+                            "font-mono tabular-nums",
                             entry.rank === 1
                               ? "text-yellow-500 font-bold"
                               : entry.rank === 2
                                 ? "text-slate-400 font-bold"
                                 : entry.rank === 3
                                   ? "text-orange-400 font-bold"
-                                  : "text-muted-foreground"
-                          }
+                                  : "text-muted-foreground",
+                          )}
                         >
                           {entry.rank}
                         </span>

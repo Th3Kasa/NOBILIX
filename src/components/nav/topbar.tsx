@@ -26,7 +26,7 @@ export function Topbar({
 
   return (
     <header className="flex h-14 items-center justify-between border-b border-border bg-card/40 px-4 md:px-6">
-      <span className="text-sm font-medium text-muted-foreground">
+      <span className="font-mono text-sm font-medium uppercase tracking-wide text-muted-foreground">
         {projectName ? (
           <>
             <span className="text-xs">Nobilix</span>
@@ -42,7 +42,10 @@ export function Topbar({
           <p className="text-sm font-medium leading-tight">{name}</p>
           <p className="text-xs text-muted-foreground leading-tight">{email}</p>
         </div>
-        <Badge variant={role === "owner" ? "default" : "secondary"}>
+        <Badge
+          variant={role === "owner" ? "default" : "secondary"}
+          className="font-mono uppercase tracking-wide"
+        >
           {role}
         </Badge>
         <div className="flex size-8 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary">

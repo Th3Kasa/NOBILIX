@@ -16,9 +16,9 @@ export default async function GameplayPage() {
       />
 
       {data.unavailableReason ? (
-        <Card className="border-border/60">
+        <Card className="border-[var(--console-violet-border)] bg-[var(--console-violet-tint)]">
           <CardContent className="flex items-start gap-3 p-6">
-            <Info className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
+            <Info className="mt-0.5 size-4 shrink-0 text-[var(--console-violet)]" />
             <p className="text-sm text-muted-foreground">
               {data.unavailableReason}
             </p>
@@ -38,10 +38,10 @@ export default async function GameplayPage() {
                     key={row.level}
                     className="flex items-center justify-between text-sm"
                   >
-                    <span className="text-muted-foreground">
+                    <span className="font-mono text-muted-foreground">
                       Level {row.level}
                     </span>
-                    <span className="font-medium tabular-nums">
+                    <span className="font-mono font-medium tabular-nums">
                       {row.playerCount.toLocaleString()}
                     </span>
                   </div>

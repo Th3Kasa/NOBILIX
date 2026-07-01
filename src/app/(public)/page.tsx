@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { Reveal } from "@/components/motion/reveal";
 import { ProjectShowcase } from "@/components/public/project-showcase";
 import { StudioHero } from "@/components/public/studio-hero";
@@ -17,35 +18,46 @@ export default function NobilixHomePage() {
       <StudioHero />
       <StudioPrinciples />
       <ProjectShowcase />
-      <Reveal>
-        <section
-          id="studio"
-          className="nobilix-studio-section"
-          aria-labelledby="studio-title"
-        >
+      <section
+        id="studio"
+        className="nobilix-studio-section"
+        aria-labelledby="studio-title"
+      >
+        <Reveal>
           <p className="eyebrow">01 / Studio</p>
-          <h2 id="studio-title">A quiet company layer for loud project worlds.</h2>
+          <h2 id="studio-title">
+            A quiet company layer for <em>loud project worlds</em>.
+          </h2>
           <p>
             Nobilix holds the business, legal, console, and portfolio structure.
             Each project gets its own visual identity, data disclosures, and
             product home — without forcing the studio brand to imitate the game.
           </p>
-        </section>
-      </Reveal>
-      <Reveal>
-        <section
-          id="contact"
-          className="nobilix-contact-section"
-          aria-labelledby="contact-title"
-        >
+        </Reveal>
+      </section>
+      <section
+        id="contact"
+        className="nobilix-contact-section"
+        aria-labelledby="contact-title"
+      >
+        <Reveal className="nobilix-contact-section__media" aria-hidden="true">
+          <Image
+            src="/assets/generated/nobilix/contact-plate.webp"
+            alt=""
+            width={1536}
+            height={864}
+            sizes="(max-width: 900px) 100vw, 40vw"
+          />
+        </Reveal>
+        <Reveal delay={0.1} className="nobilix-contact-section__copy">
           <p className="eyebrow">Contact</p>
           <h2 id="contact-title">Support, publishing, and studio enquiries.</h2>
           <p>
             Use the console for operations, TrapMan support paths for player
             requests, and the company legal directory for Nobilix notices.
           </p>
-        </section>
-      </Reveal>
+        </Reveal>
+      </section>
     </>
   );
 }

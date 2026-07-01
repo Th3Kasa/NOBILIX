@@ -41,7 +41,6 @@ const requiredAssets = [
   "nobilix/project-transition.webp",
   "trapman/city-hero.webp",
   "trapman/city-mobile.webp",
-  "trapman/portal.webp",
   "trapman/gameplay-atmosphere.webp",
   "trapman/music-atmosphere.webp",
 ];
@@ -203,7 +202,7 @@ test("asset generator validates the full plan without credentials or API calls",
   );
 
   assert.equal(stderr, "");
-  assert.match(stdout, /Validated 12 design asset definitions/);
+  assert.match(stdout, /Validated 22 design asset definitions/);
   assert.doesNotMatch(stdout, /MUAPI_API_KEY/i);
 });
 
@@ -449,7 +448,7 @@ test("partial approval preserves already-committed delivery assets", async () =>
   const deliveryRoot = path.join(temporaryRoot, "delivery");
   await cp(generatedAssetsRoot, deliveryRoot, { recursive: true });
 
-  // Only submit 6 of the 7 image assets in this run — simulates a video-only generation run
+  // Only submit 5 of the 6 image assets in this run — simulates a video-only generation run
   const incompletePaths = requiredAssets.slice(0, -1);
   const runDirectory = await createGenerationRun(
     temporaryRoot,

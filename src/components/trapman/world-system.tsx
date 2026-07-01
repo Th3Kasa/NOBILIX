@@ -1,27 +1,40 @@
 import Image from "next/image";
 
+const WORLD_CHIPS = [
+  { label: "Harbour lane", detail: "Cyan rail grinds" },
+  { label: "Underground pub", detail: "Bonus coin vaults" },
+  { label: "Opera steps", detail: "Vertical shortcuts" },
+] as const;
+
 export function WorldSystem() {
   return (
-    <div className="world-system">
-      <div className="world-system__copy">
-        <p className="trapman-kicker">World system</p>
-        <h2>Cyan paths, magenta pressure, starfield depth.</h2>
-        <p>
-          The web world borrows the game&apos;s HUD geometry and grid language, then
-          rebuilds it as original stage art for scrolling, scanning, and moving
-          between feature sections.
-        </p>
-      </div>
-      <div className="world-system__visual">
+    <div className="world-plate-section">
+      <div className="world-plate" aria-hidden="true">
         <Image
-          src="/assets/generated/trapman/gameplay-atmosphere.webp"
-          alt="Pixel-art TrapMan city atmosphere — cyan lanes cutting through a neon Sydney night."
+          src="/assets/generated/trapman/world-plate.webp"
+          alt=""
           width={1536}
           height={864}
-          sizes="(max-width: 900px) 100vw, 52vw"
+          sizes="100vw"
         />
-        <div className="world-system__orb" aria-hidden="true" />
       </div>
+      <div className="world-plate__copy">
+        <p className="trapman-kicker">World system</p>
+        <h2>Sydney underground, rebuilt in neon.</h2>
+        <p>
+          The web world borrows the game&apos;s HUD geometry and grid language, then
+          rebuilds Sydney&apos;s harbour, terraces, and underground pubs as original
+          stage art for scrolling, scanning, and moving between feature sections.
+        </p>
+      </div>
+      <ul className="world-plate__chips">
+        {WORLD_CHIPS.map(({ label, detail }) => (
+          <li key={label} className="world-chip">
+            <span className="world-chip__label">{label}</span>
+            <span className="world-chip__detail">{detail}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

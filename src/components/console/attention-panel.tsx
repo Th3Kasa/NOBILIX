@@ -1,4 +1,4 @@
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AttentionItem {
@@ -19,7 +19,7 @@ export function AttentionPanel({ items, className }: AttentionPanelProps) {
   return (
     <div
       className={cn(
-        "console-attention-panel rounded-xl border border-warning/30 bg-warning/5 p-5",
+        "console-attention-panel rounded-xl border border-[var(--console-action-border)] bg-[var(--console-action-tint)] p-5",
         className,
       )}
       role="region"
@@ -27,10 +27,10 @@ export function AttentionPanel({ items, className }: AttentionPanelProps) {
     >
       <div className="mb-3 flex items-center gap-2">
         <AlertTriangle
-          className="size-4 text-warning"
+          className="size-4 text-[var(--console-action)]"
           aria-hidden="true"
         />
-        <h2 className="text-sm font-semibold text-warning">
+        <h2 className="font-mono text-sm font-semibold uppercase tracking-wide text-[var(--console-action)]">
           Needs attention ({items.length})
         </h2>
       </div>
@@ -41,21 +41,20 @@ export function AttentionPanel({ items, className }: AttentionPanelProps) {
             className={cn(
               "flex items-start gap-2 text-sm",
               item.severity === "warning"
-                ? "text-warning/90"
-                : "text-muted-foreground",
+                ? "text-[var(--console-action)]"
+                : "text-[var(--console-violet)]",
             )}
           >
-            <span
-              className={cn(
-                "mt-1.5 size-1.5 shrink-0 rounded-full",
-                item.severity === "warning"
-                  ? "bg-warning"
-                  : "bg-muted-foreground/40",
-              )}
-              aria-hidden="true"
-            />
+            {item.severity === "info" ? (
+              <Info className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
+            ) : (
+              <span
+                className="mt-1.5 size-1.5 shrink-0 rounded-full bg-[var(--console-action)]"
+                aria-hidden="true"
+              />
+            )}
             <div>
-              <span className="font-medium">{item.label}</span>
+              <span className="font-medium text-foreground">{item.label}</span>
               {item.description && (
                 <p className="text-xs text-muted-foreground">
                   {item.description}

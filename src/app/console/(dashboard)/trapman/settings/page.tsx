@@ -33,7 +33,7 @@ export default async function SettingsPage() {
             </div>
             <div className="flex items-center justify-between gap-4">
               <span className="text-muted-foreground">Role</span>
-              <Badge variant="secondary" className="capitalize">
+              <Badge variant="secondary" className="font-mono uppercase tracking-wide">
                 {user?.role ?? "—"}
               </Badge>
             </div>

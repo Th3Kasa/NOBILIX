@@ -36,8 +36,26 @@ test("public header offers responsive company navigation", () => {
   assert.match(header, /Studio/);
   assert.match(header, /Projects/);
   assert.match(header, /Company legal/);
-  assert.match(header, /Console/);
   assert.match(header, /aria-label="Nobilix home"/);
+});
+
+test("Console is not a prominent nav item on Nobilix or TrapMan headers", () => {
+  const nobilixHeader = read("src/components/public/nobilix-header.tsx");
+  const trapmanHeader = read("src/components/trapman/trapman-header.tsx");
+  const footer = read("src/components/public/nobilix-footer.tsx");
+
+  assert.doesNotMatch(
+    nobilixHeader,
+    /Console/,
+    "Console must not appear in the Nobilix header nav or CTA",
+  );
+  assert.doesNotMatch(
+    trapmanHeader,
+    /Console/,
+    "Console must not appear in the TrapMan header nav",
+  );
+  // Discoverability is preserved via the footer and the direct /console URL.
+  assert.match(footer, /href="\/console"/);
 });
 
 test("portfolio remains scalable without inventing future projects", () => {

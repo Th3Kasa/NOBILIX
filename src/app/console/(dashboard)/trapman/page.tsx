@@ -29,11 +29,13 @@ export default async function TrapManOverviewPage() {
 
       {/* 1. Connection warning */}
       {!m.connected && (
-        <Card className="mb-6 border-warning/40 bg-warning/5">
+        <Card className="mb-6 border-[var(--console-action-border)] bg-[var(--console-action-tint)]">
           <CardContent className="flex items-start gap-3 p-4 text-sm">
-            <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warning" />
+            <AlertTriangle className="mt-0.5 size-4 shrink-0 text-[var(--console-action)]" />
             <div>
-              <p className="font-medium">Not connected to Firebase</p>
+              <p className="font-medium text-[var(--console-action)]">
+                Not connected to Firebase
+              </p>
               <p className="text-muted-foreground">
                 Add the service-account credentials to environment variables to
                 see live data.
@@ -75,9 +77,9 @@ export default async function TrapManOverviewPage() {
 
       {/* 4. Unavailable data-source panel */}
       {m.unavailable.length > 0 && (
-        <Card className="mb-6 border-border/60">
+        <Card className="mb-6 border-[var(--console-violet-border)] bg-[var(--console-violet-tint)]">
           <CardContent className="p-4">
-            <div className="mb-3 flex items-center gap-2 text-sm font-medium text-muted-foreground">
+            <div className="mb-3 flex items-center gap-2 font-mono text-sm font-medium uppercase tracking-wide text-[var(--console-violet)]">
               <Info className="size-4" aria-hidden="true" />
               Data sources pending verification
             </div>
@@ -87,7 +89,7 @@ export default async function TrapManOverviewPage() {
                   key={label}
                   className="flex items-start gap-2 text-xs text-muted-foreground"
                 >
-                  <span className="mt-1 size-1.5 shrink-0 rounded-full bg-muted-foreground/40" />
+                  <span className="mt-1 size-1.5 shrink-0 rounded-full bg-[var(--console-violet)]/50" />
                   {label}
                 </li>
               ))}

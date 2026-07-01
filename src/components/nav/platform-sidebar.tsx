@@ -23,7 +23,9 @@ export function PlatformSidebar() {
         </div>
         <div className="min-w-0 flex-1">
           <p className="font-mono text-xs font-semibold tracking-widest text-foreground">NOBILIX</p>
-          <p className="text-[10px] leading-tight text-muted-foreground">Platform console</p>
+          <p className="font-mono text-[10px] uppercase leading-tight tracking-wide text-muted-foreground">
+            Platform console
+          </p>
         </div>
         <span className="console-sidebar-brand__live" aria-label="Live" />
       </div>
@@ -41,10 +43,10 @@ export function PlatformSidebar() {
               href={href}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "flex min-h-11 items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-transform duration-150",
+                "flex min-h-11 items-center gap-3 rounded-md border-l-2 px-3 py-2 text-sm font-medium transition-transform duration-150",
                 active
-                  ? "bg-primary/15 text-primary"
-                  : "text-muted-foreground hover:bg-accent hover:text-foreground",
+                  ? "border-primary bg-primary/15 text-primary"
+                  : "border-transparent text-muted-foreground hover:bg-accent hover:text-foreground",
               )}
             >
               <Icon className="size-4" aria-hidden="true" />
@@ -54,7 +56,7 @@ export function PlatformSidebar() {
         })}
       </nav>
 
-      <div className="border-t border-border p-3 text-xs text-muted-foreground">
+      <div className="border-t border-border p-3 font-mono text-[10px] uppercase tracking-wide text-muted-foreground">
         Nobilix platform console
       </div>
     </aside>

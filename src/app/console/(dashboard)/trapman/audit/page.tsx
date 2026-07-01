@@ -34,7 +34,7 @@ export default async function AuditPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
+                  <tr className="border-b border-border text-left font-mono text-xs uppercase tracking-wide text-muted-foreground">
                     <th className="px-4 py-3 font-medium">When</th>
                     <th className="px-4 py-3 font-medium">Admin</th>
                     <th className="px-4 py-3 font-medium">Action</th>
@@ -47,14 +47,17 @@ export default async function AuditPage() {
                       key={e.id}
                       className="border-b border-border/60 last:border-0 hover:bg-accent/40"
                     >
-                      <td className="whitespace-nowrap px-4 py-3 text-muted-foreground">
+                      <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-muted-foreground">
                         {e.at
                           ? format(new Date(e.at), "MMM d, HH:mm:ss")
                           : "—"}
                       </td>
                       <td className="px-4 py-3">{e.actorEmail}</td>
                       <td className="px-4 py-3">
-                        <Badge variant={actionVariant(e.action)}>
+                        <Badge
+                          variant={actionVariant(e.action)}
+                          className="font-mono uppercase tracking-wide"
+                        >
                           {e.action}
                         </Badge>
                       </td>

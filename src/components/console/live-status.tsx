@@ -11,10 +11,10 @@ export function LiveStatus({
   return (
     <div
       className={cn(
-        "console-live-status flex min-h-11 items-center gap-2 rounded-md border px-3 py-1.5 text-xs font-medium",
+        "console-live-status flex min-h-11 items-center gap-2 rounded-md border px-3 py-1.5 font-mono text-xs font-medium uppercase tracking-wide",
         connected
-          ? "border-green-500/30 bg-green-500/10 text-green-600 dark:text-green-400"
-          : "border-border bg-muted/50 text-muted-foreground",
+          ? "border-[var(--console-live-border)] bg-[var(--console-live-tint)] text-[var(--console-live)]"
+          : "border-[var(--console-action-border)] bg-[var(--console-action-tint)] text-[var(--console-action)]",
         className,
       )}
       role="status"
@@ -23,8 +23,8 @@ export function LiveStatus({
       {connected ? (
         <>
           <span className="relative flex size-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
-            <span className="relative inline-flex size-2 rounded-full bg-green-500" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--console-live)] opacity-75" />
+            <span className="relative inline-flex size-2 rounded-full bg-[var(--console-live)]" />
           </span>
           <Wifi className="size-3.5" aria-hidden="true" />
           Live

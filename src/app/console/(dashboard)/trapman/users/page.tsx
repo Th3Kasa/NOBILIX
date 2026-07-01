@@ -52,9 +52,9 @@ export default async function UsersPage({
       <UsersFilter defaultQ={sp.q} defaultCountry={sp.country} defaultGuest={guest} />
 
       {!result.connected && (
-        <Card className="mb-4 border-warning/40 bg-warning/5">
+        <Card className="mb-4 border-[var(--console-action-border)] bg-[var(--console-action-tint)]">
           <CardContent className="flex items-start gap-3 p-4 text-sm">
-            <AlertTriangle className="mt-0.5 size-4 shrink-0 text-warning" />
+            <AlertTriangle className="mt-0.5 size-4 shrink-0 text-[var(--console-action)]" />
             <span className="text-muted-foreground">
               Couldn&apos;t reach Firebase. Add service-account credentials to see
               live players.
@@ -73,7 +73,7 @@ export default async function UsersPage({
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
+                  <tr className="border-b border-border text-left font-mono text-xs uppercase tracking-wide text-muted-foreground">
                     <th className="px-4 py-3 font-medium">Player</th>
                     <th className="px-4 py-3 font-medium">Country</th>
                     <th className="px-4 py-3 font-medium">Level</th>
@@ -97,7 +97,7 @@ export default async function UsersPage({
                             </span>
                           )}
                         </div>
-                        <div className="text-xs text-muted-foreground">
+                        <div className="font-mono text-xs text-muted-foreground">
                           {u.email ?? u.uid}
                         </div>
                       </td>
@@ -110,17 +110,21 @@ export default async function UsersPage({
                           "—"
                         )}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 font-mono tabular-nums">
                         {u.level != null ? formatNumber(u.level) : "—"}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3 font-mono tabular-nums">
                         {u.highScore != null ? formatNumber(u.highScore) : "—"}
                       </td>
                       <td className="px-4 py-3">
                         {u.isGuest ? (
-                          <Badge variant="secondary">Guest</Badge>
+                          <Badge variant="secondary" className="font-mono uppercase tracking-wide">
+                            Guest
+                          </Badge>
                         ) : (
-                          <Badge variant="success">Registered</Badge>
+                          <Badge variant="success" className="font-mono uppercase tracking-wide">
+                            Registered
+                          </Badge>
                         )}
                       </td>
                       <td className="px-4 py-3 text-muted-foreground">

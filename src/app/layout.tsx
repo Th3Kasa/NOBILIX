@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Press_Start_2P } from "next/font/google";
+import { Geist, Geist_Mono, Press_Start_2P, Fraunces } from "next/font/google";
 import { MotionProvider } from "@/components/motion/motion-provider";
 import "./globals.css";
 
@@ -19,6 +19,12 @@ const pressStart2P = Press_Start_2P({
   weight: "400",
 });
 
+const fraunces = Fraunces({
+  variable: "--font-display",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://nobilix.vercel.app"),
   title: { default: "Nobilix", template: "%s · Nobilix" },
@@ -33,7 +39,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`dark ${geistSans.variable} ${geistMono.variable} ${pressStart2P.variable} h-full antialiased`}
+      className={`dark ${geistSans.variable} ${geistMono.variable} ${pressStart2P.variable} ${fraunces.variable} h-full antialiased`}
     >
       <body className="min-h-full">
         <a className="skip-link" href="#main-content">

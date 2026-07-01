@@ -130,7 +130,9 @@ export function Compose({ prefillUid }: { prefillUid?: string }) {
           {preview.count != null && (
             <p className="text-sm text-muted-foreground">
               Estimated recipients with push enabled:{" "}
-              <span className="font-semibold text-foreground">{preview.count}</span>
+              <span className="font-mono font-semibold tabular-nums text-foreground">
+                {preview.count}
+              </span>
             </p>
           )}
           {preview.error && (
@@ -138,15 +140,15 @@ export function Compose({ prefillUid }: { prefillUid?: string }) {
           )}
 
           {state.error && (
-            <div className="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+            <div className="flex items-start gap-2 rounded-md border border-[var(--console-action-border)] bg-[var(--console-action-tint)] px-3 py-2 text-sm text-[var(--console-action)]">
               <AlertCircle className="mt-0.5 size-4 shrink-0" />
               <span>{state.error}</span>
             </div>
           )}
           {state.ok && state.summary && (
-            <div className="flex items-start gap-2 rounded-md border border-success/30 bg-success/10 px-3 py-2 text-sm text-success">
+            <div className="flex items-start gap-2 rounded-md border border-[var(--console-live-border)] bg-[var(--console-live-tint)] px-3 py-2 text-sm text-[var(--console-live)]">
               <CheckCircle2 className="mt-0.5 size-4 shrink-0" />
-              <span>
+              <span className="font-mono tabular-nums">
                 Sent to {state.summary.recipients} recipient(s) —{" "}
                 {state.summary.success} delivered, {state.summary.failure} failed.
               </span>

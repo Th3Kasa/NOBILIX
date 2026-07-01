@@ -75,11 +75,11 @@ export function ResetCompetitionModal() {
 
       <Modal open={open} onClose={() => setOpen(false)} title="Reset competition leaderboard">
         <div className="space-y-4">
-          <div className="flex items-start gap-3 rounded-md border border-warning/30 bg-warning/10 p-3 text-sm text-warning">
+          <div className="flex items-start gap-3 rounded-md border border-[var(--console-action-border)] bg-[var(--console-action-tint)] p-3 text-sm text-[var(--console-action)]">
             <AlertTriangle className="mt-0.5 size-4 shrink-0" />
             <div>
               <p className="font-medium">This action is irreversible.</p>
-              <p className="mt-0.5 text-warning/80">
+              <p className="mt-0.5 opacity-80">
                 The top 10 winners will be archived, then every entry on the
                 leaderboard is permanently deleted so the next competition
                 period starts fresh.
@@ -284,16 +284,19 @@ export function CompetitionHistory({
                 onClick={() => setExpanded(isOpen ? null : comp.id)}
                 className="flex w-full items-center gap-3 px-5 py-3 text-left text-sm hover:bg-accent/50 transition-colors"
               >
-                <Badge variant={periodBadgeVariant(comp.periodType)} className="shrink-0 capitalize">
+                <Badge
+                  variant={periodBadgeVariant(comp.periodType)}
+                  className="shrink-0 font-mono uppercase tracking-wide"
+                >
                   {comp.periodType}
                 </Badge>
                 <span className="min-w-0 flex-1 truncate font-medium">
                   {comp.label}
                 </span>
-                <span className="shrink-0 text-xs text-muted-foreground">
+                <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
                   {comp.totalEntries} players
                 </span>
-                <span className="shrink-0 text-xs text-muted-foreground">
+                <span className="shrink-0 font-mono text-xs text-muted-foreground">
                   {new Date(comp.resetAt).toLocaleDateString()}
                 </span>
                 {isOpen ? (

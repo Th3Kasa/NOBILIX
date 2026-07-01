@@ -25,11 +25,18 @@ export function StatCard({
         : value;
 
   return (
-    <Card className={cn("console-stat-card overflow-hidden bg-card/90 shadow-sm", className)}>
+    <Card
+      className={cn(
+        "console-stat-card overflow-hidden bg-card/90 shadow-sm transition-transform duration-150 hover:-translate-y-0.5",
+        className,
+      )}
+    >
       <CardContent className="flex items-start justify-between p-5">
         <div className="space-y-1">
           <p className="text-sm text-muted-foreground">{label}</p>
-          <p className="text-2xl font-semibold tracking-tight">{display}</p>
+          <p className="font-mono text-2xl font-semibold tracking-tight tabular-nums">
+            {display}
+          </p>
           {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
         </div>
         {Icon && (

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { MobileNavigation } from "@/components/nav/mobile-navigation";
 import { requirePlayerSession } from "@/lib/player-session";
@@ -25,6 +26,15 @@ export default async function PlayerAccountLayout({
 
   return (
     <div className="player-account-shell">
+      <div className="player-account-shell__plate" aria-hidden="true">
+        <Image
+          src="/assets/generated/trapman/account-shell-plate.webp"
+          alt=""
+          width={1536}
+          height={864}
+          sizes="100vw"
+        />
+      </div>
       <header className="player-account-header">
         <Link href="/trapman" className="player-account-logo-link">
           TrapMan Account

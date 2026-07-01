@@ -49,6 +49,11 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-pixel: var(--font-pixel);
+  --font-display: var(--font-display);
+
+  --color-company-hairline: var(--company-hairline);
+  --color-company-caption: var(--company-caption);
+  --radius-editorial: var(--radius-editorial);
 }
 
 :root {
@@ -59,6 +64,11 @@
   --company-ink: oklch(0.2 0.018 64);
   --company-accent: oklch(0.55 0.13 50);
   --company-accent-contrast: oklch(0.99 0.006 78);
+
+  /* Editorial/gallery accents — additive, Nobilix-scoped restraint tokens */
+  --company-hairline: oklch(0.86 0.018 70 / 0.55);
+  --company-caption: oklch(0.5 0.02 64);
+  --radius-editorial: 0.25rem;
 
   /* Project identity defaults; projects override these in a scoped root. */
   --project-accent: var(--company-accent);
@@ -157,6 +167,8 @@
   --company-ink: oklch(0.94 0.012 78);
   --company-accent: oklch(0.72 0.14 55);
   --company-accent-contrast: oklch(0.17 0.018 55);
+  --company-hairline: oklch(0.5 0.02 62 / 0.4);
+  --company-caption: oklch(0.68 0.018 78);
   --project-accent: var(--company-accent);
   --project-accent-contrast: var(--company-accent-contrast);
   --status-success: oklch(0.72 0.14 150);
@@ -268,6 +280,17 @@
   --console-action: #ff632f;
   --console-violet: #9b5cff;
 
+  /* Status-chip tint/border pairs — consistent chip semantics across every
+     module: live/operational (green), destructive/action (orange), and
+     informational (violet). Reuse these instead of ad-hoc color-mix() per
+     component. */
+  --console-live-tint: color-mix(in oklch, var(--console-live) 16%, transparent);
+  --console-live-border: color-mix(in oklch, var(--console-live) 38%, transparent);
+  --console-action-tint: color-mix(in oklch, var(--console-action) 16%, transparent);
+  --console-action-border: color-mix(in oklch, var(--console-action) 38%, transparent);
+  --console-violet-tint: color-mix(in oklch, var(--console-violet) 16%, transparent);
+  --console-violet-border: color-mix(in oklch, var(--console-violet) 38%, transparent);
+
   /* Wire console-specific palette into Tailwind's token cascade */
   --background: var(--console-bg);
   --card: var(--console-panel);
@@ -291,6 +314,18 @@
   --secondary-foreground: color-mix(in oklch, var(--paper) 82%, transparent);
   --accent: #1a2232;
   --accent-foreground: var(--paper);
+
+  /* Map shared semantic status tokens onto the console operational triad so
+     every Badge/status usage (success/warning/destructive) stays consistent
+     with live (green) / action (orange) / informational (violet) across
+     every module, without ad-hoc overrides per component. */
+  --success: var(--console-live);
+  --success-foreground: #0d1a04;
+  --warning: var(--console-action);
+  --warning-foreground: #2b0d02;
+  --destructive: var(--console-action);
+  --destructive-foreground: #2b0d02;
+  --status-info: var(--console-violet);
 }
 
 /* Glass sidebar effect */
@@ -357,6 +392,17 @@
   .console-sidebar-brand__live { animation: none; }
 }
 
+/* Console page-header eyebrow — mono, violet-accented mission-control label
+   instead of the marketing site's serif-adjacent warm accent. */
+.console-shell .eyebrow,
+.console-auth-shell .eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  color: var(--neon-violet);
+}
+
 /* TrapMan project identity is intentionally isolated from company UI. */
 .trapman-site {
   --project-accent: oklch(0.73 0.22 142);
@@ -400,11 +446,18 @@
   }
 }
 
-/* ─── Public shell ─────────────────────────────────────────────── */
+/* ─── Public shell — quiet company holding a loud project ───────── */
+/*
+  Nobilix is deliberately calm and editorial: warm-neutral --company-*
+  surfaces, a restrained serif display face, hairline dividers, and
+  generous negative space. This is the contrast layer to TrapMan's
+  saturated neon aesthetic — never the other way around.
+*/
 .public-shell {
   min-height: 100vh;
-  background: #07090d;
-  color: #f4f0e8;
+  background: var(--surface-canvas);
+  color: var(--company-ink);
+  overflow-x: clip;
 }
 .public-header,
 .public-footer {
@@ -413,101 +466,70 @@
   justify-content: space-between;
   gap: 1.5rem;
   padding: 1.25rem clamp(1.25rem, 4vw, 4rem);
-  border-color: rgb(255 255 255 / 0.1);
+  border-color: var(--company-hairline);
+  background: color-mix(in oklch, var(--surface-canvas) 88%, transparent);
+  backdrop-filter: blur(18px);
 }
-.public-header { border-bottom-width: 1px; }
-.public-footer { border-top-width: 1px; flex-wrap: wrap; }
+.public-header { border-bottom-width: 1px; position: sticky; top: 0; z-index: var(--z-header); }
+.public-footer { border-top-width: 1px; flex-wrap: wrap; align-items: flex-start; }
 .public-header nav,
 .public-footer nav { display: flex; flex-wrap: wrap; gap: 1rem; }
 .public-header a,
 .public-footer a { min-height: 44px; display: inline-flex; align-items: center; }
-.public-wordmark { font-weight: 800; letter-spacing: 0.18em; }
-
-/* ─── Public pages ──────────────────────────────────────────────── */
-.nobilix-hero {
-  min-height: 72svh;
-  display: grid;
-  align-content: center;
-  padding: clamp(5rem, 12vw, 10rem) clamp(1.25rem, 7vw, 7rem);
-}
-.nobilix-hero h1 {
-  max-width: 12ch;
-  font-size: clamp(3.75rem, 10vw, 9rem);
-  line-height: 0.88;
-  letter-spacing: -0.065em;
-}
-.nobilix-projects,
-.legal-directory,
-.public-not-found {
-  padding: clamp(4rem, 8vw, 8rem) clamp(1.25rem, 7vw, 7rem);
-}
-.project-card {
-  margin-top: 2rem;
-  max-width: 56rem;
-  padding: clamp(1.5rem, 4vw, 3rem);
-  border: 1px solid rgb(255 255 255 / 0.12);
-}
-
-/* ─── Nobilix dark arcade-luxury substrate ──────────────────────── */
-.public-shell {
-  background:
-    radial-gradient(ellipse at 18% 0%, color-mix(in oklch, var(--neon-violet) 9%, transparent) 0%, transparent 48%),
-    var(--ink-900);
-  color: var(--paper);
-  overflow-x: clip;
-}
-.public-header,
-.public-footer {
-  border-color: rgb(255 255 255 / 0.08);
-  background: rgb(3 2 7 / 0.84);
-  backdrop-filter: blur(18px);
-}
-.public-header { position: sticky; top: 0; z-index: var(--z-header); }
-.public-footer { align-items: flex-start; }
 .public-wordmark {
+  display: flex;
   flex-direction: column;
   align-items: flex-start !important;
   gap: 0;
-  font-weight: 800;
-  letter-spacing: -0.04em;
+  font-weight: 700;
+  letter-spacing: -0.03em;
   text-transform: none;
-  color: var(--paper);
+  font-family: var(--font-display), serif;
+  color: var(--company-ink);
 }
 .public-wordmark small {
-  font-size: 0.65rem;
+  font-size: 0.64rem;
   font-weight: 600;
+  font-family: var(--font-sans), system-ui, sans-serif;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: color-mix(in oklch, var(--paper) 46%, transparent);
+  color: var(--company-caption);
 }
 .public-header__nav a,
 .public-footer a {
   border-radius: 999px;
   padding-inline: 0.85rem;
   font-size: 0.88rem;
-  color: color-mix(in oklch, var(--paper) 66%, transparent);
+  color: color-mix(in oklch, var(--company-ink) 62%, transparent);
   transition: color var(--duration-fast) ease, transform var(--duration-fast) ease;
 }
 .public-header__nav a:hover,
-.public-footer a:hover { color: var(--paper); transform: translateY(-1px); }
+.public-footer a:hover { color: var(--company-ink); transform: translateY(-1px); }
 .public-footer__brand { max-width: 22rem; }
-.public-footer__brand strong { font-size: 1.4rem; letter-spacing: -0.05em; color: var(--paper); }
-.public-footer__brand p { margin-top: .35rem; color: color-mix(in oklch, var(--paper) 50%, transparent); }
+.public-footer__brand strong {
+  font-family: var(--font-display), serif;
+  font-size: 1.4rem;
+  letter-spacing: -0.02em;
+  color: var(--company-ink);
+}
+.public-footer__brand p { margin-top: .35rem; color: var(--company-caption); }
+
+/* ─── Studio hero — asymmetric editorial opening spread ─────────── */
 .studio-hero {
   min-height: 78svh;
   display: grid;
-  grid-template-columns: minmax(0, 0.86fr) minmax(18rem, 1fr);
-  gap: clamp(2rem, 6vw, 6rem);
+  grid-template-columns: minmax(0, 0.78fr) minmax(20rem, 1fr);
+  gap: clamp(2rem, 6vw, 5rem);
   align-items: center;
   padding: clamp(4.5rem, 10vw, 9rem) clamp(1.25rem, 7vw, 7rem);
 }
-.studio-hero__copy { max-width: 48rem; }
+.studio-hero__copy { max-width: 44rem; }
 .eyebrow {
   font-size: .74rem;
   font-weight: 700;
   letter-spacing: .22em;
   text-transform: uppercase;
-  color: var(--neon-cyan);
+  color: var(--company-accent);
 }
 .studio-hero h1,
 .nobilix-studio-section h2,
@@ -517,20 +539,29 @@
 .public-not-found h1,
 .legal-directory h1 {
   text-wrap: balance;
-  letter-spacing: -0.065em;
-  color: var(--paper);
+  letter-spacing: -0.02em;
+  font-family: var(--font-display), serif;
+  font-weight: 500;
+  color: var(--company-ink);
 }
 .studio-hero h1 {
-  max-width: 10.8ch;
+  max-width: 9.5ch;
   margin-top: 1.1rem;
-  font-size: clamp(4rem, 10vw, 9.5rem);
-  line-height: .86;
+  font-size: clamp(3.4rem, 8vw, 6.6rem);
+  line-height: .98;
+}
+.studio-hero h1 em,
+.nobilix-studio-section h2 em,
+.project-showcase h2 em,
+.section-kicker h2 em {
+  font-style: italic;
+  color: var(--company-accent);
 }
 .studio-hero__lede {
-  max-width: 42rem;
+  max-width: 38rem;
   margin-top: 1.4rem;
-  color: color-mix(in oklch, var(--paper) 68%, transparent);
-  font-size: clamp(1rem, 2vw, 1.22rem);
+  color: color-mix(in oklch, var(--company-ink) 68%, transparent);
+  font-size: clamp(1rem, 2vw, 1.15rem);
   line-height: 1.7;
 }
 .studio-hero__actions,
@@ -551,8 +582,8 @@
   align-items: center;
   justify-content: center;
   border-radius: 999px;
-  font-weight: 700;
-  transition: transform var(--duration-fast) ease, box-shadow var(--duration-base) ease;
+  font-weight: 600;
+  transition: transform var(--duration-fast) ease, box-shadow var(--duration-base) ease, background var(--duration-base) ease;
 }
 .nobilix-button:hover,
 .nobilix-text-link:hover,
@@ -562,31 +593,31 @@
 .nobilix-button--primary,
 .project-card a:first-child,
 .public-not-found a:first-child {
-  background: var(--neon-violet);
-  color: #fff;
+  background: var(--company-accent);
+  color: var(--company-accent-contrast);
   padding-inline: 1.25rem;
-  box-shadow: var(--glow-violet);
 }
 .nobilix-button--secondary,
 .project-card a,
 .legal-directory a,
 .public-not-found a {
-  border: 1px solid color-mix(in oklch, var(--paper) 20%, transparent);
+  border: 1px solid var(--surface-border);
   padding-inline: 1.05rem;
-  color: var(--paper);
+  color: var(--company-ink);
 }
+
+/* Editorial "plate" frame — architectural radius, hairline border, quiet shadow */
 .studio-hero__media {
   position: relative;
-  border-radius: clamp(1.5rem, 4vw, 3rem);
+  border-radius: var(--radius-editorial);
   overflow: hidden;
-  border: 1px solid color-mix(in oklch, var(--neon-violet) 30%, transparent);
-  box-shadow:
-    0 0 2rem color-mix(in oklch, var(--neon-violet) 14%, transparent),
-    0 3rem 7rem rgb(0 0 0 / .42);
+  border: 1px solid var(--company-hairline);
+  box-shadow: 0 2rem 4rem -2rem rgb(0 0 0 / .35);
 }
 .studio-hero__media img,
 .studio-hero__media video,
-.project-showcase__media img {
+.project-showcase__media img,
+.studio-principles__plate img {
   display: block;
   width: 100%;
   height: auto;
@@ -596,25 +627,32 @@
   inset: auto 1rem 1rem 1rem;
   display: flex;
   justify-content: space-between;
-  border: 1px solid rgb(255 255 255 / .18);
-  border-radius: 1rem;
-  background: rgb(3 2 7 / .72);
+  border: 1px solid color-mix(in oklch, var(--paper) 16%, transparent);
+  border-radius: var(--radius-editorial);
+  background: rgb(3 2 7 / .6);
   color: var(--paper);
   padding: .85rem 1rem;
   backdrop-filter: blur(14px);
-  font-size: .78rem;
-  letter-spacing: .14em;
+  font-size: .72rem;
+  letter-spacing: .1em;
   text-transform: uppercase;
+  font-family: var(--font-sans), system-ui, sans-serif;
 }
+
+/* ─── Shared section rhythm ──────────────────────────────────────── */
 .studio-principles,
 .project-showcase,
 .nobilix-studio-section,
 .nobilix-contact-section,
 .legal-directory,
 .public-not-found {
-  padding: clamp(4rem, 8vw, 8rem) clamp(1.25rem, 7vw, 7rem);
+  padding: var(--space-section) clamp(1.25rem, 7vw, 7rem);
 }
-.section-kicker { max-width: 46rem; }
+.nobilix-studio-section,
+.nobilix-contact-section {
+  border-top: 1px solid var(--company-hairline);
+}
+.section-kicker { max-width: 42rem; }
 .section-kicker h2,
 .nobilix-studio-section h2,
 .nobilix-contact-section h2,
@@ -622,86 +660,133 @@
 .legal-directory h1,
 .public-not-found h1 {
   margin-top: .8rem;
-  font-size: clamp(2.5rem, 6vw, 5.8rem);
-  line-height: .95;
+  font-size: clamp(2.1rem, 4.6vw, 4rem);
+  line-height: 1.04;
+}
+
+/* ─── Studio principles — asymmetric plate + staggered stack ────── */
+.studio-principles__layout {
+  display: grid;
+  grid-template-columns: minmax(16rem, .78fr) minmax(0, 1fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: start;
+  margin-top: 3rem;
+}
+.studio-principles__plate {
+  position: sticky;
+  top: 6rem;
+  border-radius: var(--radius-editorial);
+  overflow: hidden;
+  border: 1px solid var(--company-hairline);
+}
+.studio-principles__caption {
+  display: block;
+  padding: .6rem .2rem 0;
+  font-size: .76rem;
+  color: var(--company-caption);
 }
 .studio-principles__grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.studio-principle {
+  padding-block: clamp(1.5rem, 3vw, 2.25rem);
+  border-bottom: 1px solid var(--company-hairline);
+}
+.studio-principle:first-child { padding-top: 0; }
+.studio-principle:last-child { border-bottom: none; }
+/* Asymmetric indent rhythm — each row nudges further, like a curated list rather than a grid */
+.studio-principle--2 { padding-inline-start: clamp(0rem, 3vw, 2rem); }
+.studio-principle--3 { padding-inline-start: clamp(0rem, 6vw, 4rem); }
+.studio-principle article {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 3rem 1fr;
   gap: 1rem;
-  margin-top: 2.5rem;
 }
-.studio-principle,
-.project-card {
-  border: 1px solid color-mix(in oklch, var(--paper) 10%, transparent);
-  border-radius: 1.35rem;
-  background: color-mix(in oklch, var(--ink-800) 55%, transparent);
-  box-shadow: 0 0 2.5rem color-mix(in oklch, var(--neon-violet) 7%, transparent);
-  backdrop-filter: blur(12px);
+.studio-principle__index {
+  font-family: var(--font-display), serif;
+  font-style: italic;
+  font-size: 1.5rem;
+  color: var(--company-hairline);
 }
-.studio-principle { padding: clamp(1.25rem, 3vw, 2rem); }
 .studio-principle p,
 .project-card > p:first-of-type,
 .legal-directory article > p:first-child {
+  grid-column: 2;
   font-size: .72rem;
-  font-weight: 800;
+  font-weight: 700;
   letter-spacing: .16em;
   text-transform: uppercase;
-  color: var(--neon-violet);
+  color: var(--company-accent);
 }
 .studio-principle h3 {
-  margin-top: 2.5rem;
-  font-size: clamp(1.45rem, 3vw, 2.2rem);
-  line-height: 1;
-  letter-spacing: -.04em;
-  color: var(--paper);
+  grid-column: 2;
+  margin-top: .6rem;
+  font-family: var(--font-display), serif;
+  font-weight: 500;
+  font-size: clamp(1.3rem, 2.6vw, 1.9rem);
+  line-height: 1.1;
+  letter-spacing: -.01em;
+  color: var(--company-ink);
 }
-.studio-principle span,
+.studio-principle__copy,
 .project-showcase p,
 .nobilix-studio-section p,
 .nobilix-contact-section p,
 .legal-directory p,
 .public-not-found p {
   display: block;
-  max-width: 68ch;
-  margin-top: 1rem;
+  grid-column: 2;
+  max-width: 62ch;
+  margin-top: .6rem;
   line-height: 1.72;
-  color: color-mix(in oklch, var(--paper) 62%, transparent);
+  color: color-mix(in oklch, var(--company-ink) 62%, transparent);
 }
+.nobilix-studio-section p,
+.nobilix-contact-section p,
+.public-not-found p { grid-column: auto; }
+
+/* ─── Project showcase — spotlight the main project ──────────────── */
 .project-showcase {
   display: grid;
-  grid-template-columns: minmax(16rem, .8fr) minmax(0, 1fr);
+  grid-template-columns: minmax(16rem, .74fr) minmax(0, 1fr);
   gap: clamp(2rem, 6vw, 5rem);
   align-items: center;
 }
 .project-showcase__media {
-  border-radius: 2rem;
+  border-radius: var(--radius-editorial);
   overflow: hidden;
-  transform: rotate(-1deg);
-  border: 1px solid color-mix(in oklch, var(--neon-cyan) 28%, transparent);
-  box-shadow: 0 0 3rem color-mix(in oklch, var(--neon-cyan) 10%, transparent);
+  border: 1px solid var(--company-hairline);
 }
-.project-showcase__copy { max-width: 54rem; }
-.nobilix-text-link { margin-top: 1.25rem; color: var(--neon-cyan); }
+.project-showcase__copy { max-width: 50rem; }
+.nobilix-text-link {
+  margin-top: 1.25rem;
+  color: var(--company-accent);
+  font-weight: 600;
+}
 .legal-reading { max-width: 72ch; }
 .legal-preline { white-space: pre-line; }
 .legal-directory__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  margin-top: 2rem;
+  gap: 1px;
+  margin-top: 2.5rem;
+  background: var(--company-hairline);
+  border: 1px solid var(--company-hairline);
+  border-radius: var(--radius-editorial);
+  overflow: hidden;
 }
 .legal-directory article {
-  border: 1px solid color-mix(in oklch, var(--paper) 10%, transparent);
-  border-radius: 1.35rem;
-  background: color-mix(in oklch, var(--ink-800) 55%, transparent);
-  backdrop-filter: blur(12px);
-  padding: 1.5rem;
+  background: var(--surface-panel);
+  padding: clamp(1.5rem, 3vw, 2rem);
 }
 .legal-directory article h2 {
   margin-top: .6rem;
-  font-size: 1.45rem;
-  color: var(--paper);
+  font-family: var(--font-display), serif;
+  font-weight: 500;
+  font-size: 1.4rem;
+  color: var(--company-ink);
 }
 .legal-directory article a {
   width: fit-content;
@@ -713,19 +798,48 @@
   display: grid;
   align-content: center;
 }
-.project-card { max-width: 42rem; }
+.project-card {
+  margin-top: 2rem;
+  max-width: 42rem;
+  padding: clamp(1.5rem, 4vw, 2.25rem);
+  border: 1px solid var(--company-hairline);
+  border-radius: var(--radius-editorial);
+  background: var(--surface-panel);
+}
 .project-card img {
-  border-radius: 1rem;
-  background: var(--ink-void);
+  border-radius: var(--radius-editorial);
+  background: var(--surface-muted);
   padding: .75rem;
 }
 .project-card h3 {
   margin-top: .8rem;
-  font-size: clamp(2rem, 4vw, 3.6rem);
-  line-height: .92;
-  letter-spacing: -.06em;
-  color: var(--paper);
+  font-family: var(--font-display), serif;
+  font-weight: 500;
+  font-size: clamp(1.8rem, 3.4vw, 2.8rem);
+  line-height: .98;
+  letter-spacing: -.02em;
+  color: var(--company-ink);
 }
+
+/* ─── Contact section — quiet closing spread with the contact plate ── */
+.nobilix-contact-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, .82fr);
+  gap: clamp(2rem, 6vw, 4.5rem);
+  align-items: center;
+}
+.nobilix-contact-section__media {
+  order: 2;
+  border-radius: var(--radius-editorial);
+  overflow: hidden;
+  border: 1px solid var(--company-hairline);
+}
+.nobilix-contact-section__media img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.nobilix-contact-section__copy { max-width: 34rem; }
 
 /* ─── Header console CTA ────────────────────────────────────────── */
 .public-header__right {
@@ -738,29 +852,27 @@
   display: inline-flex;
   align-items: center;
   padding-inline: 1rem;
-  border-radius: 0.6rem;
-  background: var(--neon-violet);
-  color: #fff;
+  border-radius: var(--radius-editorial);
+  background: var(--company-accent);
+  color: var(--company-accent-contrast);
   font-size: 0.82rem;
   font-weight: 700;
   letter-spacing: 0.04em;
-  box-shadow: var(--glow-violet);
-  transition: box-shadow var(--duration-fast) ease, transform var(--duration-fast) ease;
+  transition: transform var(--duration-fast) ease, opacity var(--duration-fast) ease;
   white-space: nowrap;
 }
 .header-cta:hover {
   transform: translateY(-1px);
-  box-shadow: var(--glow-violet), 0 4px 16px color-mix(in oklch, var(--neon-violet) 30%, transparent);
+  opacity: .92;
 }
 
 /* ─── Studio brand badge (pixel wordmark) ────────────────────────── */
 .studio-brand-badge {
   display: inline-block;
-  font-size: clamp(0.52rem, 1.1vw, 0.68rem);
-  color: var(--neon-violet);
+  font-size: clamp(0.5rem, 1vw, 0.62rem);
+  color: var(--company-caption);
   letter-spacing: 0.18em;
   margin-bottom: 0.8rem;
-  filter: drop-shadow(0 0 6px color-mix(in oklch, var(--neon-violet) 60%, transparent));
 }
 
 /* ─── Traveling neon border ─────────────────────────────────────── */
@@ -855,21 +967,30 @@
   }
   /* Fluid hero heading — one word per line, large but not overflowing */
   .studio-hero h1 {
-    font-size: clamp(2.8rem, 10vw, 5rem);
+    font-size: clamp(2.6rem, 11vw, 4.2rem);
     max-width: none;
   }
 
   .project-showcase { grid-template-columns: 1fr; }
   /* Put image after copy on mobile */
-  .project-showcase__media { order: 2; transform: none; }
+  .project-showcase__media { order: 2; }
+
+  .nobilix-contact-section { grid-template-columns: 1fr; }
+  .nobilix-contact-section__media { order: -1; }
 
   .legal-directory__grid { grid-template-columns: 1fr; }
-  .studio-principles__grid { grid-template-columns: 1fr; }
+
+  /* Principles collapse to a single stacked column; drop the sticky plate
+     and asymmetric indents so the reading order stays linear on small screens. */
+  .studio-principles__layout { grid-template-columns: 1fr; }
+  .studio-principles__plate { position: static; }
+  .studio-principle--2,
+  .studio-principle--3 { padding-inline-start: 0; }
 }
 
-/* Narrow tablet (600–767px): 2-col principles grid avoids orphaned card */
+/* Narrow tablet (600–767px): principles keep the plate beside a shorter stack */
 @media (min-width: 600px) and (max-width: 767px) {
-  .studio-principles__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .studio-principles__layout { grid-template-columns: minmax(0, .9fr) minmax(0, 1fr); }
 }
 
 /* Wide desktop: cap section width so lines never stretch past readable measure */
@@ -884,14 +1005,18 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .project-showcase__media { transform: none; }
   .neon-border::before { animation: none; }
   .grid-mesh-floor::after { transform: none; opacity: .28; }
 }
 
 /* ─── Nobilix legal pages ──────────────────────────────────────── */
+/*
+  Text-first and calm by design: legal readability outranks art density
+  here. One optional header band image at most (see .nobilix-legal-art
+  below) — no per-section decoration.
+*/
 .nobilix-legal-shell {
-  max-width: 90rem;
+  max-width: 82rem;
   margin-inline: auto;
   padding: clamp(1.5rem, 5vw, 4rem) clamp(1.25rem, 6vw, 6rem) 6rem;
 }
@@ -902,16 +1027,16 @@
   list-style: none;
   padding: 0;
   font-size: .8rem;
-  color: color-mix(in oklch, var(--paper) 45%, transparent);
+  color: var(--company-caption);
   margin-bottom: 2.5rem;
 }
 .nobilix-legal-breadcrumb ol li + li::before {
   content: '/';
   margin-right: .6rem;
-  opacity: .45;
+  opacity: .5;
 }
 .nobilix-legal-breadcrumb a { color: inherit; text-decoration: none; }
-.nobilix-legal-breadcrumb a:hover { color: var(--neon-violet); }
+.nobilix-legal-breadcrumb a:hover { color: var(--company-accent); }
 .nobilix-legal-header {
   display: flex;
   flex-wrap: wrap;
@@ -919,7 +1044,7 @@
   gap: 1.5rem 3rem;
   margin-bottom: 2rem;
   padding-bottom: 2rem;
-  border-bottom: 1px solid color-mix(in oklch, var(--paper) 10%, transparent);
+  border-bottom: 1px solid var(--company-hairline);
 }
 .nobilix-legal-entity {
   display: flex;
@@ -928,38 +1053,40 @@
 }
 .nobilix-legal-company {
   font-size: .72rem;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: .16em;
   text-transform: uppercase;
-  color: var(--neon-violet);
+  color: var(--company-accent);
 }
 .nobilix-legal-jurisdiction {
   font-size: .78rem;
-  color: color-mix(in oklch, var(--paper) 48%, transparent);
+  color: var(--company-caption);
 }
 .nobilix-legal-title {
-  font-size: clamp(2rem, 5vw, 3.8rem);
-  line-height: .92;
-  letter-spacing: -.05em;
-  color: var(--paper);
+  font-family: var(--font-display), serif;
+  font-weight: 500;
+  font-size: clamp(1.9rem, 4.4vw, 3.2rem);
+  line-height: 1.02;
+  letter-spacing: -.015em;
+  color: var(--company-ink);
   margin: 0;
 }
 .nobilix-legal-updated {
   font-size: .78rem;
-  color: color-mix(in oklch, var(--paper) 45%, transparent);
+  color: var(--company-caption);
   margin-top: .4rem;
 }
 .nobilix-legal-draft-notice {
   padding: 1rem 1.4rem;
-  border-left: 3px solid color-mix(in oklch, var(--neon-violet) 55%, transparent);
-  background: color-mix(in oklch, var(--neon-violet) 6%, transparent);
-  border-radius: 0 .75rem .75rem 0;
+  border-left: 3px solid var(--company-accent);
+  background: color-mix(in oklch, var(--company-accent) 8%, transparent);
+  border-radius: 0 var(--radius-editorial) var(--radius-editorial) 0;
   margin-bottom: 3rem;
   font-size: .82rem;
-  color: color-mix(in oklch, var(--paper) 62%, transparent);
+  color: color-mix(in oklch, var(--company-ink) 78%, transparent);
   line-height: 1.6;
 }
-.nobilix-legal-draft-notice strong { color: var(--paper); }
+.nobilix-legal-draft-notice strong { color: var(--company-ink); }
 .nobilix-legal-body {
   display: grid;
   grid-template-columns: 14rem 1fr;
@@ -970,17 +1097,16 @@
   position: sticky;
   top: 5rem;
   padding: 1.4rem 1.25rem;
-  border: 1px solid color-mix(in oklch, var(--paper) 9%, transparent);
-  border-radius: 1.2rem;
-  background: color-mix(in oklch, var(--ink-800) 55%, transparent);
-  backdrop-filter: blur(12px);
+  border: 1px solid var(--company-hairline);
+  border-radius: var(--radius-editorial);
+  background: var(--surface-panel);
 }
 .nobilix-legal-toc-heading {
   font-size: .7rem;
-  font-weight: 900;
+  font-weight: 700;
   letter-spacing: .16em;
   text-transform: uppercase;
-  color: var(--neon-violet);
+  color: var(--company-accent);
   margin: 0 0 .7rem;
 }
 .nobilix-legal-toc ul {
@@ -995,19 +1121,19 @@
   display: block;
   padding: .35rem .6rem;
   font-size: .82rem;
-  color: color-mix(in oklch, var(--paper) 62%, transparent);
+  color: color-mix(in oklch, var(--company-ink) 68%, transparent);
   text-decoration: none;
-  border-radius: .5rem;
+  border-radius: calc(var(--radius-editorial) / 2);
   transition: background .15s ease, color .15s ease;
 }
 .nobilix-legal-toc-link:hover,
 .nobilix-legal-toc-link[aria-current="page"] {
-  background: color-mix(in oklch, var(--neon-violet) 12%, transparent);
-  color: var(--paper);
+  background: color-mix(in oklch, var(--company-accent) 12%, transparent);
+  color: var(--company-ink);
 }
 .nobilix-legal-toc-divider {
   height: 1px;
-  background: color-mix(in oklch, var(--paper) 9%, transparent);
+  background: var(--company-hairline);
   margin: .85rem 0;
 }
 .nobilix-legal-content {
@@ -1016,25 +1142,27 @@
 .nobilix-legal-content section + section {
   margin-top: 3rem;
   padding-top: 2.5rem;
-  border-top: 1px solid color-mix(in oklch, var(--paper) 7%, transparent);
+  border-top: 1px solid var(--company-hairline);
 }
 .nobilix-legal-content h2 {
+  font-family: var(--font-display), serif;
+  font-weight: 500;
   font-size: clamp(1.25rem, 2.5vw, 1.75rem);
-  letter-spacing: -.035em;
-  color: var(--paper);
+  letter-spacing: -.01em;
+  color: var(--company-ink);
   margin-bottom: 1rem;
 }
 .nobilix-legal-content h3 {
   font-size: 1rem;
   font-weight: 700;
-  letter-spacing: -.02em;
-  color: color-mix(in oklch, var(--paper) 82%, transparent);
+  letter-spacing: -.01em;
+  color: color-mix(in oklch, var(--company-ink) 88%, transparent);
   margin: 1.5rem 0 .6rem;
 }
 .nobilix-legal-content p,
 .nobilix-legal-content li {
   font-size: .94rem;
-  color: color-mix(in oklch, var(--paper) 62%, transparent);
+  color: color-mix(in oklch, var(--company-ink) 74%, transparent);
   line-height: 1.78;
   max-width: 72ch;
 }
@@ -1046,11 +1174,11 @@
   gap: .45rem;
 }
 .nobilix-legal-content a {
-  color: var(--neon-violet);
+  color: var(--company-accent);
   text-underline-offset: .2em;
 }
 .nobilix-legal-content a:hover { opacity: .8; }
-.nobilix-legal-content strong { color: color-mix(in oklch, var(--paper) 82%, transparent); }
+.nobilix-legal-content strong { color: color-mix(in oklch, var(--company-ink) 88%, transparent); }
 .nobilix-legal-content em { font-style: italic; }
 .nobilix-legal-address {
   font-style: normal;
@@ -1059,29 +1187,45 @@
   flex-direction: column;
   gap: .3rem;
   font-size: .9rem;
-  color: color-mix(in oklch, var(--paper) 65%, transparent);
+  color: color-mix(in oklch, var(--company-ink) 76%, transparent);
   line-height: 1.6;
 }
 .nobilix-legal-footer {
   margin-top: 4rem;
   padding-top: 2rem;
-  border-top: 1px solid color-mix(in oklch, var(--paper) 8%, transparent);
+  border-top: 1px solid var(--company-hairline);
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
   font-size: .82rem;
-  color: color-mix(in oklch, var(--paper) 42%, transparent);
+  color: var(--company-caption);
 }
 .nobilix-legal-footer a { color: inherit; }
-.nobilix-legal-footer a:hover { color: var(--neon-violet); }
+.nobilix-legal-footer a:hover { color: var(--company-accent); }
 .nobilix-legal-cross-link {
   margin-left: 1rem;
   text-decoration: none;
-  color: color-mix(in oklch, var(--paper) 48%, transparent);
+  color: var(--company-caption);
 }
-.nobilix-legal-cross-link:hover { color: var(--neon-violet); }
+.nobilix-legal-cross-link:hover { color: var(--company-accent); }
+
+/* Optional single header-band plate — skip entirely and the shell reads as
+   pure typography, which is equally valid for this section. */
+.nobilix-legal-art {
+  margin-bottom: 2rem;
+  border-radius: var(--radius-editorial);
+  overflow: hidden;
+  border: 1px solid var(--company-hairline);
+}
+.nobilix-legal-art img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 14rem;
+  object-fit: cover;
+}
 
 @media (max-width: 840px) {
   .nobilix-legal-body { grid-template-columns: 1fr; }

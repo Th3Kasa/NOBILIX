@@ -5,7 +5,6 @@ const navigationItems = [
   { href: "/#studio", label: "Studio", description: "Company brand" },
   { href: "/#projects", label: "Projects", description: "Current portfolio" },
   { href: "/legal", label: "Company legal", description: "Policies and notices" },
-  { href: "/console", label: "Console", description: "Operator console — sign-in required" },
 ];
 
 export function NobilixHeader() {
@@ -23,9 +22,6 @@ export function NobilixHeader() {
         ))}
       </nav>
       <div className="public-header__right">
-        <Link className="header-cta" href="/console" aria-label="Launch TrapMan Console">
-          Launch Console
-        </Link>
         <MobileNavigation items={navigationItems} />
       </div>
     </header>
