@@ -39,7 +39,7 @@ export default async function UsersPage({
     if (sp.country) p.set("country", sp.country);
     if (sp.guest) p.set("guest", sp.guest);
     p.set("cursor", String(cursor));
-    return `/console/users?${p.toString()}`;
+    return `/console/trapman/users?${p.toString()}`;
   };
 
   return (

@@ -39,7 +39,7 @@ export default async function UserDetailPage({
     <>
       <Link
         href="/console/trapman/users"
-        className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
+        className="mb-4 inline-flex min-h-11 items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
       >
         <ArrowLeft className="size-4" /> Back to players
       </Link>
@@ -51,7 +51,7 @@ export default async function UserDetailPage({
           <div className="flex flex-wrap gap-2">
             {user.fcmToken ? (
               <Link
-                href={`/console/messaging?uid=${user.uid}`}
+                href={`/console/trapman/messaging?uid=${user.uid}`}
                 className={buttonVariants({ variant: "outline" })}
               >
                 <Send className="size-4" /> Push
