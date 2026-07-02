@@ -18,6 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LiveStatus } from "@/components/console/live-status";
 import { getTrapManOverview } from "@/lib/trapman/overview";
 import { getLiveMetrics } from "./live-metrics";
+import { getGa4Snapshot } from "./ga4-data";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +31,11 @@ function money(amount: number, currency: string): string {
 }
 
 export default async function TrapManOverviewPage() {
-  const [m, live] = await Promise.all([getTrapManOverview(), getLiveMetrics()]);
+  const [m, live, ga4] = await Promise.all([
+    getTrapManOverview(),
+    getLiveMetrics(),
+    getGa4Snapshot(),
+  ]);
 
   return (
     <>
@@ -70,8 +75,45 @@ export default async function TrapManOverviewPage() {
           hint="Non-guest accounts"
         />
         <StatCard label="Guests" value={m.guestPlayers} icon={Ghost} />
-        <StatCard label="New (7 days)" value={m.newPlayers7d} icon={UserPlus} />
+        <StatCard
+          label="New (7 days)"
+          value={ga4.connected ? ga4.newUsers7d : m.newPlayers7d}
+          icon={UserPlus}
+          hint={ga4.connected ? "GA4 new users" : undefined}
+        />
       </div>
+
+      {/* 2b. Behavioural metrics from Google Analytics */}
+      {ga4.connected && (
+        <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            label="Active (7 days)"
+            value={ga4.activeUsers7d}
+            icon={Activity}
+            hint={`${ga4.activeUsers28d} over 28 days`}
+          />
+          <StatCard
+            label="GA4 revenue (30d)"
+            value={money(ga4.totalRevenue, "USD")}
+            icon={Receipt}
+            hint="USD-normalised by Google"
+          />
+          <StatCard
+            label="Avg session"
+            value={
+              ga4.avgSessionSeconds > 0
+                ? `${Math.floor(ga4.avgSessionSeconds / 60)}m ${Math.round(ga4.avgSessionSeconds % 60)}s`
+                : null
+            }
+            icon={Gauge}
+          />
+          <StatCard
+            label="Engaged sessions (30d)"
+            value={ga4.engagedSessions}
+            icon={UserCheck}
+          />
+        </div>
+      )}
 
       {/* 3. Commerce + engagement metrics (live, from confirmed fields) */}
       {live.connected && (
