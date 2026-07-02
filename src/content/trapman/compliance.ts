@@ -52,14 +52,4 @@ export const COMPLIANCE_SECTIONS = {
     Aggregated data without personal identifiers may persist.`,
   },
 
-  legalGate: {
-    heading: "Legal Launch Gate Status",
-    body: `This document is a draft pending:
-    1. Engineering sign-off on all confirmed data categories.
-    2. Engineering verification of items in the "Under Engineering Verification" section.
-    3. Matching of Store Data Safety (Google Play) and App Privacy (App Store) forms.
-    4. Qualified legal review.
-
-    It should not be relied upon as final legal advice until all gate conditions are met.`,
-  },
 } as const;

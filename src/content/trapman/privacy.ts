@@ -76,14 +76,15 @@ export const PRIVACY_SECTIONS = {
 
   yourRights: {
     heading: "Your Rights",
-    body: `You have the right to:
-    - Access the personal data we hold about you (via the account portal at /trapman/account)
-    - Download your data in a portable format (via the export function in your account)
-    - Correct inaccurate data (by updating your profile or contacting support)
-    - Delete your account and associated personal data (see /trapman/delete-account)
-    - Lodge a complaint with a relevant data protection authority
-
-    To exercise any of these rights, contact help.nobilix@outlook.com.`,
+    intro: "You have the right to:",
+    rights: [
+      "Access the personal data we hold about you (via the account portal at /trapman/account)",
+      "Download your data in a portable format (via the export function in your account)",
+      "Correct inaccurate data (by updating your profile or contacting support)",
+      "Delete your account and associated personal data (see /trapman/delete-account)",
+      "Lodge a complaint with a relevant data protection authority",
+    ],
+    outro: "To exercise any of these rights, contact help.nobilix@outlook.com.",
   },
 
   childrenPolicy: {

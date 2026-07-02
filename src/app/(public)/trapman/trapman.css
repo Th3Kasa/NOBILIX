@@ -1689,7 +1689,28 @@
   font-size: .9rem;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  padding-bottom: .35rem;
+  /* Always-visible scroll affordance — the table is wider than the legal
+     column and readers must know the Purpose/Notes columns continue. */
+  scrollbar-width: thin;
+  scrollbar-color: rgb(57 233 255 / .45) rgb(255 255 255 / .06);
 }
+.legal-data-table::-webkit-scrollbar { height: 8px; }
+.legal-data-table::-webkit-scrollbar-track {
+  background: rgb(255 255 255 / .06);
+  border-radius: 4px;
+}
+.legal-data-table::-webkit-scrollbar-thumb {
+  background: rgb(57 233 255 / .45);
+  border-radius: 4px;
+}
+.legal-table-hint {
+  margin-top: .5rem;
+  font-size: .78rem;
+  color: rgb(215 246 255 / .55);
+}
+/* Preserve intentional line breaks in multi-paragraph legal content strings */
+.legal-preline { white-space: pre-line; }
 .legal-data-table th,
 .legal-data-table td {
   border-bottom: 1px solid rgb(57 233 255 / .18);

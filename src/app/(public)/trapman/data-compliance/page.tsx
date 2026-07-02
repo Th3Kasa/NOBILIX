@@ -22,7 +22,7 @@ export default function TrapManDataCompliancePage() {
     >
       <section id="overview">
         <h2>{COMPLIANCE_SECTIONS.overview.heading}</h2>
-        <p>{COMPLIANCE_SECTIONS.overview.body}</p>
+        <p className="legal-preline">{COMPLIANCE_SECTIONS.overview.body}</p>
       </section>
 
       <section id="confirmed-data">
@@ -61,11 +61,14 @@ export default function TrapManDataCompliancePage() {
             ))}
           </tbody>
         </table>
+        <p className="legal-table-hint" aria-hidden="true">
+          Scroll the table sideways to see every column.
+        </p>
       </section>
 
       <section id="under-verification">
         <h2>{COMPLIANCE_SECTIONS.verificationNotice.heading}</h2>
-        <p>{COMPLIANCE_SECTIONS.verificationNotice.body}</p>
+        <p className="legal-preline">{COMPLIANCE_SECTIONS.verificationNotice.body}</p>
 
         <ul className="legal-unverified-list">
           {REQUIRES_ENGINEERING_VERIFICATION.map((item) => (
@@ -87,12 +90,6 @@ export default function TrapManDataCompliancePage() {
         </p>
       </section>
 
-      <section id="legal-gate">
-        <h2>{COMPLIANCE_SECTIONS.legalGate.heading}</h2>
-        <p className="legal-preline">
-          {COMPLIANCE_SECTIONS.legalGate.body}
-        </p>
-      </section>
     </LegalShell>
   );
 }

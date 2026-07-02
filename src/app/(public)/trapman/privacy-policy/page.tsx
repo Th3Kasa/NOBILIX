@@ -22,7 +22,7 @@ export default function TrapManPrivacyPolicyPage() {
     >
       <section id="introduction">
         <h2>{PRIVACY_SECTIONS.introduction.heading}</h2>
-        <p>{PRIVACY_SECTIONS.introduction.body}</p>
+        <p className="legal-preline">{PRIVACY_SECTIONS.introduction.body}</p>
       </section>
 
       <section id="what-we-collect">
@@ -62,6 +62,9 @@ export default function TrapManPrivacyPolicyPage() {
             ))}
           </tbody>
         </table>
+        <p className="legal-table-hint" aria-hidden="true">
+          Scroll the table sideways to see every column.
+        </p>
 
         <aside className="legal-analytics-note">
           <p>{PRIVACY_SECTIONS.dataWeCollect.notes.analytics}</p>
@@ -83,22 +86,28 @@ export default function TrapManPrivacyPolicyPage() {
 
       <section id="age-policy">
         <h2>{PRIVACY_SECTIONS.childrenPolicy.heading}</h2>
-        <p>{PRIVACY_SECTIONS.childrenPolicy.body}</p>
+        <p className="legal-preline">{PRIVACY_SECTIONS.childrenPolicy.body}</p>
       </section>
 
       <section id="retention">
         <h2>{PRIVACY_SECTIONS.dataRetention.heading}</h2>
-        <p>{PRIVACY_SECTIONS.dataRetention.body}</p>
+        <p className="legal-preline">{PRIVACY_SECTIONS.dataRetention.body}</p>
       </section>
 
       <section id="your-rights">
         <h2>{PRIVACY_SECTIONS.yourRights.heading}</h2>
-        <p>{PRIVACY_SECTIONS.yourRights.body}</p>
+        <p>{PRIVACY_SECTIONS.yourRights.intro}</p>
+        <ul>
+          {PRIVACY_SECTIONS.yourRights.rights.map((right) => (
+            <li key={right}>{right}</li>
+          ))}
+        </ul>
+        <p>{PRIVACY_SECTIONS.yourRights.outro}</p>
       </section>
 
       <section id="contact">
         <h2>{PRIVACY_SECTIONS.contact.heading}</h2>
-        <p>{PRIVACY_SECTIONS.contact.body}</p>
+        <p className="legal-preline">{PRIVACY_SECTIONS.contact.body}</p>
       </section>
     </LegalShell>
   );
