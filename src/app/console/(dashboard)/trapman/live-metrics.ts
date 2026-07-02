@@ -26,6 +26,7 @@ export interface LiveMetrics {
   purchaseCount: number;
   buyerCount: number;
   topRevenue: { currency: string; total: number } | null;
+  revenueByCurrency: { currency: string; total: number }[];
   maxLevelReached: number | null;
   avgCompletedLevels: number | null;
   recentActivity: ActivityEntry[];
@@ -91,7 +92,8 @@ export async function getLiveMetrics(): Promise<LiveMetrics> {
       }
     }
 
-    const topRevenueEntry = Array.from(revenue.entries()).sort((a, b) => b[1] - a[1])[0];
+    const revenueEntries = Array.from(revenue.entries()).sort((a, b) => b[1] - a[1]);
+    const topRevenueEntry = revenueEntries[0];
 
     const recentActivity: ActivityEntry[] = boardSnap.docs.map((doc) => {
       const d = doc.data();
@@ -111,6 +113,10 @@ export async function getLiveMetrics(): Promise<LiveMetrics> {
       topRevenue: topRevenueEntry
         ? { currency: topRevenueEntry[0], total: topRevenueEntry[1] }
         : null,
+      revenueByCurrency: revenueEntries.map(([currency, total]) => ({
+        currency,
+        total,
+      })),
       maxLevelReached: maxLevel,
       avgCompletedLevels:
         completedSamples > 0
@@ -126,6 +132,7 @@ export async function getLiveMetrics(): Promise<LiveMetrics> {
       purchaseCount: 0,
       buyerCount: 0,
       topRevenue: null,
+      revenueByCurrency: [],
       maxLevelReached: null,
       avgCompletedLevels: null,
       recentActivity: [],

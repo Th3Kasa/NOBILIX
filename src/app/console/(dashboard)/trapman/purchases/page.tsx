@@ -11,22 +11,36 @@ import { StatCard } from "@/components/stat-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getPurchasesData } from "./data";
+import { getAudRates, convertToAud, formatAud, formatOriginal } from "../fx";
 
 export const dynamic = "force-dynamic";
 
-function money(amount: number, currency: string): string {
-  try {
-    return new Intl.NumberFormat("en-AU", {
-      style: "currency",
-      currency,
-    }).format(amount);
-  } catch {
-    return `${amount.toFixed(2)} ${currency}`;
-  }
-}
-
 export default async function PurchasesPage() {
-  const data = await getPurchasesData();
+  const [data, fx] = await Promise.all([getPurchasesData(), getAudRates()]);
+
+  /** AUD display with honest original-currency fallback when FX is down. */
+  const aud = (amount: number, currency: string): string => {
+    const converted = fx.connected ? convertToAud(amount, currency, fx) : null;
+    return converted != null
+      ? formatAud(converted)
+      : formatOriginal(amount, currency);
+  };
+
+  // Total revenue across all currencies, converted to AUD.
+  let totalRevenueAud: number | null = null;
+  if (fx.connected && data.revenueByCurrency.length > 0) {
+    let total = 0;
+    let allConverted = true;
+    for (const { currency, total: amount } of data.revenueByCurrency) {
+      const converted = convertToAud(amount, currency, fx);
+      if (converted == null) {
+        allConverted = false;
+        break;
+      }
+      total += converted;
+    }
+    if (allConverted) totalRevenueAud = total;
+  }
 
   return (
     <>
@@ -79,15 +93,34 @@ export default async function PurchasesPage() {
               icon={Users}
               hint={`of ${data.sampleSize} sampled players`}
             />
-            {data.revenueByCurrency.slice(0, 2).map((rev) => (
+            {totalRevenueAud != null ? (
               <StatCard
-                key={rev.currency}
-                label={`Revenue (${rev.currency})`}
-                value={money(rev.total, rev.currency)}
+                label="Revenue (AUD)"
+                value={formatAud(totalRevenueAud)}
                 icon={Receipt}
-                hint={`${rev.count} transaction${rev.count === 1 ? "" : "s"}`}
+                hint={`Live ECB rate · ${fx.asOf}`}
               />
-            ))}
+            ) : (
+              data.revenueByCurrency.slice(0, 1).map((rev) => (
+                <StatCard
+                  key={rev.currency}
+                  label={`Revenue (${rev.currency})`}
+                  value={formatOriginal(rev.total, rev.currency)}
+                  icon={Receipt}
+                  hint="FX unavailable — original currency"
+                />
+              ))
+            )}
+            <StatCard
+              label="Avg per purchase"
+              value={
+                totalRevenueAud != null && data.totalCount > 0
+                  ? formatAud(totalRevenueAud / data.totalCount)
+                  : null
+              }
+              icon={Receipt}
+              hint="AUD"
+            />
           </div>
 
           <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -103,7 +136,7 @@ export default async function PurchasesPage() {
                       <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
                         <th scope="col" className="py-2 pr-4 font-medium">Product</th>
                         <th scope="col" className="py-2 pr-4 font-medium">Sold</th>
-                        <th scope="col" className="py-2 font-medium">Revenue</th>
+                        <th scope="col" className="py-2 font-medium">Revenue (AUD)</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -119,13 +152,18 @@ export default async function PurchasesPage() {
                             {product.count}
                           </td>
                           <td className="py-2.5 font-mono tabular-nums">
-                            {money(product.revenue, product.currency)}
+                            {aud(product.revenue, product.currency)}
                           </td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
+                {fx.connected && (
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    Converted at the live ECB reference rate ({fx.asOf}).
+                  </p>
+                )}
               </CardContent>
             </Card>
 
@@ -171,7 +209,7 @@ export default async function PurchasesPage() {
                   <thead>
                     <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
                       <th scope="col" className="py-2 pr-4 font-medium">Product</th>
-                      <th scope="col" className="py-2 pr-4 font-medium">Price</th>
+                      <th scope="col" className="py-2 pr-4 font-medium">Price (AUD)</th>
                       <th scope="col" className="py-2 pr-4 font-medium">Platform</th>
                       <th scope="col" className="py-2 pr-4 font-medium">Buyer</th>
                       <th scope="col" className="py-2 font-medium">When</th>
@@ -185,7 +223,10 @@ export default async function PurchasesPage() {
                       >
                         <td className="py-2.5 pr-4 font-mono text-xs">{p.productId}</td>
                         <td className="py-2.5 pr-4 font-mono tabular-nums">
-                          {money(p.price, p.currency)}
+                          {aud(p.price, p.currency)}
+                          <span className="ml-1.5 text-[11px] text-muted-foreground">
+                            {formatOriginal(p.price, p.currency)}
+                          </span>
                         </td>
                         <td className="py-2.5 pr-4">
                           <Badge variant="secondary" className="font-mono text-[10px] uppercase">

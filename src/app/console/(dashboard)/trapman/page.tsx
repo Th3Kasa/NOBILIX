@@ -19,23 +19,38 @@ import { LiveStatus } from "@/components/console/live-status";
 import { getTrapManOverview } from "@/lib/trapman/overview";
 import { getLiveMetrics } from "./live-metrics";
 import { getGa4Snapshot } from "./ga4-data";
+import { getAudRates, convertToAud, formatAud, formatOriginal } from "./fx";
 
 export const dynamic = "force-dynamic";
 
-function money(amount: number, currency: string): string {
-  try {
-    return new Intl.NumberFormat("en-AU", { style: "currency", currency }).format(amount);
-  } catch {
-    return `${amount.toFixed(2)} ${currency}`;
-  }
-}
-
 export default async function TrapManOverviewPage() {
-  const [m, live, ga4] = await Promise.all([
+  const [m, live, ga4, fx] = await Promise.all([
     getTrapManOverview(),
     getLiveMetrics(),
     getGa4Snapshot(),
+    getAudRates(),
   ]);
+
+  // Store revenue (embedded receipts, mixed currencies) converted to AUD.
+  let storeRevenueAud: number | null = null;
+  if (fx.connected && live.revenueByCurrency.length > 0) {
+    let total = 0;
+    let allConverted = true;
+    for (const { currency, total: amount } of live.revenueByCurrency) {
+      const aud = convertToAud(amount, currency, fx);
+      if (aud == null) {
+        allConverted = false;
+        break;
+      }
+      total += aud;
+    }
+    if (allConverted) storeRevenueAud = total;
+  }
+
+  const ga4RevenueAud =
+    fx.connected && ga4.connected
+      ? convertToAud(ga4.totalRevenue, "USD", fx)
+      : null;
 
   return (
     <>
@@ -94,9 +109,17 @@ export default async function TrapManOverviewPage() {
           />
           <StatCard
             label="GA4 revenue (30d)"
-            value={money(ga4.totalRevenue, "USD")}
+            value={
+              ga4RevenueAud != null
+                ? formatAud(ga4RevenueAud)
+                : formatOriginal(ga4.totalRevenue, "USD")
+            }
             icon={Receipt}
-            hint="USD-normalised by Google"
+            hint={
+              ga4RevenueAud != null
+                ? `${formatOriginal(ga4.totalRevenue, "USD")} USD · live rate`
+                : "USD — FX unavailable"
+            }
           />
           <StatCard
             label="Avg session"
@@ -129,9 +152,22 @@ export default async function TrapManOverviewPage() {
             }
           />
           <StatCard
-            label={live.topRevenue ? `Revenue (${live.topRevenue.currency})` : "Revenue"}
-            value={live.topRevenue ? money(live.topRevenue.total, live.topRevenue.currency) : null}
+            label="Store revenue (AUD)"
+            value={
+              storeRevenueAud != null
+                ? formatAud(storeRevenueAud)
+                : live.topRevenue
+                  ? formatOriginal(live.topRevenue.total, live.topRevenue.currency)
+                  : null
+            }
             icon={Receipt}
+            hint={
+              storeRevenueAud != null
+                ? `Live ECB rate · ${fx.asOf}`
+                : live.topRevenue
+                  ? "FX unavailable — original currency"
+                  : undefined
+            }
           />
           <StatCard
             label="Push-reachable"
