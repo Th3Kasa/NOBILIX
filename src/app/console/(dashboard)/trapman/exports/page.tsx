@@ -79,42 +79,75 @@ export default async function ExportsPage() {
           </CardContent>
         </Card>
 
-        <Card className="flex flex-col border-dashed">
-          <CardHeader>
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex size-9 items-center justify-center rounded-lg bg-[var(--console-violet-tint)] text-[var(--console-violet)]">
-                <ShieldCheck className="size-4.5" aria-hidden="true" />
+        {purchases.connected && purchases.totalCount > 0 ? (
+          <Card className="flex flex-col">
+            <CardHeader>
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex size-9 items-center justify-center rounded-lg bg-[var(--console-live-tint)] text-[var(--console-live)]">
+                  <ShieldCheck className="size-4.5" aria-hidden="true" />
+                </div>
+                <Badge
+                  variant="success"
+                  className="font-mono uppercase tracking-wide"
+                >
+                  Live
+                </Badge>
               </div>
-              <Badge
-                variant="info"
-                className="font-mono uppercase tracking-wide"
+              <CardTitle className="text-base">Purchases</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-1 flex-col justify-between gap-4 pt-0">
+              <p className="text-sm text-muted-foreground">
+                {purchases.totalCount.toLocaleString()} live purchase record
+                {purchases.totalCount === 1 ? "" : "s"} — product, price,
+                currency, platform, buyer, and timestamp.
+              </p>
+              <a
+                href="/api/console-exports/purchases"
+                className={cn(buttonVariants({ variant: "outline" }), "w-full")}
               >
-                No data
-              </Badge>
-            </div>
-            <CardTitle className="text-base">Purchases</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-1 flex-col justify-between gap-4 pt-0">
-            <p className="text-sm text-muted-foreground">
-              {purchases.connected
-                ? "The purchases collection is connected but has no transactions recorded yet in this environment."
-                : "Firebase is unreachable — connect it to check for purchase records."}
-            </p>
-            <button
-              type="button"
-              disabled
-              className={cn(
-                buttonVariants({ variant: "outline" }),
-                "w-full cursor-not-allowed opacity-50",
-              )}
-              aria-disabled="true"
-              title="Enabled automatically once purchases exist"
-            >
-              <Download className="size-4" aria-hidden="true" />
-              Nothing to export yet
-            </button>
-          </CardContent>
-        </Card>
+                <Download className="size-4" aria-hidden="true" />
+                Export CSV
+              </a>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="flex flex-col border-dashed">
+            <CardHeader>
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex size-9 items-center justify-center rounded-lg bg-[var(--console-violet-tint)] text-[var(--console-violet)]">
+                  <ShieldCheck className="size-4.5" aria-hidden="true" />
+                </div>
+                <Badge
+                  variant="info"
+                  className="font-mono uppercase tracking-wide"
+                >
+                  No data
+                </Badge>
+              </div>
+              <CardTitle className="text-base">Purchases</CardTitle>
+            </CardHeader>
+            <CardContent className="flex flex-1 flex-col justify-between gap-4 pt-0">
+              <p className="text-sm text-muted-foreground">
+                {purchases.connected
+                  ? "No purchase records exist yet on player profiles in this environment."
+                  : "Firebase is unreachable — connect it to check for purchase records."}
+              </p>
+              <button
+                type="button"
+                disabled
+                className={cn(
+                  buttonVariants({ variant: "outline" }),
+                  "w-full cursor-not-allowed opacity-50",
+                )}
+                aria-disabled="true"
+                title="Enabled automatically once purchases exist"
+              >
+                <Download className="size-4" aria-hidden="true" />
+                Nothing to export yet
+              </button>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </>
   );

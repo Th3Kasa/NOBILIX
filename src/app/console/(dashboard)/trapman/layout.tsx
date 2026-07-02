@@ -1,6 +1,7 @@
 import { getProject } from "@/config/projects";
 import { ConsoleMobileNav } from "@/components/nav/console-mobile-nav";
 import { ProjectSidebar } from "@/components/nav/project-sidebar";
+import { AutoRefresh } from "@/components/console/auto-refresh";
 
 const moduleLabels: Record<string, string> = {
   overview: "Overview",
@@ -38,6 +39,9 @@ export default function TrapManLayout({
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="border-b border-border bg-card/40 px-4 py-3 md:hidden">
           <ConsoleMobileNav scopeLabel={project.name} items={projectNavigationItems} />
+        </div>
+        <div className="flex items-center justify-end border-b border-border/60 bg-card/20 px-4 md:px-6">
+          <AutoRefresh />
         </div>
         <main
           id="main-content"

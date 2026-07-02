@@ -47,7 +47,9 @@ test("data module pages preserve honest empty and unavailable states", () => {
   const overview = read("src/app/console/(dashboard)/trapman/page.tsx");
   const ads = read("src/app/console/(dashboard)/trapman/ads/page.tsx");
   const gameplay = read("src/app/console/(dashboard)/trapman/gameplay/page.tsx");
-  const placeholders = `${read("src/app/console/(dashboard)/trapman/analytics/page.tsx")}\n${read("src/app/console/(dashboard)/trapman/purchases/page.tsx")}\n${read("src/app/console/(dashboard)/trapman/exports/page.tsx")}`;
+  const analytics = read("src/app/console/(dashboard)/trapman/analytics/page.tsx");
+  const purchases = read("src/app/console/(dashboard)/trapman/purchases/page.tsx");
+  const exports_ = read("src/app/console/(dashboard)/trapman/exports/page.tsx");
 
   assert.match(overview, /unavailable/);
   assert.match(overview, /Firebase connection required/);
@@ -55,8 +57,18 @@ test("data module pages preserve honest empty and unavailable states", () => {
   assert.match(ads, /No ad analytics available yet/);
   assert.match(gameplay, /unavailableReason/);
   assert.match(gameplay, /No gameplay data available yet/);
-  assert.match(placeholders, /SectionPlaceholder/);
-  assert.doesNotMatch(`${overview}\n${ads}\n${gameplay}`, /99\.99|100%|fake live/i);
+
+  // Analytics/Purchases/Exports are live-data modules now — they must keep
+  // honest connection-error and zero-data states instead of placeholders.
+  assert.match(analytics, /Not connected to Firebase/);
+  assert.match(purchases, /Not connected to Firebase/);
+  assert.match(purchases, /No purchase records yet/);
+  assert.match(exports_, /Nothing to export yet/);
+
+  assert.doesNotMatch(
+    `${overview}\n${ads}\n${gameplay}\n${analytics}\n${purchases}\n${exports_}`,
+    /99\.99|fake live/i,
+  );
 });
 
 test("table-heavy modules remain responsive", () => {

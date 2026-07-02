@@ -3,16 +3,16 @@ import { auth } from "@/auth";
 import { listUsers } from "@/lib/users";
 import { listLeaderboard } from "@/lib/leaderboard";
 import { recordAudit } from "@/lib/audit";
+import { getPurchasesData } from "@/app/console/(dashboard)/trapman/purchases/data";
 
 /**
- * Console data exports — CSV downloads for datasets that are confirmed to
- * have real Firestore-backed data (`users`, `leaderboard`). Purchases is
- * intentionally NOT included here: the `purchases` collection is confirmed
- * to exist but currently holds zero documents (Phase 0 discovery), so there
- * is nothing honest to export yet.
+ * Console data exports — CSV downloads for datasets confirmed to have real
+ * Firestore-backed data: `users`, `leaderboard`, and `purchases` (embedded
+ * purchase records aggregated from users/{uid}.purchases, confirmed by
+ * engineering schema review).
  */
 
-const SUPPORTED_DATASETS = ["users", "leaderboard"] as const;
+const SUPPORTED_DATASETS = ["users", "leaderboard", "purchases"] as const;
 type Dataset = (typeof SUPPORTED_DATASETS)[number];
 
 function toCsvValue(value: unknown): string {
@@ -50,7 +50,30 @@ export async function GET(
   let csv: string;
   let filename: string;
 
-  if (dataset === "users") {
+  if (dataset === "purchases") {
+    const result = await getPurchasesData();
+    if (!result.connected) {
+      return NextResponse.json(
+        { error: result.error ?? "Firebase unreachable" },
+        { status: 503 },
+      );
+    }
+    const columns = [
+      "purchaseId",
+      "productId",
+      "price",
+      "currency",
+      "platform",
+      "buyerUid",
+      "buyerName",
+      "timestamp",
+    ];
+    csv = toCsv(
+      result.purchases.map((p) => ({ ...p })),
+      columns,
+    );
+    filename = "trapman-purchases.csv";
+  } else if (dataset === "users") {
     const result = await listUsers({ limit: 1000 });
     if (!result.connected) {
       return NextResponse.json(

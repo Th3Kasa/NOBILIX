@@ -1,12 +1,14 @@
-import { Info } from "lucide-react";
+import { Info, Gauge, ListChecks } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
+import { StatCard } from "@/components/stat-card";
 import { Card, CardContent } from "@/components/ui/card";
 import { getGameplayData } from "@/lib/trapman/gameplay";
+import { getLiveMetrics } from "../live-metrics";
 
 export const dynamic = "force-dynamic";
 
 export default async function GameplayPage() {
-  const data = await getGameplayData();
+  const [data, live] = await Promise.all([getGameplayData(), getLiveMetrics()]);
 
   return (
     <>
@@ -14,6 +16,23 @@ export default async function GameplayPage() {
         title="Gameplay"
         description="Level distribution and player progression analytics."
       />
+
+      {live.connected && (
+        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <StatCard
+            label="Highest level reached"
+            value={live.maxLevelReached}
+            icon={Gauge}
+            hint="Across all sampled players"
+          />
+          <StatCard
+            label="Avg levels completed"
+            value={live.avgCompletedLevels}
+            icon={ListChecks}
+            hint="Per player, from completedLevels"
+          />
+        </div>
+      )}
 
       {data.unavailableReason ? (
         <Card className="border-[var(--console-violet-border)] bg-[var(--console-violet-tint)]">

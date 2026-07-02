@@ -5,24 +5,39 @@ import {
   Ghost,
   AlertTriangle,
   Info,
+  ShoppingCart,
+  BellRing,
+  Receipt,
+  Activity,
+  Gauge,
 } from "lucide-react";
+import { format } from "date-fns";
 import { PageHeader } from "@/components/page-header";
 import { StatCard } from "@/components/stat-card";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LiveStatus } from "@/components/console/live-status";
 import { getTrapManOverview } from "@/lib/trapman/overview";
+import { getLiveMetrics } from "./live-metrics";
 
 export const dynamic = "force-dynamic";
 
+function money(amount: number, currency: string): string {
+  try {
+    return new Intl.NumberFormat("en-AU", { style: "currency", currency }).format(amount);
+  } catch {
+    return `${amount.toFixed(2)} ${currency}`;
+  }
+}
+
 export default async function TrapManOverviewPage() {
-  const m = await getTrapManOverview();
+  const [m, live] = await Promise.all([getTrapManOverview(), getLiveMetrics()]);
 
   return (
     <>
       <div className="mb-6 flex items-center justify-between gap-4">
         <PageHeader
           title="TrapMan — Mission Control"
-          description="Live snapshot of the TrapMan player base."
+          description="Live snapshot of the TrapMan player base, straight from Firebase."
         />
         <LiveStatus connected={m.connected} className="shrink-0" />
       </div>
@@ -46,7 +61,7 @@ export default async function TrapManOverviewPage() {
       )}
 
       {/* 2. Player health metrics */}
-      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Total players" value={m.totalPlayers} icon={Users} />
         <StatCard
           label="Registered"
@@ -54,19 +69,91 @@ export default async function TrapManOverviewPage() {
           icon={UserCheck}
           hint="Non-guest accounts"
         />
-        <StatCard
-          label="Guests"
-          value={m.guestPlayers}
-          icon={Ghost}
-        />
-        <StatCard
-          label="New (7 days)"
-          value={m.newPlayers7d}
-          icon={UserPlus}
-        />
+        <StatCard label="Guests" value={m.guestPlayers} icon={Ghost} />
+        <StatCard label="New (7 days)" value={m.newPlayers7d} icon={UserPlus} />
       </div>
 
-      {/* 3. Activity chart region — honest empty state when no data */}
+      {/* 3. Commerce + engagement metrics (live, from confirmed fields) */}
+      {live.connected && (
+        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            label="Purchases"
+            value={live.purchaseCount}
+            icon={ShoppingCart}
+            hint={
+              live.buyerCount > 0
+                ? `${live.buyerCount} unique buyer${live.buyerCount === 1 ? "" : "s"}`
+                : undefined
+            }
+          />
+          <StatCard
+            label={live.topRevenue ? `Revenue (${live.topRevenue.currency})` : "Revenue"}
+            value={live.topRevenue ? money(live.topRevenue.total, live.topRevenue.currency) : null}
+            icon={Receipt}
+          />
+          <StatCard
+            label="Push-reachable"
+            value={live.pushReachable}
+            icon={BellRing}
+            hint="Players with an active FCM token"
+          />
+          <StatCard
+            label="Highest level"
+            value={live.maxLevelReached}
+            icon={Gauge}
+            hint={
+              live.avgCompletedLevels != null
+                ? `avg ${live.avgCompletedLevels} levels completed`
+                : undefined
+            }
+          />
+        </div>
+      )}
+
+      {/* 4. Live activity feed from leaderboard events */}
+      {live.connected && live.recentActivity.length > 0 && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Activity className="size-4 text-[var(--console-live)]" aria-hidden="true" />
+              Latest score submissions
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
+                    <th scope="col" className="py-2 pr-4 font-medium">Player</th>
+                    <th scope="col" className="py-2 pr-4 font-medium">Country</th>
+                    <th scope="col" className="py-2 pr-4 font-medium">Score</th>
+                    <th scope="col" className="py-2 font-medium">When</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {live.recentActivity.map((entry) => (
+                    <tr
+                      key={`${entry.username}-${entry.timestamp}`}
+                      className="border-b border-border/60 last:border-0 hover:bg-accent/40"
+                    >
+                      <td className="py-2.5 pr-4">{entry.username}</td>
+                      <td className="py-2.5 pr-4 font-mono text-xs">{entry.country ?? "—"}</td>
+                      <td className="py-2.5 pr-4 font-mono tabular-nums">
+                        {entry.score.toLocaleString()}
+                      </td>
+                      <td className="py-2.5 font-mono text-xs tabular-nums text-muted-foreground">
+                        {entry.timestamp ? format(new Date(entry.timestamp), "PP p") : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* 5. Activity chart region — honest empty state when no data */}
       {!m.connected && (
         <Card className="mb-6">
           <CardContent className="flex min-h-40 items-center justify-center p-6 text-sm text-muted-foreground">
@@ -75,7 +162,7 @@ export default async function TrapManOverviewPage() {
         </Card>
       )}
 
-      {/* 4. Unavailable data-source panel */}
+      {/* 6. Unavailable data-source panel */}
       {m.unavailable.length > 0 && (
         <Card className="mb-6 border-[var(--console-violet-border)] bg-[var(--console-violet-tint)]">
           <CardContent className="p-4">

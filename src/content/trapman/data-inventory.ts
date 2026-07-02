@@ -68,9 +68,9 @@ export const TRAPMAN_DATA_INVENTORY = [
     key: "purchaseReceiptRecord",
     label: "Purchases Made",
     system: "Firestore",
-    location: "purchases/{purchaseId}",
+    location: "users/{uid}.purchases (embedded purchase map)",
     purpose:
-      "Records in-app purchase transactions for receipt and dispute resolution.",
+      "Records in-app purchase transactions (price, currency, platform, receipt, timestamp) for receipt and dispute resolution. Confirmed by engineering schema review to be stored on the player profile document.",
     deletable: false,
     deletionNote:
       "Purchase receipt records may be retained for financial compliance and dispute resolution. Personal identifiers within receipts are anonymized on account deletion where retention is required.",
@@ -79,7 +79,7 @@ export const TRAPMAN_DATA_INVENTORY = [
     key: "purchasedProductId",
     label: "Purchased Item",
     system: "Firestore",
-    location: "purchases/{purchaseId}.productId",
+    location: "users/{uid}.purchases.{purchaseId}.productId",
     purpose:
       "Identifies which in-app product was purchased (e.g., character skin, power-up pack).",
     deletable: false,
@@ -172,6 +172,6 @@ export const REQUIRES_ENGINEERING_VERIFICATION = [
   "Device identifiers including Google Advertising ID (GAID) and Apple IDFA — depends on consent and attribution SDK",
   "Crash reporting data (e.g., Firebase Crashlytics — stack traces, device model, OS version)",
   "Advertising SDKs and their destination processors — depends on which SDKs are integrated and their data sharing practices",
-  "An embedded purchases object exists directly on some user documents (users/{uid}.purchases, observed on a portion of sampled profiles) in addition to the separate purchases collection referenced by product/receipt records above — its internal field shape has not been inspected; do not assume it duplicates or supersedes the dedicated purchases collection until confirmed",
-  "The dedicated purchases/{purchaseId} and player_progress/{uid} collections contained no documents at the time of the most recent engineering schema review — purchase and progression data currently observed lives on the users/{uid} document itself (see purchases, currentLevel, completedLevels above); this may change as the collections are populated",
+  "A minority of embedded purchase records carry raw app-store receipt blobs keyed by store purchase tokens (a different shape from the confirmed productId/price/currency/platform/timestamp records) — the internal contents of those raw receipt blobs have not been individually verified",
+  "The dedicated purchases/{purchaseId} and player_progress/{uid} collections no longer exist in the live database as of the most recent engineering schema review — all purchase and progression data lives on the users/{uid} document itself (see purchases, currentLevel, completedLevels above)",
 ] as const;
