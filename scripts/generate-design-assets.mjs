@@ -222,7 +222,9 @@ export const assets = [
     purpose: "TrapMan player-account CTA section backdrop",
     source: `${modelName} original text-to-image generation`,
     prompt:
-      "Original 16-bit pixel-art backdrop suggesting 'your progress continues', Sydney night theme. A softly glowing cyan pixel-art save-point beacon standing alone on a rooftop running path, faint upward light column, distant Sydney skyline and harbour glow on the horizon, a single trailing light-streak suggesting a runner just passed through. Calm, hopeful, forward-looking mood. Generous flat dark sky area above for CTA text overlay. Crisp hard pixel edges, restrained palette. No characters, no readable text, no logos, no photorealism.",
+      "Original 16-bit pixel-art night environment, Sydney theme, completely empty of any living figure and completely free of any lettering or signage. A softly glowing cyan pixel-art save-point beacon standing alone on a deserted rooftop running path, faint upward light column, distant Sydney skyline and harbour glow on the horizon, two horizontal cyan light-trails skimming along the empty path as pure light effects. Calm, hopeful, forward-looking mood. The upper half of the frame is pure empty dark night sky with absolutely nothing drawn or written in it. Crisp hard pixel edges, restrained palette. Unpopulated environment only.",
+    negativePrompt:
+      "person, people, human, runner, character, figure, silhouette of a person, animal, face, body, text, letters, logos, UI, photorealism, 3D render",
   },
   {
     id: "trapman-support-plate",
