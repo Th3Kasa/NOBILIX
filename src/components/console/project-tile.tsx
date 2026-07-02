@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight, Circle } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { ProjectTileLogo } from "@/components/console/project-tile-logo";
 import { cn } from "@/lib/utils";
 import type { ProjectDefinition } from "@/types/projects";
 
@@ -27,16 +28,9 @@ export function ProjectTile({ project }: { project: ProjectDefinition }) {
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="flex size-10 items-center justify-center rounded-lg border border-border bg-card/80">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <ProjectTileLogo
                 src={project.logoPath}
                 alt={`${project.name} logo`}
-                width={28}
-                height={28}
-                className="size-7 object-contain"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).style.display = "none";
-                }}
               />
             </div>
             <div>
