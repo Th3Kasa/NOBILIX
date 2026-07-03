@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { Reveal } from "@/components/motion/reveal";
 import { ProjectShowcase } from "@/components/public/project-showcase";
 import { StudioHero } from "@/components/public/studio-hero";
@@ -24,7 +25,10 @@ export default function NobilixHomePage() {
         aria-labelledby="studio-title"
       >
         <Reveal>
-          <p className="eyebrow">01 / Studio</p>
+          <p className="eyebrow">
+            <span className="eyebrow__dot" aria-hidden="true" />
+            01 / Studio
+          </p>
           <h2 id="studio-title">
             A quiet company layer for <em>loud project worlds</em>.
           </h2>
@@ -40,7 +44,7 @@ export default function NobilixHomePage() {
         className="nobilix-contact-section"
         aria-labelledby="contact-title"
       >
-        <Reveal className="nobilix-contact-section__media" aria-hidden="true">
+        <Reveal className="nobilix-contact-section__media neon-border" aria-hidden="true">
           <Image
             src="/assets/generated/nobilix/contact-plate.webp"
             alt=""
@@ -50,12 +54,23 @@ export default function NobilixHomePage() {
           />
         </Reveal>
         <Reveal delay={0.1} className="nobilix-contact-section__copy">
-          <p className="eyebrow">Contact</p>
+          <p className="eyebrow">
+            <span className="eyebrow__dot" aria-hidden="true" />
+            Contact
+          </p>
           <h2 id="contact-title">Support, publishing, and studio enquiries.</h2>
           <p>
             Use the console for operations, TrapMan support paths for player
             requests, and the company legal directory for Nobilix notices.
           </p>
+          <div className="nobilix-contact-section__actions">
+            <Link className="nobilix-button nobilix-button--primary magnetic-hover" href="/console">
+              Open console
+            </Link>
+            <Link className="nobilix-button nobilix-button--secondary magnetic-hover" href="/legal">
+              Company legal
+            </Link>
+          </div>
         </Reveal>
       </section>
     </>

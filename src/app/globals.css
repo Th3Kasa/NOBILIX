@@ -291,6 +291,21 @@
   --console-violet-tint: color-mix(in oklch, var(--console-violet) 16%, transparent);
   --console-violet-border: color-mix(in oklch, var(--console-violet) 38%, transparent);
 
+  /* Control-station redesign tokens — grid-mesh backdrop + glass panel ramp.
+     Kept scoped to .console-shell so nothing leaks into the public/TrapMan
+     surfaces per the shared-token rule. */
+  --console-mesh-line: color-mix(in oklch, var(--neon-violet) 14%, transparent);
+  --console-mesh-line-strong: color-mix(in oklch, var(--neon-cyan) 10%, transparent);
+  --console-glass-blur: 14px;
+  --console-glass-bg: color-mix(in oklch, var(--console-panel) 72%, transparent);
+  --console-glass-border: color-mix(in oklch, var(--paper) 10%, transparent);
+  --console-hairline-grad: linear-gradient(
+    90deg,
+    var(--neon-cyan),
+    var(--neon-violet),
+    var(--neon-magenta)
+  );
+
   /* Wire console-specific palette into Tailwind's token cascade */
   --background: var(--console-bg);
   --card: var(--console-panel);
@@ -1230,4 +1245,618 @@
 @media (max-width: 840px) {
   .nobilix-legal-body { grid-template-columns: 1fr; }
   .nobilix-legal-toc { position: static; }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   NOBILIX redesign — premium retro-arcade / arcade-luxury pass
+   Appended-only section. Does not modify any rule above. Re-themes the
+   `.public-shell` (studio homepage, legal directory + pages, header,
+   footer, 404) onto the shared dark --ink-* substrate so Nobilix reads
+   as the calmer, more spacious sibling of TrapMan's saturated neon —
+   same universe, lower density. Max 5 active colors per view: ink
+   substrate + paper text + violet (primary) + cyan (secondary accent)
+   + yellow (single rarest spark, hero CTA only). Magenta is reserved
+   for hover/energy states. All motion gated behind prefers-reduced-motion
+   via the existing Reveal/ParallaxMedia components and the guards below.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ─── Dark substrate takeover ─────────────────────────────────────
+   Re-point the Tailwind-consumed semantic tokens (consumed by
+   MobileNavigation and any utility classes) so nothing outside this
+   scope needs to change to pick up the new theme. */
+.public-shell {
+  --surface-canvas: var(--ink-900);
+  --surface-panel: var(--ink-800);
+  --surface-elevated: color-mix(in oklch, var(--ink-800) 88%, white 4%);
+  --surface-muted: color-mix(in oklch, var(--ink-800) 92%, white 3%);
+  --surface-border: color-mix(in oklch, var(--paper) 16%, transparent);
+  --company-canvas: var(--ink-900);
+  --company-ink: var(--paper);
+  --company-accent: var(--neon-violet);
+  --company-accent-contrast: var(--paper);
+  --company-hairline: color-mix(in oklch, var(--paper) 14%, transparent);
+  --company-caption: color-mix(in oklch, var(--paper) 56%, transparent);
+  --project-accent: var(--neon-violet);
+  --project-accent-contrast: var(--paper);
+  --background: var(--surface-canvas);
+  --foreground: var(--company-ink);
+  --card: var(--surface-panel);
+  --card-foreground: var(--company-ink);
+  --popover: var(--surface-elevated);
+  --popover-foreground: var(--company-ink);
+  --primary: var(--neon-violet);
+  --primary-foreground: var(--paper);
+  --secondary: var(--surface-muted);
+  --secondary-foreground: var(--company-ink);
+  --muted: var(--surface-muted);
+  --muted-foreground: color-mix(in oklch, var(--paper) 60%, transparent);
+  --accent: color-mix(in oklch, var(--neon-violet) 18%, var(--ink-800));
+  --accent-foreground: var(--paper);
+  --border: var(--surface-border);
+  --input: var(--surface-border);
+  --ring: var(--neon-cyan);
+  --focus-ring: var(--neon-cyan);
+  background: var(--surface-canvas);
+  color: var(--company-ink);
+}
+
+/* Faint ambient violet/cyan wash behind the whole shell — light, not fill */
+.public-shell {
+  background-image:
+    radial-gradient(ellipse 60rem 34rem at 12% -8%, color-mix(in oklch, var(--neon-violet) 13%, transparent), transparent 60%),
+    radial-gradient(ellipse 50rem 30rem at 92% 18%, color-mix(in oklch, var(--neon-cyan) 8%, transparent), transparent 60%);
+  background-repeat: no-repeat;
+}
+
+/* Header/footer glass on dark substrate */
+.public-shell .public-header,
+.public-shell .public-footer {
+  background: color-mix(in oklch, var(--ink-900) 78%, transparent);
+  backdrop-filter: blur(18px);
+  border-color: var(--company-hairline);
+}
+.public-shell .public-header__nav a:hover,
+.public-shell .public-footer a:hover {
+  color: var(--neon-cyan);
+}
+
+/* Wordmark: pixel monogram tile + Geist wordmark (pixel type stays short-string only) */
+.public-wordmark {
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 0.6rem;
+}
+.public-wordmark__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  font-size: 0.72rem;
+  border-radius: var(--radius-editorial);
+  background: color-mix(in oklch, var(--neon-violet) 22%, var(--ink-800));
+  color: var(--neon-cyan);
+  box-shadow: var(--glow-violet);
+}
+.public-wordmark__text {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.public-shell .public-wordmark,
+.public-shell .public-wordmark__text span:first-child {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  color: var(--paper);
+}
+.public-shell .public-wordmark small {
+  color: var(--company-caption);
+}
+
+/* Header console CTA restyled for the neon-violet primary */
+.public-shell .header-cta {
+  background: var(--neon-violet);
+  color: var(--paper);
+  box-shadow: var(--glow-violet);
+}
+.public-shell .header-cta:hover {
+  box-shadow: var(--glow-magenta);
+}
+
+/* Eyebrow status dot — small arcade "live" pulse, mono-flavoured kicker */
+.public-shell .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono), monospace;
+  color: var(--neon-cyan);
+}
+.eyebrow__dot {
+  display: inline-block;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--neon-yellow);
+  box-shadow: var(--glow-yellow);
+  animation: eyebrow-pulse 2.4s ease-in-out infinite;
+}
+@keyframes eyebrow-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+/* Headings keep the display face but on paper-on-ink */
+.public-shell .studio-hero h1,
+.public-shell .nobilix-studio-section h2,
+.public-shell .nobilix-contact-section h2,
+.public-shell .project-showcase h2,
+.public-shell .section-kicker h2,
+.public-shell .public-not-found h1,
+.public-shell .legal-directory h1 {
+  color: var(--paper);
+}
+.public-shell .studio-hero h1 em,
+.public-shell .nobilix-studio-section h2 em,
+.public-shell .project-showcase h2 em,
+.public-shell .section-kicker h2 em {
+  color: var(--neon-cyan);
+  font-style: normal;
+}
+
+/* Buttons: primary uses violet with glow; secondary is a glass hairline */
+.public-shell .nobilix-button--primary,
+.public-shell .project-card a:first-child,
+.public-shell .public-not-found a:first-child {
+  background: var(--neon-violet);
+  color: var(--paper);
+  box-shadow: var(--glow-violet);
+}
+.public-shell .nobilix-button--primary:hover,
+.public-shell .project-card a:first-child:hover,
+.public-shell .public-not-found a:first-child:hover {
+  box-shadow: var(--glow-magenta);
+}
+.public-shell .nobilix-button--secondary,
+.public-shell .project-card a,
+.public-shell .legal-directory a,
+.public-shell .public-not-found a {
+  border-color: var(--company-hairline);
+  background: color-mix(in oklch, var(--ink-800) 60%, transparent);
+  backdrop-filter: blur(10px);
+  color: var(--paper);
+}
+.public-shell .nobilix-button--secondary:hover,
+.public-shell .legal-directory a:hover,
+.public-shell .public-not-found a:hover {
+  border-color: color-mix(in oklch, var(--neon-cyan) 55%, var(--company-hairline));
+  color: var(--neon-cyan);
+}
+.public-shell .nobilix-text-link {
+  color: var(--neon-cyan);
+}
+.public-shell .nobilix-text-link:hover {
+  color: var(--neon-magenta);
+}
+
+/* Plates/panels: glass surface instead of flat white cards */
+.public-shell .project-card,
+.public-shell .legal-directory article,
+.public-shell .nobilix-legal-toc {
+  background: color-mix(in oklch, var(--ink-800) 82%, transparent);
+  backdrop-filter: blur(12px);
+  border-color: var(--company-hairline);
+}
+.public-shell .studio-principle__index {
+  color: color-mix(in oklch, var(--neon-violet) 55%, transparent);
+  font-style: normal;
+}
+
+/* Hero scanline accent — subtle, confined to the hero plate only */
+.studio-hero__scanline {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+.studio-hero__scanline::after {
+  opacity: 0.5;
+}
+
+/* Magnetic-feeling hover: lift + glow on interactive tiles/buttons, cheap
+   (transform/box-shadow only), fully reversible, reduced-motion safe. */
+.magnetic-hover {
+  transition:
+    transform var(--duration-base) cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow var(--duration-base) ease,
+    border-color var(--duration-base) ease;
+}
+.magnetic-hover:hover {
+  transform: translateY(-2px) scale(1.008);
+}
+.public-shell .project-card.magnetic-hover:hover,
+.public-shell .legal-directory article.magnetic-hover:hover {
+  border-color: color-mix(in oklch, var(--neon-violet) 45%, var(--company-hairline));
+  box-shadow: 0 1.5rem 3rem -1.5rem color-mix(in oklch, var(--neon-violet) 35%, transparent);
+}
+
+/* Project card status dot */
+.project-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+.project-card__status-dot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--status-success);
+  box-shadow: 0 0 6px var(--status-success);
+}
+
+/* Footer telemetry line + column headings */
+.public-footer__heading {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--company-caption);
+  margin-bottom: 0.35rem;
+  width: 100%;
+}
+.public-footer__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.6rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+  color: var(--company-caption);
+}
+.public-footer__dot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--status-success);
+  box-shadow: 0 0 6px var(--status-success);
+}
+
+/* Contact section CTA row (new, additive) */
+.nobilix-contact-section__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+
+/* 404 oversized pixel code mark — decorative, kept to a very short string
+   per the pixel-type legibility rule. */
+.public-not-found__code {
+  font-size: clamp(2.5rem, 10vw, 5.5rem);
+  color: color-mix(in oklch, var(--neon-violet) 40%, transparent);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+/* Legal shell on dark substrate: keep it text-first and calm, per the
+   existing house rule above — only re-theme colors, not density. */
+.public-shell .nobilix-legal-shell {
+  color: var(--paper);
+}
+.public-shell .nobilix-legal-company {
+  color: var(--neon-cyan);
+}
+.public-shell .nobilix-legal-title {
+  color: var(--paper);
+}
+.public-shell .nobilix-legal-toc-link:hover,
+.public-shell .nobilix-legal-toc-link[aria-current="page"] {
+  background: color-mix(in oklch, var(--neon-violet) 16%, transparent);
+  color: var(--paper);
+}
+.public-shell .nobilix-legal-content a {
+  color: var(--neon-cyan);
+}
+.public-shell .nobilix-legal-content a:hover {
+  color: var(--neon-magenta);
+}
+.nobilix-legal-updated__mono {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+
+/* Studio hero pixel badge glow — the one place display pixel type gets a
+   light touch, still a short all-caps word only. */
+.public-shell .studio-brand-badge {
+  color: var(--neon-cyan);
+  text-shadow: var(--glow-cyan);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eyebrow__dot { animation: none; }
+  .magnetic-hover:hover { transform: none; }
+}
+
+/* Touch-target + contrast safety net at small viewports */
+@media (max-width: 480px) {
+  .public-wordmark__mark { width: 1.75rem; height: 1.75rem; font-size: 0.6rem; }
+  .public-not-found__code { font-size: clamp(2rem, 14vw, 3rem); }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   CONSOLE redesign — "control station" pass (docs/art-direction.md §6)
+   Asymmetric 12-col grid, glass widget panels over an animated grid-mesh,
+   neon hairlines, SVG status pulses, Geist Mono telemetry type, max 5
+   colors, calm-by-default with neon reserved for live/alert states.
+   Scoped entirely to .console-shell / .console-auth-shell — never touches
+   the public or TrapMan player-facing surfaces.
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Grid-mesh backdrop ──────────────────────────────────────────────── */
+/* A low-opacity perspective-style grid sits behind every console screen.
+   Rendered as a fixed decorative layer so it never affects layout/scroll
+   and stays subtle enough not to fight panel content. */
+.console-grid-mesh {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--console-mesh-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--console-mesh-line) 1px, transparent 1px);
+  background-size: 48px 48px;
+  background-position: center -1px;
+  mask-image: radial-gradient(80% 60% at 50% 0%, black 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(80% 60% at 50% 0%, black 40%, transparent 100%);
+  animation: console-mesh-drift 60s linear infinite;
+  opacity: 0.55;
+}
+.console-grid-mesh::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(1px 1px at 24px 24px, var(--console-mesh-line-strong) 1px, transparent 1px);
+  background-size: 96px 96px;
+}
+@keyframes console-mesh-drift {
+  from { background-position: center -1px, center -1px; }
+  to { background-position: center -49px, center -49px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .console-grid-mesh { animation: none; }
+}
+
+/* ─── Shell layout: asymmetric 12-col rhythm ─────────────────────────── */
+.console-shell {
+  position: relative;
+  isolation: isolate;
+  background: radial-gradient(120% 100% at 15% 0%, color-mix(in oklch, var(--neon-violet) 7%, transparent), transparent 60%), var(--console-bg);
+}
+.console-shell > .console-grid-mesh { position: fixed; }
+.console-shell main {
+  position: relative;
+  z-index: 1;
+}
+
+/* Page content grid — asymmetric 12-column track that widgets can opt into
+   via .console-grid-span-{n}. Falls back to a simple stack when unused. */
+.console-page-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 1rem;
+}
+.console-grid-span-4 { grid-column: span 12 / span 12; }
+.console-grid-span-5 { grid-column: span 12 / span 12; }
+.console-grid-span-6 { grid-column: span 12 / span 12; }
+.console-grid-span-7 { grid-column: span 12 / span 12; }
+.console-grid-span-8 { grid-column: span 12 / span 12; }
+@media (min-width: 1024px) {
+  .console-grid-span-4 { grid-column: span 4 / span 4; }
+  .console-grid-span-5 { grid-column: span 5 / span 5; }
+  .console-grid-span-6 { grid-column: span 6 / span 6; }
+  .console-grid-span-7 { grid-column: span 7 / span 7; }
+  .console-grid-span-8 { grid-column: span 8 / span 8; }
+}
+
+/* ─── Glass widget panels ─────────────────────────────────────────────── */
+/* Applied alongside the existing Card component classes — adds the glass
+   blur + neon-tinted hairline + inner vignette called for in the brief
+   without altering Card's structure. */
+.console-shell .console-glass,
+.console-auth-shell .console-glass {
+  background: var(--console-glass-bg) !important;
+  backdrop-filter: blur(var(--console-glass-blur));
+  -webkit-backdrop-filter: blur(var(--console-glass-blur));
+  border-color: var(--console-glass-border) !important;
+  box-shadow:
+    inset 0 1px 0 0 color-mix(in oklch, var(--paper) 6%, transparent),
+    0 1px 0 0 color-mix(in oklch, black 40%, transparent);
+}
+
+/* Thin travelling gradient hairline — reserved for the single most
+   important panel per view (e.g. the primary KPI or the compose card). */
+.console-shell .console-hairline-glow {
+  position: relative;
+}
+.console-shell .console-hairline-glow::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--console-hairline-grad);
+  background-size: 200% 100%;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.55;
+  animation: console-hairline-travel 6s linear infinite;
+}
+@keyframes console-hairline-travel {
+  to { background-position: 200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .console-shell .console-hairline-glow::before { animation: none; }
+}
+
+/* ─── Telemetry / pixel type utilities ───────────────────────────────── */
+.console-telemetry {
+  font-family: var(--font-mono), monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.01em;
+}
+/* Score-style numerals — Press Start 2P, short strings only per brief. */
+.console-pixel-label {
+  font-family: var(--font-pixel), var(--font-mono), monospace;
+  font-size: 0.6rem;
+  line-height: 1.6;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ─── Page header: mission-control strip ─────────────────────────────── */
+.console-shell .console-page-header,
+.console-auth-shell .console-page-header {
+  position: relative;
+  padding-bottom: 1.25rem;
+}
+.console-shell .console-page-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--console-mesh-line-strong), transparent 70%);
+}
+.console-shell .console-page-header h1 {
+  font-family: var(--font-mono), monospace;
+  letter-spacing: -0.01em;
+}
+
+/* ─── Stat / metric panels: glass + live glow on hover ───────────────── */
+.console-shell .console-stat-card {
+  background: var(--console-glass-bg) !important;
+  backdrop-filter: blur(var(--console-glass-blur));
+  -webkit-backdrop-filter: blur(var(--console-glass-blur));
+  border-color: var(--console-glass-border) !important;
+  position: relative;
+  overflow: hidden;
+}
+.console-shell .console-stat-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, color-mix(in oklch, var(--neon-violet) 6%, transparent), transparent 55%);
+  pointer-events: none;
+}
+.console-shell .console-stat-card:hover {
+  border-color: color-mix(in oklch, var(--neon-cyan) 32%, var(--console-glass-border)) !important;
+  box-shadow: 0 0 0 1px color-mix(in oklch, var(--neon-cyan) 18%, transparent), 0 12px 32px -16px color-mix(in oklch, var(--neon-violet) 35%, transparent);
+}
+
+/* ─── Sidebar: glass rail with animated brand pulse ──────────────────── */
+.console-shell aside {
+  background: color-mix(in oklch, var(--console-panel) 55%, transparent) !important;
+  position: relative;
+}
+.console-shell aside::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(180deg, var(--console-mesh-line-strong), transparent 70%);
+}
+
+/* ─── Empty / unavailable states ─────────────────────────────────────── */
+/* Honest "no data yet" and "unavailable" panels get the same restrained
+   glass treatment plus a dashed hairline so they read as deliberate
+   design, not a placeholder that was forgotten. */
+.console-shell .console-empty-state {
+  position: relative;
+  background: color-mix(in oklch, var(--console-panel) 40%, transparent);
+}
+.console-shell .console-empty-state::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  background-image: radial-gradient(1px 1px at 12px 12px, var(--console-mesh-line-strong) 1px, transparent 1px);
+  background-size: 24px 24px;
+  opacity: 0.4;
+  pointer-events: none;
+}
+/* Direct children paint above the decorative dot-grid without every
+   call site needing to add `relative` by hand. */
+.console-shell .console-empty-state > :not(style) {
+  position: relative;
+  z-index: 1;
+}
+
+/* ─── Auth shell: secure sign-in vault framing ───────────────────────── */
+.console-auth-shell {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(60% 50% at 50% 0%, color-mix(in oklch, var(--neon-violet) 16%, transparent), transparent 70%),
+    var(--console-bg);
+}
+.console-auth-card {
+  position: relative;
+}
+.console-step-list li {
+  transition: color 150ms ease, border-color 150ms ease;
+}
+
+/* ─── Live status + pulse dots: SVG-style glow via drop-shadow ──────── */
+.console-shell [class*="animate-ping"] {
+  filter: drop-shadow(0 0 4px currentColor);
+}
+
+/* ─── Table density + hover clarity on dark glass ────────────────────── */
+.console-shell table thead tr {
+  background: color-mix(in oklch, var(--console-panel) 60%, transparent);
+}
+.console-shell table tbody tr:hover {
+  background: color-mix(in oklch, var(--neon-violet) 6%, transparent);
+}
+
+/* ─── Scanline accent — very low opacity, console backdrop only ─────── */
+.console-shell::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-scene-atmosphere, -2);
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    color-mix(in oklch, black 8%, transparent) 0px,
+    transparent 1px,
+    transparent 3px
+  );
+  opacity: 0.25;
+  mix-blend-mode: overlay;
+}
+@media (prefers-reduced-motion: reduce) {
+  .console-shell::before { opacity: 0.12; }
+}
+
+/* ─── Responsive safety net (320–1920px) ─────────────────────────────── */
+@media (max-width: 380px) {
+  .console-shell .console-page-header h1 { font-size: 1.25rem; }
+  .console-pixel-label { font-size: 0.52rem; }
+}
+@media (min-width: 1600px) {
+  .console-page-grid { gap: 1.25rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .console-shell *,
+  .console-auth-shell * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

@@ -1,4 +1,6 @@
 import Image from "next/image";
+import { ParallaxMedia } from "@/components/motion/parallax-media";
+import { MazeDivider } from "./maze-divider";
 
 const WORLD_CHIPS = [
   { label: "Harbour lane", detail: "Cyan rail grinds" },
@@ -9,7 +11,7 @@ const WORLD_CHIPS = [
 export function WorldSystem() {
   return (
     <div className="world-plate-section">
-      <div className="world-plate" aria-hidden="true">
+      <ParallaxMedia amount={24} className="world-plate" aria-hidden="true">
         <Image
           src="/assets/generated/trapman/world-plate.webp"
           alt=""
@@ -17,7 +19,7 @@ export function WorldSystem() {
           height={864}
           sizes="100vw"
         />
-      </div>
+      </ParallaxMedia>
       <div className="world-plate__copy">
         <p className="trapman-kicker">World system</p>
         <h2>Sydney underground, rebuilt in neon.</h2>
@@ -35,6 +37,7 @@ export function WorldSystem() {
           </li>
         ))}
       </ul>
+      <MazeDivider className="tm-section-divider tm-section-divider--top" />
     </div>
   );
 }

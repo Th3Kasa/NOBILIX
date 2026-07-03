@@ -16,20 +16,81 @@ import { PageHeader } from "@/components/page-header";
 import { StatCard } from "@/components/stat-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LiveStatus } from "@/components/console/live-status";
-import { getTrapManOverview } from "@/lib/trapman/overview";
-import { getLiveMetrics } from "./live-metrics";
-import { getGa4Snapshot } from "./ga4-data";
-import { getAudRates, convertToAud, formatAud, formatOriginal } from "./fx";
+import { getTrapManOverview, type TrapManOverview } from "@/lib/trapman/overview";
+import { getLiveMetrics, type LiveMetrics } from "./live-metrics";
+import { getGa4Snapshot, type Ga4Snapshot } from "./ga4-data";
+import { getAudRates, convertToAud, formatAud, formatOriginal, type FxRates } from "./fx";
 
 export const dynamic = "force-dynamic";
 
+const FALLBACK_OVERVIEW: TrapManOverview = {
+  connected: false,
+  totalPlayers: null,
+  registeredPlayers: null,
+  guestPlayers: null,
+  newPlayers7d: null,
+  purchases24h: null,
+  revenue24h: null,
+  adsClosed24h: null,
+  adsClicked24h: null,
+  unavailable: ["All metrics — panel failed to load"],
+};
+
+const FALLBACK_LIVE: LiveMetrics = {
+  connected: false,
+  pushReachable: 0,
+  purchaseCount: 0,
+  buyerCount: 0,
+  topRevenue: null,
+  revenueByCurrency: [],
+  maxLevelReached: null,
+  avgCompletedLevels: null,
+  recentActivity: [],
+  latestActivityAt: null,
+  error: "Panel failed to load",
+};
+
+const FALLBACK_GA4: Ga4Snapshot = {
+  connected: false,
+  activeUsers1d: 0,
+  activeUsers7d: 0,
+  activeUsers28d: 0,
+  totalUsers30d: 0,
+  newUsers7d: 0,
+  events: [],
+  adClicked30d: 0,
+  adClosed30d: 0,
+  totalRevenue: 0,
+  purchaseRevenue: 0,
+  avgSessionSeconds: 0,
+  engagedSessions: 0,
+  countries: [],
+  error: "Panel failed to load",
+};
+
+const FALLBACK_FX: FxRates = {
+  connected: false,
+  audTo: {},
+  error: "Panel failed to load",
+};
+
 export default async function TrapManOverviewPage() {
-  const [m, live, ga4, fx] = await Promise.all([
+  // Each data source is independently fetched from a different backend
+  // (Firestore, GA4, an external FX API). Promise.allSettled means one
+  // source failing unexpectedly (outside its own internal try/catch) still
+  // renders the rest of the page — with that panel's own honest
+  // "unavailable" state — instead of crashing the whole overview.
+  const [mResult, liveResult, ga4Result, fxResult] = await Promise.allSettled([
     getTrapManOverview(),
     getLiveMetrics(),
     getGa4Snapshot(),
     getAudRates(),
   ]);
+
+  const m = mResult.status === "fulfilled" ? mResult.value : FALLBACK_OVERVIEW;
+  const live = liveResult.status === "fulfilled" ? liveResult.value : FALLBACK_LIVE;
+  const ga4 = ga4Result.status === "fulfilled" ? ga4Result.value : FALLBACK_GA4;
+  const fx = fxResult.status === "fulfilled" ? fxResult.value : FALLBACK_FX;
 
   // Store revenue (embedded receipts, mixed currencies) converted to AUD.
   let storeRevenueAud: number | null = null;
@@ -64,8 +125,8 @@ export default async function TrapManOverviewPage() {
 
       {/* 1. Connection warning */}
       {!m.connected && (
-        <Card className="mb-6 border-[var(--console-action-border)] bg-[var(--console-action-tint)]">
-          <CardContent className="flex items-start gap-3 p-4 text-sm">
+        <Card className="console-empty-state mb-6 border-[var(--console-action-border)] bg-[var(--console-action-tint)]">
+          <CardContent className="relative flex items-start gap-3 p-4 text-sm">
             <AlertTriangle className="mt-0.5 size-4 shrink-0 text-[var(--console-action)]" />
             <div>
               <p className="font-medium text-[var(--console-action)]">
@@ -190,10 +251,10 @@ export default async function TrapManOverviewPage() {
 
       {/* 4. Live activity feed from leaderboard events */}
       {live.connected && live.recentActivity.length > 0 && (
-        <Card className="mb-6">
+        <Card className="console-glass mb-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
-              <Activity className="size-4 text-[var(--console-live)]" aria-hidden="true" />
+              <Activity className="size-4 text-[var(--console-live)] drop-shadow-[0_0_4px_var(--console-live)]" aria-hidden="true" />
               Latest score submissions
             </CardTitle>
           </CardHeader>
@@ -242,9 +303,9 @@ export default async function TrapManOverviewPage() {
 
       {/* 6. Unavailable data-source panel */}
       {m.unavailable.length > 0 && (
-        <Card className="mb-6 border-[var(--console-violet-border)] bg-[var(--console-violet-tint)]">
-          <CardContent className="p-4">
-            <div className="mb-3 flex items-center gap-2 font-mono text-sm font-medium uppercase tracking-wide text-[var(--console-violet)]">
+        <Card className="console-empty-state mb-6 border-[var(--console-violet-border)] bg-[var(--console-violet-tint)]">
+          <CardContent className="relative p-4">
+            <div className="console-pixel-label mb-3 flex items-center gap-2 text-[var(--console-violet)]">
               <Info className="size-4" aria-hidden="true" />
               Data sources pending verification
             </div>

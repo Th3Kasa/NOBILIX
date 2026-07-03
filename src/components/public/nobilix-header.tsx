@@ -11,8 +11,13 @@ export function NobilixHeader() {
   return (
     <header className="public-header">
       <Link className="public-wordmark" href="/" aria-label="Nobilix home">
-        <span>Nobilix</span>
-        <small>Studio</small>
+        <span className="public-wordmark__mark pixel-type" aria-hidden="true">
+          N
+        </span>
+        <span className="public-wordmark__text">
+          <span>Nobilix</span>
+          <small>Studio</small>
+        </span>
       </Link>
       <nav className="public-header__nav" aria-label="Primary navigation">
         {navigationItems.map((item) => (
@@ -22,6 +27,9 @@ export function NobilixHeader() {
         ))}
       </nav>
       <div className="public-header__right">
+        <Link className="header-cta" href="/console">
+          Console
+        </Link>
         <MobileNavigation items={navigationItems} />
       </div>
     </header>

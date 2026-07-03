@@ -50,7 +50,7 @@ export function Compose({ prefillUid }: { prefillUid?: string }) {
   ];
 
   return (
-    <Card>
+    <Card className="console-glass console-hairline-glow">
       <CardHeader>
         <CardTitle>Compose notification</CardTitle>
       </CardHeader>

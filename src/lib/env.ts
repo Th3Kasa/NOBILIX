@@ -34,6 +34,11 @@ const schema = z.object({
   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: z.string().optional(),
   NEXT_PUBLIC_FIREBASE_PROJECT_ID: z.string().optional(),
   NEXT_PUBLIC_FIREBASE_APP_ID: z.string().optional(),
+
+  // --- Google Analytics 4 (console TrapMan overview) ---
+  // GA4 property ID for the Analytics Data API. Optional — falls back to the
+  // TrapMan property's known ID when unset.
+  GA4_PROPERTY_ID: z.string().optional(),
 });
 
 export type Env = z.infer<typeof schema>;

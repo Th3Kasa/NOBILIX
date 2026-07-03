@@ -40,7 +40,7 @@ export function StudioPrinciples() {
       </Reveal>
 
       <div className="studio-principles__layout">
-        <Reveal delay={0.08} className="studio-principles__plate">
+        <Reveal delay={0.08} className="studio-principles__plate neon-border">
           <Image
             src="/assets/generated/nobilix/principles-plate.webp"
             alt=""
@@ -59,7 +59,7 @@ export function StudioPrinciples() {
               className={`studio-principle studio-principle--${position + 1}`}
             >
               <article>
-                <span className="studio-principle__index" aria-hidden="true">
+                <span className="studio-principle__index pixel-type" aria-hidden="true">
                   {principle.index}
                 </span>
                 <p>{principle.label}</p>

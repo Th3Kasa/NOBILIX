@@ -5,7 +5,10 @@ export default function LegalDirectoryPage() {
   const project = PROJECTS.trapman;
   return (
     <section className="legal-directory legal-reading" aria-labelledby="company-legal-title">
-      <p className="eyebrow">Company brand</p>
+      <p className="eyebrow">
+        <span className="eyebrow__dot" aria-hidden="true" />
+        Company brand
+      </p>
       <h1 id="company-legal-title">Legal and project policies</h1>
       <p>
         Nobilix is the company brand. Project-specific terms, privacy notices,
@@ -14,7 +17,7 @@ export default function LegalDirectoryPage() {
       </p>
 
       <div className="legal-directory__grid">
-        <article>
+        <article className="magnetic-hover">
           <p>Corporate notices</p>
           <h2>Nobilix Pty Ltd</h2>
           <p>
@@ -24,7 +27,7 @@ export default function LegalDirectoryPage() {
           <Link href="/legal/privacy-policy">Privacy Policy</Link>
           <Link href="/legal/terms-of-use">Terms of Use</Link>
         </article>
-        <article>
+        <article className="magnetic-hover">
           <p>Project policies</p>
           <h2>{project.name}</h2>
           <Link href={project.legal.privacy}>Privacy Policy</Link>

@@ -32,7 +32,7 @@ export function NobilixLegalShell({
         </ol>
       </nav>
 
-      <div className="nobilix-legal-art" aria-hidden="true">
+      <div className="nobilix-legal-art neon-border" aria-hidden="true">
         <Image
           src="/assets/generated/nobilix/legal-header-plate.webp"
           alt=""
@@ -53,8 +53,9 @@ export function NobilixLegalShell({
         <div className="nobilix-legal-title-block">
           <h1 className="nobilix-legal-title">{title}</h1>
           <p className="nobilix-legal-updated">
-            Last updated:{" "}
-            <time dateTime={lastUpdated}>{formatDate(lastUpdated)}</time>
+            <span className="nobilix-legal-updated__mono">
+              Last updated <time dateTime={lastUpdated}>{formatDate(lastUpdated)}</time>
+            </span>
           </p>
         </div>
       </header>

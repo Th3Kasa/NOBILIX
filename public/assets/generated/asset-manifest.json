@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-07-02T08:06:18.521Z",
+  "generatedAt": "2026-07-03T04:49:31.477Z",
   "reviewedAt": "2026-07-02T08:08:36.209Z",
   "assets": [
     {
@@ -25,15 +25,15 @@
       "path": "nobilix/project-transition.webp",
       "width": 1440,
       "height": 900,
-      "source": "MuAPI Flux 2 Dev original text-to-image generation",
+      "source": "Higgsfield Nano Banana Pro original text-to-image generation (2026-07-03 redesign pass)",
       "purpose": "Nobilix portfolio transition plate",
-      "prompt": "Original editorial transition plate for an independent game studio portfolio page. Abstract dark cinematic composition: the left two-thirds is deep obsidian studio space with subtle charcoal geometric texture, the right third shows 16-bit pixel-art city fragments materialising from darkness — tiny rooftop silhouettes, a harbour waterline, distant glass towers beginning to appear as if a digital world is rendering into existence. A single thin violet-to-cyan gradient seam marks the transition zone. Gallery-catalogue restraint, disciplined dark negative space, no accidental brightness. No text, no letters, no logos, no people, no photorealistic office, no stationery, no rulers, no notepads, no paper, no craft materials.",
-      "model": "MuAPI Flux 2 Dev",
-      "endpoint": "flux-2-dev",
+      "prompt": "Original editorial transition plate for an independent game studio portfolio page. Left two-thirds deep obsidian studio space with subtle charcoal geometric texture; right third desaturated 16-bit pixel-art city fragments materialising from darkness with harbour waterline reflection. A single thin cyan-to-violet gradient seam marks the transition zone. Gallery-catalogue restraint.",
+      "model": "Higgsfield Nano Banana Pro",
+      "endpoint": "nano_banana_pro",
       "seed": null,
-      "generatedAt": "2026-06-27T09:06:11.413Z",
-      "approved": true,
-      "approval": "Manual visual review"
+      "generatedAt": "2026-07-03T04:49:31.477Z",
+      "approved": false,
+      "approval": "Pending manual visual review (agent pre-reviewed against media brief)"
     },
     {
       "id": "trapman-city-hero",
@@ -105,15 +105,15 @@
       "path": "nobilix/principles-plate.webp",
       "width": 1536,
       "height": 864,
-      "source": "MuAPI Flux 2 Dev original text-to-image generation",
+      "source": "Higgsfield Nano Banana Pro original text-to-image generation (2026-07-03 redesign pass)",
       "purpose": "Nobilix studio-principles section editorial plate",
-      "prompt": "Original dark editorial photograph-style composition, pure architectural still life, completely free of any signage or lettering. A macro study of a single obsidian drafting-table corner under a low raking light: a folded charcoal blueprint sheet showing only abstract grid lines and dots (never words or letterforms), a thin acid-lime laser-level line crossing the frame, deep shadow gradients, one sharp specular highlight. Extremely restrained, gallery-catalogue minimalism, the entire left two-thirds of the frame is pure empty black negative space with absolutely nothing drawn in it. Cold, precise, architectural mood.",
-      "model": "MuAPI Flux 2 Dev",
-      "endpoint": "flux-2-dev",
+      "prompt": "Original dark editorial photograph-style composition, pure architectural still life, completely free of any signage or lettering. A macro study of a single obsidian drafting-table corner under a low raking light: a folded charcoal blueprint sheet showing only abstract grid lines and dots (never words or letterforms), a thin neon-violet laser-level hairline crossing the frame on a subtle diagonal, deep layered shadow gradients receding in depth so the composition stays interesting at a fixed crop, one sharp cool specular highlight. No lime or yellow light anywhere in the frame. Extremely restrained, gallery-catalogue minimalism, the entire left two-thirds of the frame is pure empty black negative space with absolutely nothing drawn in it. Cold, precise, architectural mood.",
+      "model": "Higgsfield Nano Banana Pro",
+      "endpoint": "nano_banana_pro",
       "seed": null,
-      "generatedAt": "2026-07-01T11:39:46.128Z",
-      "approved": true,
-      "approval": "Manual visual review"
+      "generatedAt": "2026-07-03T04:49:31.477Z",
+      "approved": false,
+      "approval": "Pending manual visual review (agent pre-reviewed against media brief)"
     },
     {
       "id": "nobilix-contact-plate",
@@ -121,15 +121,15 @@
       "path": "nobilix/contact-plate.webp",
       "width": 1536,
       "height": 864,
-      "source": "MuAPI Flux 2 Dev original text-to-image generation",
+      "source": "Higgsfield Nano Banana Pro original text-to-image generation (2026-07-03 redesign pass)",
       "purpose": "Nobilix homepage contact section editorial plate",
-      "prompt": "Original dark editorial architectural photograph, completely free of any signage, lettering, or interface elements. A single narrow beam of acid-lime light entering a pitch-black obsidian corridor from an unseen source, illuminating faint architectural seams in the bare wall texture, soft violet ambient bounce light at the edges. Quiet, spacious, gallery-opening mood — evokes 'a door is open' without showing a literal door, person, or any drawn shapes. The entire right half of the frame is pure empty black negative space with absolutely nothing drawn, written, or outlined in it — no boxes, no lines, no shapes, no form fields.",
-      "model": "MuAPI Flux 2 Dev",
-      "endpoint": "flux-2-dev",
+      "prompt": "Original dark editorial architectural photograph, completely free of any signage, lettering, or interface elements. A single narrow beam of restrained neon-violet light entering a pitch-black obsidian corridor from an unseen source, illuminating faint architectural seams in the bare wall texture, soft cyan ambient bounce light at the edges. No lime or yellow light anywhere in the frame. Quiet, spacious, gallery-opening mood.",
+      "model": "Higgsfield Nano Banana Pro",
+      "endpoint": "nano_banana_pro",
       "seed": null,
-      "generatedAt": "2026-07-01T11:39:46.415Z",
-      "approved": true,
-      "approval": "Manual visual review"
+      "generatedAt": "2026-07-03T04:49:31.477Z",
+      "approved": false,
+      "approval": "Pending manual visual review (agent pre-reviewed against media brief)"
     },
     {
       "id": "nobilix-legal-header-plate",

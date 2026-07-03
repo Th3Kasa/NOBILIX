@@ -265,9 +265,9 @@ export function CompetitionHistory({
   if (history.length === 0) return null;
 
   return (
-    <div className="rounded-lg border border-border bg-card">
+    <div className="console-glass rounded-lg border border-border bg-card">
       <div className="flex items-center gap-2 border-b border-border px-5 py-4">
-        <Trophy className="size-4 text-primary" />
+        <Trophy className="size-4 text-primary drop-shadow-[0_0_4px_var(--neon-violet)]" />
         <h2 className="font-semibold">Past competitions</h2>
         <span className="ml-auto text-xs text-muted-foreground">
           {history.length} archived

@@ -476,16 +476,6 @@
 .trapman-account-cta a:hover,
 .trapman-support a:hover,
 .leaderboard-cta:hover { transform: translateY(-1px); }
-.hero-evidence {
-  position: absolute;
-  right: clamp(1rem, 5vw, 5rem);
-  bottom: clamp(1rem, 4vw, 4rem);
-  z-index: var(--z-scene-evidence);
-  display: flex;
-  gap: .75rem;
-  transform: rotate(2deg);
-}
-.hero-evidence img,
 .shop-showcase__screen,
 .gameplay-frame,
 .character-frame {
@@ -494,10 +484,6 @@
   box-shadow:
     0 0 0 1px rgb(241 68 255 / .38),
     0 0 2.2rem rgb(241 68 255 / .28);
-}
-.hero-evidence img {
-  width: clamp(5.5rem, 10vw, 9rem);
-  height: auto;
 }
 .runner-stage {
   z-index: var(--z-scene-runner);
@@ -1189,12 +1175,6 @@
   .shop-grid-section h2 {
     font-size: clamp(3rem, 17vw, 5.7rem);
   }
-  .hero-evidence {
-    right: 1rem;
-    left: 1rem;
-    bottom: 2rem;
-    justify-content: center;
-  }
   .music-strip {
     grid-template-columns: 1fr;
   }
@@ -1843,4 +1823,657 @@ h2.legal-toc-heading {
       "actions";
   }
   .legal-toc { position: static; }
+}
+
+/* ══════════════════════════════════════════════════════════════
+   TRAPMAN REDESIGN — pixel-type pass + scroll-parallax wrappers.
+   Appended section; earlier rules above are unchanged except where a
+   component now nests markup in a new motion-parallax wrapper
+   (documented inline below).
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── Pixel display type: hero word, section kickers, wordmark,
+   score-style numerals only — never full sentences (art-direction §3). */
+.trapman-header__wordmark {
+  font-size: .82rem;
+  letter-spacing: .06em;
+}
+.trapman-kicker {
+  font-family: var(--font-pixel), monospace;
+  letter-spacing: .12em;
+}
+.leaderboard-rank,
+.leaderboard-score {
+  font-family: var(--font-pixel), monospace;
+  letter-spacing: 0;
+}
+.leaderboard-rank { font-size: 1rem; }
+.leaderboard-score { font-size: .82rem; }
+
+/* ── ParallaxMedia wrappers: the video/plate wrapping <motion.div>
+   needs the absolute-fill box the plain <div> used to provide, since
+   ParallaxMedia renders an intermediate element. ── */
+.city-hero__atmosphere-layer {
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-scene-atmosphere);
+}
+.city-hero__atmosphere-layer .city-hero__atmosphere {
+  z-index: auto;
+}
+.leaderboard-stage__plate {
+  position: relative;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   GAME-NATIVE VISUAL LANGUAGE — hand-built recreation of the actual
+   game's look (chrome wordmark, neon skyline, grid floor, maze motif,
+   HUD chrome, podium, in-game leaderboard/player-bar styling). Real
+   screenshots are the style reference only and are never embedded —
+   see docs/media-brief-trapman.md.
+   ══════════════════════════════════════════════════════════════ */
+
+/* Existing generated atmosphere plates are indigo/amber-toned; the game
+   is violet/magenta/cyan. Pull plates toward the game palette wherever
+   they sit behind or beside the new native chrome, scoped to their own
+   containers so nothing outside this page is affected. */
+.city-hero__atmosphere,
+.character-stage__plate img,
+.world-plate img,
+.shop-item-card__plate img,
+.leaderboard-stage__plate img,
+.trapman-account-cta__plate img {
+  filter: saturate(1.14) contrast(1.05) hue-rotate(-6deg);
+}
+
+/* ── Chrome pixel wordmark: hero headline ─────────────────────────── */
+.tm-chrome-wordmark {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: .6em;
+  font-size: clamp(2.1rem, 6.4vw, 4.4rem);
+  line-height: 1.05;
+  letter-spacing: -.02em;
+  max-width: none;
+  text-shadow: none;
+}
+.tm-chrome-wordmark__text {
+  background: linear-gradient(180deg, #ff9df1 0%, #ffffff 46%, #bff8ff 62%, #39e9ff 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  position: relative;
+  filter: drop-shadow(0 3px 0 #6b1fb8) drop-shadow(0 6px 0 #4a1480) drop-shadow(0 0 1.6rem rgb(241 68 255 / .55));
+}
+.tm-chrome-wordmark__sparkle {
+  font-size: .32em;
+  color: #fff;
+  text-shadow: 0 0 .6em #39e9ff;
+  animation: tm-sparkle-twinkle 2.6s ease-in-out infinite;
+}
+.tm-chrome-wordmark__sparkle--b { animation-delay: .6s; }
+.tm-chrome-wordmark__sparkle--c {
+  position: absolute;
+  top: -.4em;
+  right: -.2em;
+  animation-delay: 1.2s;
+}
+@keyframes tm-sparkle-twinkle {
+  0%, 100% { opacity: .35; transform: scale(.85); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+/* ── Neon Sydney skyline: sits above the generated plate, behind the
+   wordmark, like the game's home screen. ── */
+.tm-hero-skyline {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 44%;
+  z-index: var(--z-scene-floor);
+  width: 100%;
+  height: auto;
+  max-height: 28rem;
+  pointer-events: none;
+  /* Static glow only: animating drop-shadow re-rasterizes the whole
+     full-width SVG every frame and stalls the compositor. */
+  filter: drop-shadow(0 0 .55rem rgb(241 68 255 / .55)) drop-shadow(0 0 1.6rem rgb(140 39 255 / .35));
+}
+.tm-skyline__windows { animation: tm-window-flicker 3.4s steps(2, jump-none) infinite; }
+@keyframes tm-window-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .55; }
+}
+
+/* ── Play button: mirrors the in-game PLAY control. ── */
+.tm-play-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: .9rem 2.4rem;
+  overflow: hidden;
+  border-radius: 1rem;
+  color: #fff;
+  font-size: .95rem;
+  letter-spacing: .04em;
+  text-decoration: none;
+  border: 2px solid var(--tm-cyan);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--tm-violet) 82%, var(--tm-magenta)), var(--tm-violet));
+  box-shadow:
+    0 0 0 1px rgb(241 68 255 / .35),
+    0 0 2rem rgb(57 233 255 / .4),
+    inset 0 1px 0 rgb(255 255 255 / .25);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.tm-play-btn:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 0 1px rgb(241 68 255 / .45),
+    0 0 2.8rem rgb(57 233 255 / .55),
+    inset 0 1px 0 rgb(255 255 255 / .3);
+}
+.tm-play-btn__grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: .5;
+  background:
+    linear-gradient(rgb(255 255 255 / .12) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / .12) 1px, transparent 1px);
+  background-size: 10px 10px;
+}
+.tm-play-btn__label { position: relative; z-index: 1; }
+.tm-hero-secondary-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: 1.4rem;
+  border-radius: .9rem;
+  border: 1px solid rgb(57 233 255 / .4);
+  color: var(--tm-cyan);
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-decoration: none;
+  transition: border-color .18s ease, background .18s ease;
+}
+.tm-hero-secondary-link:hover {
+  border-color: rgb(57 233 255 / .7);
+  background: rgb(57 233 255 / .1);
+}
+
+/* ── App store links ───────────────────────────────────────────────── */
+.tm-store-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  margin-top: .25rem;
+}
+.tm-store-badge {
+  display: flex;
+  flex-direction: column;
+  gap: .1rem;
+  min-height: 44px;
+  justify-content: center;
+  padding: .5rem 1.1rem;
+  border-radius: .8rem;
+  border: 1px solid rgb(255 255 255 / .22);
+  background: rgb(3 2 7 / .55);
+  color: #fff;
+  text-decoration: none;
+  transition: border-color .18s ease, transform .18s ease;
+}
+.tm-store-badge:hover { border-color: rgb(57 233 255 / .6); transform: translateY(-1px); }
+.tm-store-badge__eyebrow { font-size: .62rem; letter-spacing: .06em; opacity: .7; }
+.tm-store-badge__name { font-size: .92rem; font-weight: 800; }
+
+/* ── Perspective neon grid floor (already present via .city-hero::after);
+   reinforced parallax-safe variant for sections beyond the hero. ── */
+.tm-grid-floor {
+  position: absolute;
+  inset: auto 0 0;
+  height: 40%;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(rgb(57 233 255 / .16) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(241 68 255 / .2) 1px, transparent 1px);
+  background-size: 56px 56px;
+  transform: perspective(380px) rotateX(62deg);
+  transform-origin: bottom;
+  opacity: .5;
+  mask-image: linear-gradient(180deg, transparent, #000 40%);
+}
+
+/* ── Maze-line motif: section dividers built from the gameplay
+   corridor language, with a scroll-reveal "line draw" animation. ── */
+.tm-maze-divider {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-top: 2.5rem;
+  filter: drop-shadow(0 0 .5rem rgb(57 233 255 / .45));
+}
+.tm-maze-divider__path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 1.6s ease;
+}
+.reveal.visible .tm-maze-divider__path { stroke-dashoffset: 0; }
+.tm-maze-divider__coins {
+  opacity: 0;
+  transition: opacity .6s ease .9s;
+}
+.reveal.visible .tm-maze-divider__coins { opacity: 1; }
+.tm-maze-divider__coins circle {
+  /* No per-circle drop-shadow: a filter plus continuous opacity animation
+     forces a filter re-raster per frame per coin. */
+  animation: tm-coin-pulse 1.6s ease-in-out infinite;
+}
+.tm-maze-divider__coins circle:nth-child(2) { animation-delay: .15s; }
+.tm-maze-divider__coins circle:nth-child(3) { animation-delay: .3s; }
+.tm-maze-divider__coins circle:nth-child(4) { animation-delay: .45s; }
+@keyframes tm-coin-pulse {
+  0%, 100% { opacity: .55; }
+  50% { opacity: 1; }
+}
+.tm-section-divider--top { margin-top: 0; margin-bottom: 1.5rem; transform: scaleY(-1); }
+
+/* ── HUD chrome: hexagonal/angled neon-bordered stat readouts, pixel
+   hearts, leading-zero score counters — decorative framing that echoes
+   the in-game HUD bar. ── */
+.tm-hud-bar {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  padding: 1rem clamp(1rem, 3vw, 1.75rem);
+  border-radius: 1rem;
+  border: 1px solid rgb(241 68 255 / .4);
+  background: linear-gradient(135deg, rgb(3 2 7 / .82), rgb(22 5 38 / .68));
+  box-shadow:
+    0 0 0 1px rgb(57 233 255 / .18),
+    0 0 2rem rgb(241 68 255 / .16);
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+}
+.tm-hud-chip {
+  display: flex;
+  flex-direction: column;
+  gap: .2rem;
+}
+.tm-hud-chip__label {
+  font-size: .62rem;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--tm-cyan);
+  opacity: .8;
+}
+.tm-hud-chip[data-accent="magenta"] .tm-hud-chip__label { color: var(--tm-magenta); }
+.tm-hud-chip[data-accent="yellow"] .tm-hud-chip__label { color: var(--tm-yellow); }
+.tm-hud-chip__value {
+  font-size: .95rem;
+  color: #fff;
+  text-shadow: 0 0 .6rem rgb(57 233 255 / .5);
+}
+.tm-hud-chip[data-accent="magenta"] .tm-hud-chip__value { text-shadow: 0 0 .6rem rgb(241 68 255 / .55); }
+.tm-hud-bar__lives {
+  display: flex;
+  gap: .35rem;
+  color: #ff4369;
+}
+.tm-pixel-heart {
+  width: 1.2rem;
+  height: 1rem;
+  filter: drop-shadow(0 0 .4rem rgb(255 67 105 / .6));
+}
+.tm-hud-bar__level {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .1rem;
+  padding: .3rem .8rem;
+  border-radius: .6rem;
+  border: 1px solid rgb(57 233 255 / .4);
+  background: rgb(3 2 7 / .6);
+  color: #fff;
+  font-size: .85rem;
+}
+.tm-hud-bar__level-label {
+  font-size: .55rem;
+  letter-spacing: .1em;
+  color: var(--tm-cyan);
+  opacity: .8;
+}
+
+/* ── Character podium showcase ─────────────────────────────────────── */
+.tm-podium-stage {
+  --char-accent: var(--tm-cyan);
+  position: relative;
+  z-index: 1;
+  margin-top: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  padding: clamp(2rem, 6vw, 3.5rem) 1rem;
+}
+.tm-podium-scene {
+  position: relative;
+  width: min(100%, 22rem);
+  aspect-ratio: 1 / 1.05;
+  display: grid;
+  place-items: center;
+}
+.tm-podium-ring {
+  position: absolute;
+  bottom: 12%;
+  width: 78%;
+  aspect-ratio: 3.2 / 1;
+  border-radius: 50%;
+  border: 3px solid var(--char-accent);
+  box-shadow:
+    0 0 1.5rem var(--char-accent),
+    inset 0 0 1.5rem color-mix(in srgb, var(--char-accent) 45%, transparent);
+  animation: tm-podium-ring-pulse 3.2s ease-in-out infinite;
+  transition: border-color .3s ease, box-shadow .3s ease;
+}
+.tm-podium-ring--outer {
+  width: 96%;
+  bottom: 8%;
+  border-width: 1px;
+  opacity: .5;
+  animation-delay: .4s;
+}
+@keyframes tm-podium-ring-pulse {
+  0%, 100% { transform: scale(1); opacity: .85; }
+  50% { transform: scale(1.035); opacity: 1; }
+}
+.tm-podium-glow {
+  position: absolute;
+  bottom: 10%;
+  width: 60%;
+  height: 55%;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--char-accent) 45%, transparent), transparent 72%);
+  filter: blur(4px);
+  transition: background .3s ease;
+}
+.tm-podium-avatar {
+  position: relative;
+  z-index: 1;
+  bottom: 8%;
+  width: 40%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border-radius: 1.4rem;
+  border: 2px solid var(--char-accent);
+  background: linear-gradient(160deg, color-mix(in srgb, var(--char-accent) 24%, #0a0114), rgb(3 2 7 / .92));
+  box-shadow: 0 0 2.4rem color-mix(in srgb, var(--char-accent) 55%, transparent);
+  animation: tm-podium-avatar-idle 2.4s ease-in-out infinite;
+  transition: border-color .3s ease, box-shadow .3s ease;
+}
+@keyframes tm-podium-avatar-idle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6%); }
+}
+.tm-podium-avatar__initial {
+  font-family: var(--font-pixel), monospace;
+  font-size: clamp(1.8rem, 5vw, 2.6rem);
+  color: var(--char-accent);
+  text-shadow: 0 0 1rem var(--char-accent);
+}
+.tm-podium-base {
+  position: absolute;
+  bottom: 4%;
+  width: 84%;
+  height: 10%;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--char-accent) 30%, #030207);
+  box-shadow: 0 0 2rem color-mix(in srgb, var(--char-accent) 30%, transparent);
+}
+.tm-podium-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.tm-podium-arrow {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: .8rem;
+  border: 2px solid var(--char-accent);
+  background: rgb(3 2 7 / .7);
+  color: var(--char-accent);
+  box-shadow: 0 0 1rem color-mix(in srgb, var(--char-accent) 45%, transparent);
+  transition: transform .18s ease, background .18s ease;
+}
+.tm-podium-arrow svg { width: 20px; height: 20px; }
+.tm-podium-arrow:hover { background: color-mix(in srgb, var(--char-accent) 18%, transparent); transform: translateY(-1px); }
+.tm-podium-arrow:focus-visible { outline: 2px solid var(--char-accent); outline-offset: 2px; }
+.tm-podium-plate {
+  min-width: 10rem;
+  text-align: center;
+  padding: .7rem 1.4rem;
+  border-radius: 2rem;
+  border: 1px solid var(--char-accent);
+  background: rgb(3 2 7 / .75);
+  color: #fff;
+  font-size: .9rem;
+  box-shadow: 0 0 1.4rem color-mix(in srgb, var(--char-accent) 40%, transparent);
+}
+.tm-podium-tabs {
+  display: flex;
+  gap: .6rem;
+}
+.tm-podium-tab {
+  min-height: 44px;
+  padding-inline: 1rem;
+  border-radius: .7rem;
+  border: 1px solid rgb(255 255 255 / .18);
+  background: transparent;
+  color: #cdeaff;
+  font-size: .8rem;
+  font-weight: 700;
+  transition: border-color .18s ease, color .18s ease, background .18s ease;
+}
+.tm-podium-tab[data-active="true"] {
+  border-color: var(--char-accent);
+  color: #fff;
+  background: color-mix(in srgb, var(--char-accent) 16%, transparent);
+}
+.tm-podium-tab:focus-visible { outline: 2px solid var(--char-accent); outline-offset: 2px; }
+.tm-podium-info {
+  max-width: 34rem;
+  text-align: center;
+}
+.tm-podium-info .character-tag { color: var(--char-accent); justify-content: center; }
+.tm-podium-info .character-desc { font-size: .95rem; }
+
+/* ── Leaderboard: rank medals, gold pixel numerals, neon row dividers,
+   share-style corner accents — restyle only, data logic unchanged. ── */
+.tm-leaderboard-board__frame {
+  position: relative;
+  padding: 1.5rem;
+  border-radius: 1.2rem;
+  border: 1px solid rgb(241 68 255 / .4);
+  background: linear-gradient(160deg, rgb(3 2 7 / .85), rgb(10 2 22 / .7));
+  box-shadow: 0 0 2.5rem rgb(241 68 255 / .12);
+}
+.tm-leaderboard-board__corner {
+  position: absolute;
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 2px solid var(--tm-cyan);
+  opacity: .8;
+}
+.tm-leaderboard-board__corner--tl { top: -1px; left: -1px; border-right: none; border-bottom: none; border-top-left-radius: .8rem; }
+.tm-leaderboard-board__corner--br { bottom: -1px; right: -1px; border-left: none; border-top: none; border-bottom-right-radius: .8rem; }
+.leaderboard-row { border-bottom: 1px solid rgb(57 233 255 / .18); }
+.leaderboard-row[data-top] { background: linear-gradient(90deg, rgb(255 212 54 / .08), transparent 60%); }
+.leaderboard-table td.leaderboard-score { color: var(--tm-yellow); text-shadow: 0 0 .5rem rgb(255 212 54 / .5); }
+.tm-leaderboard-medal { font-size: 1.2rem; line-height: 1; }
+.tm-leaderboard-flag { margin-right: .45rem; }
+
+/* ── Music/crew section: presents Lonely Souljaz, restyles the strip as
+   the in-game player bar. ── */
+.tm-crew-card {
+  padding: 1.4rem 1.6rem;
+  border-radius: 1.2rem;
+  border: 1px solid rgb(140 39 255 / .35);
+  background: linear-gradient(135deg, rgb(140 39 255 / .1), rgb(3 2 7 / .5));
+}
+.tm-crew-card__eyebrow {
+  font-size: .68rem;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--tm-cyan);
+}
+.tm-crew-card__name {
+  margin-top: .5rem;
+  font-size: 1.05rem;
+  color: #fff;
+  text-shadow: 0 0 .8rem rgb(241 68 255 / .5);
+}
+.tm-crew-card__tag {
+  margin-top: .35rem;
+  font-size: .8rem;
+  color: var(--tm-magenta);
+  letter-spacing: .04em;
+}
+.tm-crew-card__body {
+  margin-top: .75rem;
+  font-size: .88rem;
+  color: #cdeaff;
+  line-height: 1.65;
+}
+.tm-player-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: .9rem 1.1rem;
+  border-radius: 1rem;
+  border: 1px solid rgb(57 233 255 / .4);
+  background: rgb(3 2 7 / .75);
+  box-shadow: 0 0 1.6rem rgb(57 233 255 / .14);
+}
+.tm-player-bar__meta {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  min-width: 9rem;
+}
+.tm-player-bar__dot {
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: radial-gradient(circle at 35% 30%, var(--tm-cyan), var(--tm-violet) 70%);
+  box-shadow: 0 0 .8rem rgb(57 233 255 / .5);
+}
+.tm-player-bar__track {
+  font-size: .68rem;
+  color: #fff;
+}
+.tm-player-bar__artist {
+  margin-top: .2rem;
+  font-size: .74rem;
+  color: var(--tm-cyan);
+}
+.tm-player-bar__transport {
+  display: flex;
+  gap: .4rem;
+}
+.tm-player-bar__chip {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: .5rem;
+  border: 1px solid rgb(57 233 255 / .4);
+  color: var(--tm-cyan);
+  font-size: .8rem;
+}
+.tm-player-bar__chip--play {
+  border-color: var(--tm-magenta);
+  color: var(--tm-magenta);
+}
+.tm-player-bar__progress {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  flex: 1;
+  min-width: 10rem;
+}
+.tm-player-bar__time {
+  font-size: .68rem;
+  color: #cdeaff;
+  font-variant-numeric: tabular-nums;
+}
+.tm-player-bar__track-bar {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: rgb(255 255 255 / .12);
+  overflow: hidden;
+}
+.tm-player-bar__track-fill {
+  display: block;
+  width: 4%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--tm-cyan), var(--tm-magenta));
+  box-shadow: 0 0 .5rem rgb(57 233 255 / .6);
+}
+
+@media (max-width: 820px) {
+  .tm-chrome-wordmark { font-size: clamp(1.9rem, 9vw, 3rem); }
+  .tm-hero-skyline { max-height: 16rem; bottom: 48%; }
+  .tm-hud-bar { justify-content: center; text-align: center; }
+  .tm-podium-scene { width: min(100%, 17rem); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tm-hero-skyline,
+  .tm-skyline__windows,
+  .tm-podium-ring,
+  .tm-podium-avatar,
+  .tm-maze-divider__coins circle,
+  .tm-chrome-wordmark__sparkle {
+    animation: none !important;
+  }
+  .tm-maze-divider__path {
+    transition: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+  .tm-maze-divider__coins {
+    transition: none !important;
+    opacity: 1 !important;
+  }
+}
+
+/* Chrome wordmark sizing: must beat the generic `.hero-copy h1` clamp, which
+   was tuned for the condensed sans heading. Press Start 2P glyphs are ~1em
+   wide, so "TRAP-MAN" needs a far smaller scale to fit 320-1920px. */
+.hero-copy h1.tm-chrome-wordmark,
+h1.tm-chrome-wordmark {
+  font-size: clamp(1.6rem, 5.2vw, 4.2rem);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  max-width: none;
+}
+@media (max-width: 820px) {
+  .hero-copy h1.tm-chrome-wordmark,
+  h1.tm-chrome-wordmark {
+    font-size: clamp(1.15rem, 6.5vw, 2.4rem);
+  }
 }

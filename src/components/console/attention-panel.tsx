@@ -19,18 +19,18 @@ export function AttentionPanel({ items, className }: AttentionPanelProps) {
   return (
     <div
       className={cn(
-        "console-attention-panel rounded-xl border border-[var(--console-action-border)] bg-[var(--console-action-tint)] p-5",
+        "console-attention-panel console-empty-state rounded-xl border border-[var(--console-action-border)] bg-[var(--console-action-tint)] p-5",
         className,
       )}
       role="region"
       aria-label="Items requiring attention"
     >
-      <div className="mb-3 flex items-center gap-2">
+      <div className="relative mb-3 flex items-center gap-2">
         <AlertTriangle
-          className="size-4 text-[var(--console-action)]"
+          className="size-4 text-[var(--console-action)] drop-shadow-[0_0_4px_var(--console-action)]"
           aria-hidden="true"
         />
-        <h2 className="font-mono text-sm font-semibold uppercase tracking-wide text-[var(--console-action)]">
+        <h2 className="console-pixel-label text-[var(--console-action)]">
           Needs attention ({items.length})
         </h2>
       </div>

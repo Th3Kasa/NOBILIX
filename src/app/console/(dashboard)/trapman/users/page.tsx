@@ -52,8 +52,8 @@ export default async function UsersPage({
       <UsersFilter defaultQ={sp.q} defaultCountry={sp.country} defaultGuest={guest} />
 
       {!result.connected && (
-        <Card className="mb-4 border-[var(--console-action-border)] bg-[var(--console-action-tint)]">
-          <CardContent className="flex items-start gap-3 p-4 text-sm">
+        <Card className="console-empty-state mb-4 border-[var(--console-action-border)] bg-[var(--console-action-tint)]">
+          <CardContent className="relative flex items-start gap-3 p-4 text-sm">
             <AlertTriangle className="mt-0.5 size-4 shrink-0 text-[var(--console-action)]" />
             <span className="text-muted-foreground">
               Couldn&apos;t reach Firebase. Add service-account credentials to see
@@ -63,12 +63,14 @@ export default async function UsersPage({
         </Card>
       )}
 
-      <Card className="mt-4">
+      <Card className="console-glass mt-4">
         <CardContent className="p-0">
           {result.users.length === 0 ? (
-            <p className="p-8 text-center text-sm text-muted-foreground">
-              No players found.
-            </p>
+            <div className="console-empty-state">
+              <p className="relative p-8 text-center text-sm text-muted-foreground">
+                No players found.
+              </p>
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -134,8 +136,8 @@ export default async function UsersPage({
                       </td>
                       <td className="px-4 py-3 text-right">
                         <Link
-                          href={`/console/users/${u.uid}`}
-                          className="inline-flex items-center text-primary hover:underline"
+                          href={`/console/trapman/users/${u.uid}`}
+                          className="inline-flex items-center text-primary transition-transform hover:translate-x-0.5 hover:underline"
                         >
                           View <ChevronRight className="size-4" />
                         </Link>

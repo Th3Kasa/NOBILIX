@@ -50,8 +50,8 @@ export default async function PurchasesPage() {
       />
 
       {!data.connected ? (
-        <Card className="border-[var(--console-action-border)] bg-[var(--console-action-tint)]">
-          <CardContent className="flex items-start gap-3 p-4 text-sm">
+        <Card className="console-empty-state border-[var(--console-action-border)] bg-[var(--console-action-tint)]">
+          <CardContent className="relative flex items-start gap-3 p-4 text-sm">
             <AlertTriangle className="mt-0.5 size-4 shrink-0 text-[var(--console-action)]" />
             <div>
               <p className="font-medium text-[var(--console-action)]">
@@ -64,8 +64,8 @@ export default async function PurchasesPage() {
           </CardContent>
         </Card>
       ) : data.totalCount === 0 ? (
-        <div className="console-empty-state rounded-xl border border-dashed border-border bg-muted/20">
-          <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
+        <div className="console-empty-state console-glass rounded-xl border border-dashed border-border">
+          <div className="relative flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
             <div className="flex size-10 items-center justify-center rounded-lg bg-[var(--console-violet-tint)] text-[var(--console-violet)]">
               <Receipt className="size-5" aria-hidden="true" />
             </div>
@@ -123,9 +123,9 @@ export default async function PurchasesPage() {
             />
           </div>
 
-          <div className="mb-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div className="console-page-grid mb-6">
             {/* Product breakdown */}
-            <Card>
+            <Card className="console-glass console-grid-span-6">
               <CardHeader>
                 <CardTitle className="text-base">Revenue by product</CardTitle>
               </CardHeader>
@@ -168,7 +168,7 @@ export default async function PurchasesPage() {
             </Card>
 
             {/* Platform split */}
-            <Card>
+            <Card className="console-glass console-grid-span-6">
               <CardHeader>
                 <CardTitle className="text-base">Platforms</CardTitle>
               </CardHeader>
@@ -199,7 +199,7 @@ export default async function PurchasesPage() {
           </div>
 
           {/* Recent purchases */}
-          <Card>
+          <Card className="console-glass">
             <CardHeader>
               <CardTitle className="text-base">Recent purchases</CardTitle>
             </CardHeader>

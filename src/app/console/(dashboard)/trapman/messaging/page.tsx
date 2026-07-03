@@ -36,30 +36,34 @@ export default async function MessagingPage({
         description="Contact players via Firebase Cloud Messaging."
       />
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        {canWrite ? (
-          <Compose prefillUid={uid} />
-        ) : (
-          <Card>
-            <CardHeader>
-              <CardTitle>Compose notification</CardTitle>
-            </CardHeader>
-            <CardContent className="text-sm text-muted-foreground">
-              Your role is read-only. You can view campaign history but cannot
-              send notifications.
-            </CardContent>
-          </Card>
-        )}
+      <div className="console-page-grid">
+        <div className="console-grid-span-6">
+          {canWrite ? (
+            <Compose prefillUid={uid} />
+          ) : (
+            <Card className="console-glass">
+              <CardHeader>
+                <CardTitle>Compose notification</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-muted-foreground">
+                Your role is read-only. You can view campaign history but cannot
+                send notifications.
+              </CardContent>
+            </Card>
+          )}
+        </div>
 
-        <Card>
+        <Card className="console-glass console-grid-span-6">
           <CardHeader>
             <CardTitle>Recent campaigns</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
             {campaigns.length === 0 ? (
-              <p className="p-6 text-center text-sm text-muted-foreground">
-                No campaigns sent yet.
-              </p>
+              <div className="console-empty-state">
+                <p className="relative p-6 text-center text-sm text-muted-foreground">
+                  No campaigns sent yet.
+                </p>
+              </div>
             ) : (
               <ul className="divide-y divide-border/60">
                 {campaigns.map((c) => (

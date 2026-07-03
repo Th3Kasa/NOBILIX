@@ -9,7 +9,7 @@ export function ProjectShowcase() {
 
   return (
     <section id="projects" className="project-showcase" aria-labelledby="projects-title">
-      <Reveal className="project-showcase__media" aria-hidden="true">
+      <Reveal className="project-showcase__media neon-border" aria-hidden="true">
         <Image
           src="/assets/generated/nobilix/project-transition.webp"
           alt=""
@@ -19,7 +19,10 @@ export function ProjectShowcase() {
         />
       </Reveal>
       <Reveal delay={0.1} className="project-showcase__copy">
-        <p className="eyebrow">02 / Main project</p>
+        <p className="eyebrow">
+          <span className="eyebrow__dot" aria-hidden="true" />
+          02 / Main project
+        </p>
         <h2 id="projects-title">
           TrapMan is the <em>main project</em> currently.
         </h2>

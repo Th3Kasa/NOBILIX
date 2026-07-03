@@ -19,6 +19,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="console-shell flex min-h-dvh">
+      <div className="console-grid-mesh" aria-hidden="true" />
       <PlatformSidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <div className="border-b border-border bg-card/40 px-4 py-3 md:hidden">

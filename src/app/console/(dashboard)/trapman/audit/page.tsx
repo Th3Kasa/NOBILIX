@@ -24,12 +24,14 @@ export default async function AuditPage() {
         title="Audit log"
         description="Every privileged action, with who and when."
       />
-      <Card>
+      <Card className="console-glass">
         <CardContent className="p-0">
           {entries.length === 0 ? (
-            <p className="p-8 text-center text-sm text-muted-foreground">
-              No audit entries yet.
-            </p>
+            <div className="console-empty-state">
+              <p className="relative p-8 text-center text-sm text-muted-foreground">
+                No audit entries yet.
+              </p>
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">

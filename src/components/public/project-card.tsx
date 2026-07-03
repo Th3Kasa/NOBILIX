@@ -4,14 +4,15 @@ import type { ProjectDefinition } from "@/types/projects";
 
 export function ProjectCard({ project }: { project: ProjectDefinition }) {
   return (
-    <article className="project-card">
+    <article className="project-card magnetic-hover">
       <Image
         src={project.logoPath}
         alt={`${project.name} logo`}
         width={112}
         height={112}
       />
-      <p>
+      <p className="project-card__meta">
+        <span className="project-card__status-dot" aria-hidden="true" />
         {project.kind} · {project.status}
       </p>
       <h3>{project.name}</h3>

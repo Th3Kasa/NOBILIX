@@ -38,30 +38,35 @@ export default async function LeaderboardPage() {
       />
 
       {!connected && (
-        <div className="mb-4 rounded-lg border border-[var(--console-action-border)] bg-[var(--console-action-tint)] px-4 py-3 text-sm text-[var(--console-action)]">
-          Firebase connection failed: {error ?? "unknown error"}. Add your
-          service-account credentials to .env.local to connect.
+        <div className="console-empty-state mb-4 rounded-lg border border-[var(--console-action-border)] bg-[var(--console-action-tint)] px-4 py-3 text-sm text-[var(--console-action)]">
+          <span className="relative">
+            Firebase connection failed: {error ?? "unknown error"}. Add your
+            service-account credentials to .env.local to connect.
+          </span>
         </div>
       )}
 
       <div className="space-y-6">
         {/* Current leaderboard */}
-        <div className="rounded-lg border border-border bg-card">
+        <div className="console-glass rounded-lg border border-border bg-card">
           <div className="flex items-center gap-2 border-b border-border px-5 py-4">
             <h2 className="font-semibold">Current standings</h2>
             {connected && (
               <Badge variant="success" className="ml-auto font-mono uppercase tracking-wide">
+                <span className="mr-1 size-1.5 rounded-full bg-current drop-shadow-[0_0_3px_currentColor]" />
                 Live
               </Badge>
             )}
           </div>
 
           {entries.length === 0 ? (
-            <p className="px-5 py-12 text-center text-sm text-muted-foreground">
-              {connected
-                ? "No entries yet — the competition hasn't started or the leaderboard is empty."
-                : "Connect Firebase to view leaderboard data."}
-            </p>
+            <div className="console-empty-state">
+              <p className="relative px-5 py-12 text-center text-sm text-muted-foreground">
+                {connected
+                  ? "No entries yet — the competition hasn't started or the leaderboard is empty."
+                  : "Connect Firebase to view leaderboard data."}
+              </p>
+            </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
@@ -86,7 +91,7 @@ export default async function LeaderboardPage() {
                           className={cn(
                             "font-mono tabular-nums",
                             entry.rank === 1
-                              ? "text-yellow-500 font-bold"
+                              ? "text-yellow-500 font-bold drop-shadow-[0_0_5px_var(--neon-yellow)]"
                               : entry.rank === 2
                                 ? "text-slate-400 font-bold"
                                 : entry.rank === 3

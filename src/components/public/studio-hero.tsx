@@ -5,11 +5,14 @@ import { Reveal } from "@/components/motion/reveal";
 
 export function StudioHero() {
   return (
-    <section className="studio-hero" aria-labelledby="company-title">
+    <section className="studio-hero grid-mesh-floor" aria-labelledby="company-title">
       <div className="studio-hero__copy">
         <Reveal>
           <p className="studio-brand-badge pixel-type" aria-hidden="true">NOBILIX</p>
-          <p className="eyebrow">Independent game studio</p>
+          <p className="eyebrow">
+            <span className="eyebrow__dot" aria-hidden="true" />
+            Independent game studio · Sydney, AU
+          </p>
         </Reveal>
         <Reveal delay={0.08}>
           <h1 id="company-title">
@@ -25,16 +28,16 @@ export function StudioHero() {
             product home — without forcing the studio brand to compete.
           </p>
           <div className="studio-hero__actions" aria-label="Primary actions">
-            <Link className="nobilix-button nobilix-button--primary" href="/trapman">
+            <Link className="nobilix-button nobilix-button--primary magnetic-hover" href="/trapman">
               Enter TrapMan
             </Link>
-            <Link className="nobilix-button nobilix-button--secondary" href="/#projects">
+            <Link className="nobilix-button nobilix-button--secondary magnetic-hover" href="/#projects">
               View projects
             </Link>
           </div>
         </Reveal>
       </div>
-      <ParallaxMedia className="studio-hero__media" amount={24}>
+      <ParallaxMedia className="studio-hero__media neon-border" amount={24}>
         <CinematicVideo
           src="/assets/generated/nobilix/studio-hero.mp4"
           poster="/assets/generated/nobilix/studio-hero.webp"
@@ -44,6 +47,7 @@ export function StudioHero() {
           sizes="(max-width: 768px) 100vw, 52vw"
           priority
         />
+        <div className="studio-hero__scanline crt-overlay" aria-hidden="true" />
         <div className="studio-hero__plate" aria-hidden="true">
           <span>Plate 01</span>
           <span>Studio, in progress</span>

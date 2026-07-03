@@ -19,7 +19,7 @@ export default async function ExportsPage() {
       />
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <Card className="flex flex-col">
+        <Card className="console-glass flex flex-col">
           <CardHeader>
             <div className="flex items-start justify-between gap-2">
               <div className="flex size-9 items-center justify-center rounded-lg bg-[var(--console-live-tint)] text-[var(--console-live)]">
@@ -49,7 +49,7 @@ export default async function ExportsPage() {
           </CardContent>
         </Card>
 
-        <Card className="flex flex-col">
+        <Card className="console-glass flex flex-col">
           <CardHeader>
             <div className="flex items-start justify-between gap-2">
               <div className="flex size-9 items-center justify-center rounded-lg bg-[var(--console-live-tint)] text-[var(--console-live)]">
@@ -80,7 +80,7 @@ export default async function ExportsPage() {
         </Card>
 
         {purchases.connected && purchases.totalCount > 0 ? (
-          <Card className="flex flex-col">
+          <Card className="console-glass flex flex-col">
             <CardHeader>
               <div className="flex items-start justify-between gap-2">
                 <div className="flex size-9 items-center justify-center rounded-lg bg-[var(--console-live-tint)] text-[var(--console-live)]">
@@ -111,7 +111,7 @@ export default async function ExportsPage() {
             </CardContent>
           </Card>
         ) : (
-          <Card className="flex flex-col border-dashed">
+          <Card className="console-empty-state console-glass flex flex-col border-dashed">
             <CardHeader>
               <div className="flex items-start justify-between gap-2">
                 <div className="flex size-9 items-center justify-center rounded-lg bg-[var(--console-violet-tint)] text-[var(--console-violet)]">

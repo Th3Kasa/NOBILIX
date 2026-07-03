@@ -31,6 +31,7 @@ export default function TrapManLayout({
 
   return (
     <div className="console-shell flex min-h-dvh">
+      <div className="console-grid-mesh" aria-hidden="true" />
       <ProjectSidebar
         projectSlug={project.slug}
         projectName={project.name}
@@ -40,7 +41,7 @@ export default function TrapManLayout({
         <div className="border-b border-border bg-card/40 px-4 py-3 md:hidden">
           <ConsoleMobileNav scopeLabel={project.name} items={projectNavigationItems} />
         </div>
-        <div className="flex items-center justify-end border-b border-border/60 bg-card/20 px-4 md:px-6">
+        <div className="flex h-10 items-center justify-end border-b border-border/60 bg-card/20 px-4 md:px-6">
           <AutoRefresh />
         </div>
         <main

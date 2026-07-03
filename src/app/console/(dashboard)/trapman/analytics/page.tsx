@@ -54,8 +54,8 @@ export default async function AnalyticsPage() {
       )}
 
       {!data.connected && (
-        <Card className="mb-6 border-[var(--console-action-border)] bg-[var(--console-action-tint)]">
-          <CardContent className="flex items-start gap-3 p-4 text-sm">
+        <Card className="console-empty-state mb-6 border-[var(--console-action-border)] bg-[var(--console-action-tint)]">
+          <CardContent className="relative flex items-start gap-3 p-4 text-sm">
             <AlertTriangle className="mt-0.5 size-4 shrink-0 text-[var(--console-action)]" />
             <div>
               <p className="font-medium text-[var(--console-action)]">
@@ -87,8 +87,8 @@ export default async function AnalyticsPage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-            <Card>
+          <div className="console-page-grid">
+            <Card className="console-glass console-grid-span-6">
               <CardHeader>
                 <CardTitle className="text-base">Country distribution</CardTitle>
               </CardHeader>
@@ -97,7 +97,7 @@ export default async function AnalyticsPage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="console-glass console-grid-span-6">
               <CardHeader>
                 <CardTitle className="text-base">Level progress distribution</CardTitle>
               </CardHeader>
@@ -108,7 +108,7 @@ export default async function AnalyticsPage() {
           </div>
 
           {ga4.connected && ga4.countries.length > 0 && (
-            <Card className="mt-4">
+            <Card className="console-glass mt-4">
               <CardHeader>
                 <CardTitle className="text-base">
                   Active users by country (GA4, last 30 days)

@@ -47,21 +47,21 @@ export function LoginForm() {
           aria-current={step === "credentials" ? "step" : undefined}
           className={`border-b-2 pb-2 transition-colors ${
             onCredentials
-              ? "border-primary text-primary"
+              ? "border-primary text-primary drop-shadow-[0_0_6px_var(--neon-violet)]"
               : "border-border text-muted-foreground"
           }`}
         >
-          1. Credentials
+          01 · Credentials
         </li>
         <li
           aria-current={step !== "credentials" ? "step" : undefined}
           className={`border-b-2 pb-2 text-right transition-colors ${
             !onCredentials
-              ? "border-primary text-primary"
+              ? "border-primary text-primary drop-shadow-[0_0_6px_var(--neon-violet)]"
               : "border-border text-muted-foreground"
           }`}
         >
-          2. Two-factor
+          02 · Two-factor
         </li>
       </ol>
 

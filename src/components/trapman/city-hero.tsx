@@ -1,30 +1,35 @@
-import Image from "next/image";
 import Link from "next/link";
 import { CinematicVideo } from "@/components/motion/cinematic-video";
+import { ParallaxMedia } from "@/components/motion/parallax-media";
+import { ChromeWordmark } from "./chrome-wordmark";
 import { CityMotion } from "./city-motion";
+import { NeonSkyline } from "./neon-skyline";
+import { PlayButton } from "./play-button";
 
 export function CityHero() {
   return (
     <div className="city-hero" aria-labelledby="trapman-title">
       <CityMotion />
-      <CinematicVideo
-        src="/assets/generated/trapman/city-hero.mp4"
-        poster="/assets/generated/trapman/city-hero.webp"
-        posterWidth={1536}
-        posterHeight={864}
-        sizes="100vw"
-        priority
-        className="city-hero__atmosphere city-hero__atmosphere--desktop"
-      />
-      <CinematicVideo
-        src="/assets/generated/trapman/city-mobile.mp4"
-        poster="/assets/generated/trapman/city-mobile.webp"
-        posterWidth={864}
-        posterHeight={1536}
-        sizes="100vw"
-        priority
-        className="city-hero__atmosphere city-hero__atmosphere--mobile"
-      />
+      <ParallaxMedia amount={28} className="city-hero__atmosphere-layer">
+        <CinematicVideo
+          src="/assets/generated/trapman/city-hero.mp4"
+          poster="/assets/generated/trapman/city-hero.webp"
+          posterWidth={1536}
+          posterHeight={864}
+          sizes="100vw"
+          priority
+          className="city-hero__atmosphere city-hero__atmosphere--desktop"
+        />
+        <CinematicVideo
+          src="/assets/generated/trapman/city-mobile.mp4"
+          poster="/assets/generated/trapman/city-mobile.webp"
+          posterWidth={864}
+          posterHeight={1536}
+          sizes="100vw"
+          priority
+          className="city-hero__atmosphere city-hero__atmosphere--mobile"
+        />
+      </ParallaxMedia>
       <div className="starfield" data-layer="starfield" aria-hidden="true" />
       <div className="far-skyline" data-layer="far-skyline" aria-hidden="true" />
       <div className="near-skyline" data-layer="near-skyline" aria-hidden="true" />
@@ -32,20 +37,36 @@ export function CityHero() {
         <span className="rotor" />
         <span className="searchlight" data-layer="searchlight" />
       </div>
+
+      {/* Game-accurate neon skyline, hand-built in SVG per the owner's
+          "recreate, don't screenshot" direction — sits above the generated
+          atmosphere plate, behind the wordmark, like the game's home screen. */}
+      <NeonSkyline className="tm-hero-skyline" />
+
       <div className="hero-copy">
         <p className="trapman-kicker">02 / Main project</p>
-        <Image src="/assets/trapman-logo.png" alt="TrapMan" width={320} height={180} priority />
-        <h1 id="trapman-title">Pixel soul. Premium stage.</h1>
+        <ChromeWordmark id="trapman-title" />
         <p>
           A neon pixel runner presented as a polished web world: music, score,
           shop, characters, and account support all in one place.
         </p>
         <div className="hero-cta">
-          <Link href="#the-run">Explore the game</Link>
-          <Link href="/trapman/account">My account</Link>
+          <PlayButton href="#the-run">Play</PlayButton>
+          <Link href="/trapman/account" className="tm-hero-secondary-link">My account</Link>
+        </div>
+        <div className="tm-store-links" aria-label="Get TrapMan">
+          <a className="tm-store-badge" href="#the-run">
+            <span className="tm-store-badge__eyebrow">Get it on</span>
+            <span className="tm-store-badge__name">Google Play</span>
+          </a>
+          <a className="tm-store-badge" href="#the-run">
+            <span className="tm-store-badge__eyebrow">Download on the</span>
+            <span className="tm-store-badge__name">App Store</span>
+          </a>
         </div>
       </div>
-<div className="runner-stage" aria-hidden="true">
+
+      <div className="runner-stage" aria-hidden="true">
         <div className="runner" data-layer="runner" />
         <div className="scan-platform" data-layer="scan-platform" />
       </div>

@@ -33,7 +33,7 @@ export default async function AdsPage() {
               hint="GA4 ad_closed events"
             />
           </div>
-          <Card className="mb-6">
+          <Card className="console-glass mb-6">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <BarChart3 className="size-4 text-[var(--console-violet)]" aria-hidden="true" />
@@ -56,29 +56,33 @@ export default async function AdsPage() {
           </Card>
         </>
       ) : (
-        <Card className="mb-6 border-[var(--console-violet-border)] bg-[var(--console-violet-tint)]">
-          <CardContent className="flex items-start gap-3 p-6">
-            <Info className="mt-0.5 size-4 shrink-0 text-[var(--console-violet)]" />
-            <p className="text-sm text-muted-foreground">
-              Google Analytics unavailable: {ga4.error}
-            </p>
-          </CardContent>
-        </Card>
+        <div className="console-empty-state mb-6 rounded-xl border border-[var(--console-violet-border)] bg-[var(--console-violet-tint)]">
+          <div className="relative flex flex-col items-center gap-3 px-6 py-14 text-center">
+            <div className="flex size-10 items-center justify-center rounded-lg bg-[var(--console-violet-tint)] text-[var(--console-violet)]">
+              <Info className="size-5" aria-hidden="true" />
+            </div>
+            <p className="text-sm font-medium">Google Analytics unavailable</p>
+            <p className="max-w-md text-sm text-muted-foreground">{ga4.error}</p>
+          </div>
+        </div>
       )}
 
       {data.unavailableReason ? (
         !ga4.connected && (
-          <Card className="border-[var(--console-violet-border)] bg-[var(--console-violet-tint)]">
-            <CardContent className="flex items-start gap-3 p-6">
-              <Info className="mt-0.5 size-4 shrink-0 text-[var(--console-violet)]" />
-              <p className="text-sm text-muted-foreground">
+          <div className="console-empty-state rounded-xl border border-dashed border-[var(--console-violet-border)] bg-[var(--console-violet-tint)]">
+            <div className="relative flex flex-col items-center gap-3 px-6 py-14 text-center">
+              <div className="flex size-10 items-center justify-center rounded-lg bg-[var(--console-violet-tint)] text-[var(--console-violet)]">
+                <Info className="size-5" aria-hidden="true" />
+              </div>
+              <p className="text-sm font-medium">Firestore ad metrics unavailable</p>
+              <p className="max-w-md text-sm text-muted-foreground">
                 {data.unavailableReason}
               </p>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         )
       ) : (
-        <Card>
+        <Card className="console-glass">
           <CardContent className="p-6">
             {data.rows.length === 0 ? (
               <p className="text-sm text-muted-foreground">

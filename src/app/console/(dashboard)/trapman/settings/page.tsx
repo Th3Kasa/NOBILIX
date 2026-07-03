@@ -18,7 +18,7 @@ export default async function SettingsPage() {
       />
 
       <div className="grid max-w-2xl gap-4">
-        <Card>
+        <Card className="console-glass">
           <CardHeader>
             <CardTitle>Your account</CardTitle>
           </CardHeader>
@@ -40,7 +40,7 @@ export default async function SettingsPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="console-glass">
           <CardHeader>
             <CardTitle>Change password</CardTitle>
           </CardHeader>

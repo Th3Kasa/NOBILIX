@@ -14,7 +14,7 @@ export function TrapManHeader() {
     <header className="trapman-header">
       <Link href="/trapman" aria-label="TrapMan home" className="trapman-header__brand">
         <Image src="/assets/trapman-logo.png" alt="" width={64} height={64} priority />
-        <span>TRAPMAN</span>
+        <span className="pixel-type trapman-header__wordmark">TRAPMAN</span>
       </Link>
       <nav aria-label="TrapMan navigation">
         {links.map((link) => (

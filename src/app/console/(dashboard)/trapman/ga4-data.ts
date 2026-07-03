@@ -1,5 +1,6 @@
 import "server-only";
 import { JWT } from "google-auth-library";
+import { env } from "@/lib/env";
 
 /**
  * Google Analytics 4 data-access for the TrapMan console.
@@ -15,7 +16,10 @@ import { JWT } from "google-auth-library";
  *  - The firebase-adminsdk service account granted Viewer on the GA4 property
  */
 
-const GA4_PROPERTY_ID = process.env.GA4_PROPERTY_ID ?? "540977563";
+// Read lazily (function, not module constant): touching the `env` proxy
+// validates the full schema, which must not happen at build time on
+// machines without secrets.
+const ga4PropertyId = () => env.GA4_PROPERTY_ID ?? "540977563";
 const ANALYTICS_SCOPE = "https://www.googleapis.com/auth/analytics.readonly";
 
 export interface Ga4EventCount {
@@ -80,7 +84,7 @@ async function batchRunReports(
 ): Promise<ReportResult[]> {
   const client = getJwtClient();
   const res = await client.request<{ reports?: ReportResult[] }>({
-    url: `https://analyticsdata.googleapis.com/v1beta/properties/${GA4_PROPERTY_ID}:batchRunReports`,
+    url: `https://analyticsdata.googleapis.com/v1beta/properties/${ga4PropertyId()}:batchRunReports`,
     method: "POST",
     data: { requests },
   });

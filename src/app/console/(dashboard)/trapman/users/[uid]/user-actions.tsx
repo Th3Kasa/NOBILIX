@@ -79,7 +79,7 @@ export function UserActions({
 
   if (!canWrite) {
     return (
-      <Card>
+      <Card className="console-glass">
         <CardHeader>
           <CardTitle>Actions</CardTitle>
         </CardHeader>
@@ -92,7 +92,7 @@ export function UserActions({
 
   return (
     <>
-      <Card>
+      <Card className="console-glass">
         <CardHeader>
           <CardTitle>Actions</CardTitle>
         </CardHeader>

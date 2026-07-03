@@ -67,8 +67,8 @@ export default async function UserDetailPage({
         }
       />
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+      <div className="console-page-grid">
+        <Card className="console-glass console-grid-span-8">
           <CardHeader>
             <CardTitle>Profile</CardTitle>
           </CardHeader>
@@ -137,17 +137,19 @@ export default async function UserDetailPage({
           </CardContent>
         </Card>
 
-        <UserActions
-          uid={user.uid}
-          canWrite={canWrite}
-          initial={{
-            displayName: user.displayName ?? "",
-            country: user.country ?? "",
-            character: user.character ?? "",
-            level: user.level ?? 0,
-            highScore: user.highScore ?? 0,
-          }}
-        />
+        <div className="console-grid-span-4">
+          <UserActions
+            uid={user.uid}
+            canWrite={canWrite}
+            initial={{
+              displayName: user.displayName ?? "",
+              country: user.country ?? "",
+              character: user.character ?? "",
+              level: user.level ?? 0,
+              highScore: user.highScore ?? 0,
+            }}
+          />
+        </div>
       </div>
     </>
   );

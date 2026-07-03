@@ -11,9 +11,9 @@ export function LiveStatus({
   return (
     <div
       className={cn(
-        "console-live-status flex min-h-11 items-center gap-2 rounded-md border px-3 py-1.5 font-mono text-xs font-medium uppercase tracking-wide",
+        "console-live-status flex min-h-11 items-center gap-2 rounded-md border px-3 py-1.5 font-mono text-xs font-medium uppercase tracking-wide backdrop-blur-sm",
         connected
-          ? "border-[var(--console-live-border)] bg-[var(--console-live-tint)] text-[var(--console-live)]"
+          ? "border-[var(--console-live-border)] bg-[var(--console-live-tint)] text-[var(--console-live)] shadow-[0_0_16px_-6px_var(--console-live)]"
           : "border-[var(--console-action-border)] bg-[var(--console-action-tint)] text-[var(--console-action)]",
         className,
       )}
