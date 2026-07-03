@@ -21,6 +21,20 @@
 .trapman-site h2 { font-size: clamp(2.5rem, 7vw, 6rem); line-height: .9; }
 .trapman-header { min-height: 76px; display: flex; justify-content: space-between; align-items: center; padding: .75rem clamp(1rem, 4vw, 4rem); }
 
+/* Every /trapman route already carries its own full navigation surface —
+   the sticky TrapManHeader on the marketing page, the breadcrumb + TOC nav
+   in LegalShell on legal/login/delete pages. The outer studio chrome
+   (NobilixHeader/NobilixFooter from the shared public layout) was stacking
+   on top of that as a redundant duplicate header/footer band. Both are
+   `position: sticky; top: 0`, so they visibly double up at the top of the
+   page on load/scroll-to-top. Hide the outer studio chrome for any page
+   nested under .trapman-site; TrapMan pages keep their own back-to-Nobilix
+   links (header wordmark link, legal breadcrumb, login "Back to TrapMan"). */
+.public-shell:has(.trapman-site) > .public-header,
+.public-shell:has(.trapman-site) > .public-footer {
+  display: none;
+}
+
 /* ── City Hero ─────────────────────────────────────────────── */
 .city-hero {
   position: relative;
@@ -157,9 +171,9 @@
 
 /* ── Gameplay Gallery ──────────────────────────────────────── */
 .gameplay-gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 2rem;
+  /* Single column: the feature-card row inside manages its own horizontal
+     layout. (The old auto-fit grid squeezed the row into a narrow track.) */
+  display: block;
   margin-top: 3rem;
 }
 .gameplay-figure { margin: 0; }
@@ -337,6 +351,13 @@
   font-weight: 950;
   letter-spacing: .12em;
 }
+/* Tailwind's preflight sets `img { height: auto }` globally, which
+   conflicts with next/image's explicit width/height props unless both
+   axes are pinned here too. */
+.trapman-header__brand img {
+  width: 64px;
+  height: 64px;
+}
 .trapman-header nav {
   display: flex;
   flex-wrap: wrap;
@@ -441,8 +462,7 @@
 }
 .hero-copy h1,
 .trapman-story-section h2,
-.world-system h2,
-.shop-showcase h2 {
+.world-system h2 {
   max-width: 11ch;
   color: #fff;
   text-wrap: balance;
@@ -453,8 +473,7 @@
 }
 .hero-copy p,
 .trapman-story-section > p,
-.world-system p,
-.shop-showcase p {
+.world-system p {
   max-width: 64ch;
   color: #cdeaff;
   line-height: 1.72;
@@ -476,7 +495,6 @@
 .trapman-account-cta a:hover,
 .trapman-support a:hover,
 .leaderboard-cta:hover { transform: translateY(-1px); }
-.shop-showcase__screen,
 .gameplay-frame,
 .character-frame {
   border: 2px solid rgb(57 233 255 / .58);
@@ -543,7 +561,6 @@
   background: rgb(3 2 7 / .72);
 }
 .world-system,
-.shop-showcase,
 .music-strip {
   display: grid;
   grid-template-columns: minmax(0, .8fr) minmax(18rem, 1fr);
@@ -551,7 +568,6 @@
   align-items: center;
 }
 .world-system__visual,
-.shop-showcase__stage,
 .music-strip__art {
   position: relative;
   overflow: hidden;
@@ -587,16 +603,32 @@
   opacity: .82;
   animation: portal-float 4.4s ease-in-out infinite alternate-reverse;
 }
-/* ── Gameplay feature cards (replace screenshot grid) ─────── */
+/* ── Gameplay feature cards: horizontal row, scrolls on narrow viewports
+   instead of stacking, snap-aligned so a swipe lands on one card. ── */
 .gameplay-features {
   position: relative;
   z-index: 2;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
   gap: 1.5rem;
   margin-top: 3rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  padding-bottom: .5rem; /* room for the scrollbar so it doesn't clip card shadows */
+}
+.gameplay-features::-webkit-scrollbar { height: .4rem; }
+.gameplay-features::-webkit-scrollbar-thumb {
+  background: rgb(57 233 255 / .3);
+  border-radius: 999px;
 }
 .gameplay-feature-card {
+  /* Fill the row evenly on wide screens; the min size forces horizontal
+     scrolling (with snap) instead of stacking on narrow ones. */
+  flex: 1 1 0;
+  min-inline-size: clamp(15rem, 72vw, 17rem);
+  scroll-snap-align: start;
   padding: 2rem 1.75rem;
   border: 1px solid rgb(57 233 255 / .22);
   border-radius: 1.4rem;
@@ -1189,6 +1221,16 @@
   .world-plate-section {
     min-height: 26rem;
   }
+  /* The desktop scrim is a horizontal gradient tuned for a narrow left text
+     column with image showing through on the right (`transparent 46%`).
+     Below 820px the copy column spans nearly the section's full width, so
+     that transparent half was sitting directly under heading/body text —
+     failing contrast and reading as clipped/missing text. Full-bleed scrim
+     on narrow viewports instead. */
+  .world-plate::after {
+    background:
+      linear-gradient(0deg, rgb(3 2 7 / .92) 0%, rgb(3 2 7 / .74) 55%, rgb(3 2 7 / .5) 100%);
+  }
   .leaderboard-stage,
   .trapman-account-cta,
   .trapman-support {
@@ -1627,6 +1669,11 @@
   position: relative;
   z-index: 1;
 }
+.legal-logo {
+  width: 56px;
+  height: 60px;
+  display: block;
+}
 .legal-draft-notice,
 .legal-content,
 .legal-toc {
@@ -1947,46 +1994,6 @@ h2.legal-toc-heading {
   50% { opacity: .55; }
 }
 
-/* ── Play button: mirrors the in-game PLAY control. ── */
-.tm-play-btn {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 52px;
-  padding: .9rem 2.4rem;
-  overflow: hidden;
-  border-radius: 1rem;
-  color: #fff;
-  font-size: .95rem;
-  letter-spacing: .04em;
-  text-decoration: none;
-  border: 2px solid var(--tm-cyan);
-  background: linear-gradient(180deg, color-mix(in srgb, var(--tm-violet) 82%, var(--tm-magenta)), var(--tm-violet));
-  box-shadow:
-    0 0 0 1px rgb(241 68 255 / .35),
-    0 0 2rem rgb(57 233 255 / .4),
-    inset 0 1px 0 rgb(255 255 255 / .25);
-  transition: transform .18s ease, box-shadow .18s ease;
-}
-.tm-play-btn:hover {
-  transform: translateY(-2px);
-  box-shadow:
-    0 0 0 1px rgb(241 68 255 / .45),
-    0 0 2.8rem rgb(57 233 255 / .55),
-    inset 0 1px 0 rgb(255 255 255 / .3);
-}
-.tm-play-btn__grid {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  opacity: .5;
-  background:
-    linear-gradient(rgb(255 255 255 / .12) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(255 255 255 / .12) 1px, transparent 1px);
-  background-size: 10px 10px;
-}
-.tm-play-btn__label { position: relative; z-index: 1; }
 .tm-hero-secondary-link {
   display: inline-flex;
   align-items: center;
@@ -2024,10 +2031,35 @@ h2.legal-toc-heading {
   background: rgb(3 2 7 / .55);
   color: #fff;
   text-decoration: none;
-  transition: border-color .18s ease, transform .18s ease;
+  transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
 }
 .tm-store-badge:hover { border-color: rgb(57 233 255 / .6); transform: translateY(-1px); }
+.tm-store-badge:focus-visible { outline: 2px solid var(--tm-cyan); outline-offset: 2px; }
 .tm-store-badge__eyebrow { font-size: .62rem; letter-spacing: .06em; opacity: .7; }
+
+/* Hero variant: with the Play button removed, these badges carry the hero's
+   only CTA weight, so they get the same neon prominence .tm-play-btn used to
+   have (violet→magenta fill, cyan border glow) instead of the quieter
+   subdued-badge treatment used when store links are a secondary row. */
+.tm-store-links--primary .tm-store-badge {
+  min-height: 52px;
+  padding: .7rem 1.4rem;
+  border: 2px solid var(--tm-cyan);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--tm-violet) 82%, var(--tm-magenta)), var(--tm-violet));
+  box-shadow:
+    0 0 0 1px rgb(241 68 255 / .35),
+    0 0 2rem rgb(57 233 255 / .4),
+    inset 0 1px 0 rgb(255 255 255 / .25);
+}
+.tm-store-links--primary .tm-store-badge:hover {
+  border-color: var(--tm-cyan);
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 0 1px rgb(241 68 255 / .45),
+    0 0 2.8rem rgb(57 233 255 / .55),
+    inset 0 1px 0 rgb(255 255 255 / .3);
+}
+.tm-store-links--primary .tm-store-badge__eyebrow { opacity: .85; }
 .tm-store-badge__name { font-size: .92rem; font-weight: 800; }
 
 /* ── Perspective neon grid floor (already present via .city-hero::after);
@@ -2397,9 +2429,9 @@ h2.legal-toc-heading {
 .tm-player-bar__chip {
   display: grid;
   place-items: center;
-  width: 2rem;
-  height: 2rem;
-  border-radius: .5rem;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: .6rem;
   border: 1px solid rgb(57 233 255 / .4);
   color: var(--tm-cyan);
   font-size: .8rem;
@@ -2463,7 +2495,7 @@ h2.legal-toc-heading {
 
 /* Chrome wordmark sizing: must beat the generic `.hero-copy h1` clamp, which
    was tuned for the condensed sans heading. Press Start 2P glyphs are ~1em
-   wide, so "TRAP-MAN" needs a far smaller scale to fit 320-1920px. */
+   wide, so "TRAPMAN" needs a far smaller scale to fit 320-1920px. */
 .hero-copy h1.tm-chrome-wordmark,
 h1.tm-chrome-wordmark {
   font-size: clamp(1.6rem, 5.2vw, 4.2rem);
@@ -2602,4 +2634,76 @@ h1.tm-chrome-wordmark {
 }
 @media (prefers-reduced-motion: reduce) {
   .tm-podium-scene__video { display: none; }
+}
+
+/* ── Floating music player: fixed to the viewport (owner requirement),
+   collapsible via a chevron toggle, auto-hides near the footer so it
+   never covers the legal links. ── */
+.tm-floating-player {
+  position: fixed;
+  left: 50%;
+  bottom: 1.25rem;
+  transform: translateX(-50%);
+  z-index: 60;
+  width: min(92vw, 30rem);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  transition: opacity .3s ease, transform .3s ease;
+}
+.tm-floating-player[data-hidden] {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(.5rem);
+}
+.tm-floating-player .tm-player-bar {
+  position: relative;
+  box-shadow: 0 .5rem 2.5rem rgb(0 0 0 / .5), 0 0 1.6rem rgb(57 233 255 / .18);
+  backdrop-filter: blur(16px);
+}
+.tm-floating-player:not([data-expanded]) .tm-player-bar {
+  width: max-content;
+  max-width: 100%;
+  margin-inline: auto;
+  padding: .3rem 1rem .3rem .3rem;
+  border-radius: 999px;
+  gap: .6rem;
+}
+.tm-floating-player__toggle {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid rgb(57 233 255 / .35);
+  background: rgb(3 2 7 / .6);
+  color: var(--tm-cyan);
+  cursor: pointer;
+}
+.tm-floating-player[data-expanded] .tm-floating-player__toggle {
+  border-radius: .6rem;
+}
+.tm-floating-player__toggle svg { width: 16px; height: 16px; transition: transform .2s ease; }
+.tm-floating-player__toggle .tm-floating-player__chevron--flipped { transform: rotate(180deg); }
+.tm-floating-player__toggle:hover { border-color: var(--tm-cyan); }
+.tm-floating-player__toggle:focus-visible { outline: 2px solid var(--tm-cyan); outline-offset: 2px; }
+.tm-floating-player:not([data-expanded]) .tm-player-bar__meta { min-width: 0; }
+.tm-floating-player:not([data-expanded]) .tm-player-bar__track { white-space: nowrap; }
+
+.tm-player-bar__volume-row {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  width: 100%;
+}
+.tm-player-bar__volume-icon { font-size: .85rem; flex-shrink: 0; }
+.tm-player-bar__volume { flex: 1; max-width: 8rem; }
+
+@media (max-width: 480px) {
+  .tm-floating-player { bottom: .85rem; width: min(94vw, 26rem); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tm-floating-player,
+  .tm-floating-player__toggle svg { transition: none; }
 }

@@ -17,8 +17,8 @@ export default function NobilixTermsOfUsePage() {
         <h2>Acceptance of Terms</h2>
         <p>
           By accessing or using any Nobilix Pty Ltd website, product, or
-          service (collectively, the <strong>"Services"</strong>), you agree to
-          be bound by these Terms of Use (the <strong>"Terms"</strong>). If you
+          service (collectively, the <strong>“Services”</strong>), you agree to
+          be bound by these Terms of Use (the <strong>“Terms”</strong>). If you
           do not agree to these Terms, do not access or use the Services.
         </p>
         <p>
@@ -120,8 +120,8 @@ export default function NobilixTermsOfUsePage() {
       <section id="disclaimers">
         <h2>Disclaimers</h2>
         <p>
-          The Services are provided on an <strong>"as is"</strong> and{" "}
-          <strong>"as available"</strong> basis. To the maximum extent permitted
+          The Services are provided on an <strong>“as is”</strong> and{" "}
+          <strong>“as available”</strong> basis. To the maximum extent permitted
           by law, Nobilix makes no representations or warranties of any kind,
           express or implied, regarding the operation or availability of the
           Services, or the accuracy or completeness of any content.
@@ -189,8 +189,8 @@ export default function NobilixTermsOfUsePage() {
         <h2>Changes to These Terms</h2>
         <p>
           We reserve the right to update or revise these Terms at any time.
-          Material changes will be posted on this page with an updated "Last
-          updated" date. Your continued use of the Services after any change
+          Material changes will be posted on this page with an updated “Last
+          updated” date. Your continued use of the Services after any change
           constitutes acceptance of the revised Terms. If you do not agree to
           the revised Terms, you must stop using the Services.
         </p>

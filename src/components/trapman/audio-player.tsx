@@ -39,18 +39,26 @@ function formatTime(seconds: number): string {
 }
 
 /**
- * The real in-game-styled music player. Starts with CEEBS and attempts
- * autoplay on arrival; when the browser blocks it (standard autoplay
- * policy), playback starts on the visitor's first interaction anywhere on
+ * Floating in-game-styled music player, fixed to the bottom of the
+ * viewport (mirrors the collapsible bar in the real gameplay screenshot).
+ * Starts with CEEBS and attempts autoplay on arrival; when the browser
+ * blocks it, playback starts on the visitor's first interaction anywhere on
  * the page instead. Tracks advance automatically and wrap around.
+ *
+ * Auto-collapses (fades, non-interactive) once the page footer scrolls
+ * into view so it never sits on top of the footer's legal links.
  */
 export function TrapManAudioPlayer() {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const rootRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(false);
+  const [volume, setVolume] = useState(0.65);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [expanded, setExpanded] = useState(true);
+  const [nearFooter, setNearFooter] = useState(false);
   const wantsAutoplay = useRef(true);
 
   const track = TRACKS[index];
@@ -87,6 +95,28 @@ export function TrapManAudioPlayer() {
     return disarm;
   }, []);
 
+  // Keep the <audio> element's volume in sync with the slider.
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.volume = volume;
+  }, [volume]);
+
+  // Fade out (and disable pointer events on) the floating player once the
+  // page's legal-links block enters the viewport, so it never covers them.
+  // Note: the shared NobilixFooter (.public-footer) is intentionally
+  // display:none on /trapman routes (see trapman.css — TrapMan pages carry
+  // their own chrome), so the real "footer" here is the #support section's
+  // privacy/terms/data-compliance/delete-account link row.
+  useEffect(() => {
+    const target = document.querySelector(".trapman-support__links") ?? document.getElementById("support");
+    if (!target) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => setNearFooter(entry.isIntersecting),
+      { rootMargin: "0px 0px -10% 0px" },
+    );
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, []);
+
   // When the queue position changes, load and keep playing if we were playing.
   const go = useCallback(
     (nextIndex: number, autoplay = true) => {
@@ -119,7 +149,12 @@ export function TrapManAudioPlayer() {
   };
 
   return (
-    <div className="tm-player-bar tm-player-bar--live" role="group" aria-label="TrapMan soundtrack player">
+    <div
+      ref={rootRef}
+      className="tm-floating-player"
+      data-expanded={expanded || undefined}
+      data-hidden={nearFooter || undefined}
+    >
       {/* key forces a clean reload when the track changes */}
       <audio
         key={track.src}
@@ -135,72 +170,114 @@ export function TrapManAudioPlayer() {
         <source src={track.src} type={track.type} />
       </audio>
 
-      <div className="tm-player-bar__meta">
-        <span className="tm-player-bar__dot" data-playing={playing || undefined} aria-hidden="true" />
-        <div aria-live="polite">
-          <p className="tm-player-bar__track pixel-type">{track.title}</p>
-          <p className="tm-player-bar__artist">{track.artist}</p>
+      <div className="tm-player-bar tm-player-bar--live" role="group" aria-label="TrapMan soundtrack player">
+        <button
+          type="button"
+          className="tm-floating-player__toggle"
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
+          aria-label={expanded ? "Collapse music player" : "Expand music player"}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" className={expanded ? "" : "tm-floating-player__chevron--flipped"}>
+            <path d="M6 15l6-6 6 6" stroke="currentColor" strokeWidth="2.4" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+
+        <div className="tm-player-bar__meta">
+          <span className="tm-player-bar__dot" data-playing={playing || undefined} aria-hidden="true" />
+          <div aria-live="polite">
+            <p className="tm-player-bar__track pixel-type">{track.title}</p>
+            {expanded && <p className="tm-player-bar__artist">{track.artist}</p>}
+          </div>
         </div>
-      </div>
 
-      <div className="tm-player-bar__transport">
-        <button type="button" className="tm-player-bar__chip" onClick={() => go(index - 1)} aria-label="Previous track">
-          ⏮
-        </button>
-        <button
-          type="button"
-          className="tm-player-bar__chip tm-player-bar__chip--play"
-          onClick={toggle}
-          aria-label={playing ? "Pause" : "Play"}
-        >
-          {playing ? "⏸" : "▶"}
-        </button>
-        <button type="button" className="tm-player-bar__chip" onClick={() => go(index + 1)} aria-label="Next track">
-          ⏭
-        </button>
-        <button
-          type="button"
-          className="tm-player-bar__chip tm-player-bar__chip--mute"
-          onClick={() => setMuted((m) => !m)}
-          aria-label={muted ? "Unmute" : "Mute"}
-          aria-pressed={muted}
-        >
-          {muted ? "🔇" : "🔊"}
-        </button>
-      </div>
-
-      <div className="tm-player-bar__progress">
-        <span className="tm-player-bar__time">{formatTime(currentTime)}</span>
-        <input
-          type="range"
-          className="tm-player-bar__seek"
-          min={0}
-          max={Number.isFinite(duration) && duration > 0 ? duration : 0}
-          step={1}
-          value={Math.min(currentTime, duration || 0)}
-          onChange={seek}
-          aria-label="Seek position"
-        />
-        <span className="tm-player-bar__time">{formatTime(duration)}</span>
-      </div>
-
-      <ol className="tm-player-queue" aria-label="Track list">
-        {TRACKS.map((t, i) => (
-          <li key={t.src}>
-            <button
-              type="button"
-              className="tm-player-queue__row"
-              data-active={i === index || undefined}
-              onClick={() => go(i)}
-              aria-current={i === index ? "true" : undefined}
-            >
-              <span className="tm-player-queue__num pixel-type">{String(i + 1).padStart(2, "0")}</span>
-              <span className="tm-player-queue__title">{t.title}</span>
-              <span className="tm-player-queue__artist">{t.artist}</span>
+        <div className="tm-player-bar__transport">
+          {expanded && (
+            <button type="button" className="tm-player-bar__chip" onClick={() => go(index - 1)} aria-label="Previous track">
+              ⏮
             </button>
-          </li>
-        ))}
-      </ol>
+          )}
+          <button
+            type="button"
+            className="tm-player-bar__chip tm-player-bar__chip--play"
+            onClick={toggle}
+            aria-label={playing ? "Pause" : "Play"}
+          >
+            {playing ? "⏸" : "▶"}
+          </button>
+          {expanded && (
+            <>
+              <button type="button" className="tm-player-bar__chip" onClick={() => go(index + 1)} aria-label="Next track">
+                ⏭
+              </button>
+              <button
+                type="button"
+                className="tm-player-bar__chip tm-player-bar__chip--mute"
+                onClick={() => setMuted((m) => !m)}
+                aria-label={muted ? "Unmute" : "Mute"}
+                aria-pressed={muted}
+              >
+                {muted ? "🔇" : "🔊"}
+              </button>
+            </>
+          )}
+        </div>
+
+        {expanded && (
+          <>
+            <div className="tm-player-bar__progress">
+              <span className="tm-player-bar__time">{formatTime(currentTime)}</span>
+              <input
+                type="range"
+                className="tm-player-bar__seek"
+                min={0}
+                max={Number.isFinite(duration) && duration > 0 ? duration : 0}
+                step={1}
+                value={Math.min(currentTime, duration || 0)}
+                onChange={seek}
+                aria-label="Seek position"
+              />
+              <span className="tm-player-bar__time">{formatTime(duration)}</span>
+            </div>
+
+            <div className="tm-player-bar__volume-row">
+              <span className="tm-player-bar__volume-icon" aria-hidden="true">{muted || volume === 0 ? "🔇" : "🔊"}</span>
+              <input
+                type="range"
+                className="tm-player-bar__seek tm-player-bar__volume"
+                min={0}
+                max={1}
+                step={0.01}
+                value={muted ? 0 : volume}
+                onChange={(e) => {
+                  const v = Number(e.target.value);
+                  setVolume(v);
+                  if (muted && v > 0) setMuted(false);
+                }}
+                aria-label="Volume"
+              />
+            </div>
+
+            <ol className="tm-player-queue" aria-label="Track list">
+              {TRACKS.map((t, i) => (
+                <li key={t.src}>
+                  <button
+                    type="button"
+                    className="tm-player-queue__row"
+                    data-active={i === index || undefined}
+                    onClick={() => go(i)}
+                    aria-current={i === index ? "true" : undefined}
+                  >
+                    <span className="tm-player-queue__num pixel-type">{String(i + 1).padStart(2, "0")}</span>
+                    <span className="tm-player-queue__title">{t.title}</span>
+                    <span className="tm-player-queue__artist">{t.artist}</span>
+                  </button>
+                </li>
+              ))}
+            </ol>
+          </>
+        )}
+      </div>
     </div>
   );
 }

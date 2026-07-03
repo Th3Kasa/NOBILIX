@@ -57,8 +57,8 @@ export function LegalShell({ title, lastUpdated, children }: LegalShellProps) {
           <Image
             src="/assets/trapman-logo.png"
             alt="TrapMan by Nobilix"
-            width={120}
-            height={40}
+            width={56}
+            height={60}
             className="legal-logo"
             priority
           />

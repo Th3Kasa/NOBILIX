@@ -1,10 +1,8 @@
-import Link from "next/link";
 import { CinematicVideo } from "@/components/motion/cinematic-video";
 import { ParallaxMedia } from "@/components/motion/parallax-media";
 import { ChromeWordmark } from "./chrome-wordmark";
 import { CityMotion } from "./city-motion";
 import { NeonSkyline } from "./neon-skyline";
-import { PlayButton } from "./play-button";
 
 export function CityHero() {
   return (
@@ -44,22 +42,17 @@ export function CityHero() {
       <NeonSkyline className="tm-hero-skyline" />
 
       <div className="hero-copy">
-        <p className="trapman-kicker">02 / Main project</p>
         <ChromeWordmark id="trapman-title" />
         <p>
           A neon pixel runner presented as a polished web world: music, score,
           shop, characters, and account support all in one place.
         </p>
-        <div className="hero-cta">
-          <PlayButton href="#the-run">Play</PlayButton>
-          <Link href="/trapman/account" className="tm-hero-secondary-link">My account</Link>
-        </div>
-        <div className="tm-store-links" aria-label="Get TrapMan">
-          <a className="tm-store-badge" href="#the-run">
+        <div className="tm-store-links tm-store-links--primary" aria-label="Get TrapMan">
+          <a className="tm-store-badge magnetic-hover" href="#the-run">
             <span className="tm-store-badge__eyebrow">Get it on</span>
             <span className="tm-store-badge__name">Google Play</span>
           </a>
-          <a className="tm-store-badge" href="#the-run">
+          <a className="tm-store-badge magnetic-hover" href="#the-run">
             <span className="tm-store-badge__eyebrow">Download on the</span>
             <span className="tm-store-badge__name">App Store</span>
           </a>

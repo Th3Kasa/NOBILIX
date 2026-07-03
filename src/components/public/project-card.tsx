@@ -1,10 +1,16 @@
 import Image from "next/image";
-import Link from "next/link";
 import type { ProjectDefinition } from "@/types/projects";
 
+/**
+ * Identity card only — no CTA here. The studio homepage already has an
+ * "Enter TrapMan" action in the hero and a link below this card; a third
+ * "Enter TrapMan" plus a "Player account" link on the same card were
+ * redundant/out-of-place (studio home isn't the place to route toward
+ * player login) and have been removed.
+ */
 export function ProjectCard({ project }: { project: ProjectDefinition }) {
   return (
-    <article className="project-card magnetic-hover">
+    <article className="project-card">
       <Image
         src={project.logoPath}
         alt={`${project.name} logo`}
@@ -17,10 +23,6 @@ export function ProjectCard({ project }: { project: ProjectDefinition }) {
       </p>
       <h3>{project.name}</h3>
       <p>{project.description}</p>
-      <div className="project-card__actions">
-        <Link href={project.publicPath}>Enter {project.name}</Link>
-        {project.accountPath && <Link href={project.accountPath}>Player account</Link>}
-      </div>
     </article>
   );
 }

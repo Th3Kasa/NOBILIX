@@ -1,6 +1,5 @@
 import { Gamepad2, ShoppingBag, Trophy } from "lucide-react";
 import { CinematicVideo } from "@/components/motion/cinematic-video";
-import { HudChip, PixelHeart } from "./hud-chip";
 import { MazeDivider } from "./maze-divider";
 
 const FEATURES = [
@@ -31,22 +30,6 @@ export function GameplayGallery() {
           posterWidth={1536}
           posterHeight={864}
         />
-      </div>
-
-      {/* HUD chrome framing, recreating the in-game bar language: hexagonal
-          neon-bordered stat readouts, pixel hearts, leading-zero score. */}
-      <div className="tm-hud-bar" role="img" aria-label="TrapMan in-game HUD: high score 006580, three lives, level 1, score 000060">
-        <HudChip label="High score" value="006580" accent="magenta" />
-        <div className="tm-hud-bar__lives" aria-hidden="true">
-          <PixelHeart />
-          <PixelHeart />
-          <PixelHeart />
-        </div>
-        <div className="tm-hud-bar__level pixel-type" aria-hidden="true">
-          <span className="tm-hud-bar__level-label">Level</span>
-          <span>01</span>
-        </div>
-        <HudChip label="Score" value="000060" accent="cyan" />
       </div>
 
       <div className="gameplay-features">

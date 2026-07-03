@@ -1,11 +1,10 @@
 import { CinematicVideo } from "@/components/motion/cinematic-video";
-import { TrapManAudioPlayer } from "./audio-player";
 
 /**
- * The in-game player bar, live: real soundtrack playback (starting with
- * CEEBS) in the same visual language as the gameplay screenshot's bottom
- * music strip — plus a crew section crediting Lonely Souljaz — Cult Shotta
- * as the Sydney trap rap group behind the game.
+ * Crew card + ambient atmosphere crediting Lonely Souljaz — Cult Shotta as
+ * the Sydney trap rap group behind the game. Playback itself lives in the
+ * floating TrapManAudioPlayer (rendered once at the page level, fixed to
+ * the viewport) so the transport stays reachable while scrolling.
  */
 export function MusicStrip() {
   return (
@@ -31,8 +30,6 @@ export function MusicStrip() {
             Every run plays out over their tracks.
           </p>
         </div>
-
-        <TrapManAudioPlayer />
 
         <div className="music-waveform" aria-hidden="true">
           {Array.from({ length: 32 }, (_, i) => (

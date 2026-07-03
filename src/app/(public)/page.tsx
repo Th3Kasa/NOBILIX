@@ -64,9 +64,15 @@ export default function NobilixHomePage() {
             requests, and the company legal directory for Nobilix notices.
           </p>
           <div className="nobilix-contact-section__actions">
-            <Link className="nobilix-button nobilix-button--primary magnetic-hover" href="/console">
-              Open console
-            </Link>
+            {/* TODO(copy): confirm label — was "Open console" before the console CTA
+                was demoted to footer-only; promoted the support email as the
+                primary contact action in its place. */}
+            <a
+              className="nobilix-button nobilix-button--primary magnetic-hover"
+              href="mailto:help.nobilix@outlook.com"
+            >
+              Email support
+            </a>
             <Link className="nobilix-button nobilix-button--secondary magnetic-hover" href="/legal">
               Company legal
             </Link>

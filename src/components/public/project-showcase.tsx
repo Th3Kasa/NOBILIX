@@ -31,8 +31,8 @@ export function ProjectShowcase() {
           More worlds are being shaped, and the system is ready when they are.
         </p>
         <ProjectCard project={mainProject} />
-        <Link className="nobilix-text-link" href="/trapman">
-          Enter the TrapMan project
+        <Link className="nobilix-text-link magnetic-hover" href={mainProject.publicPath}>
+          See what&apos;s inside TrapMan →
         </Link>
       </Reveal>
     </section>

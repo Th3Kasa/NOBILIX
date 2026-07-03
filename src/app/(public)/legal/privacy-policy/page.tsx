@@ -16,8 +16,8 @@ export default function NobilixPrivacyPolicyPage() {
       <section id="introduction">
         <h2>Introduction</h2>
         <p>
-          Nobilix Pty Ltd (ABN pending) (<strong>"Nobilix"</strong>,{" "}
-          <strong>"we"</strong>, <strong>"us"</strong>, <strong>"our"</strong>)
+          Nobilix Pty Ltd (ABN pending) (<strong>“Nobilix”</strong>,{" "}
+          <strong>“we”</strong>, <strong>“us”</strong>, <strong>“our”</strong>)
           is a game development studio incorporated in New South Wales,
           Australia. We operate the nobilix.com website, the TrapMan mobile
           game, and associated developer tools.
@@ -240,7 +240,7 @@ export default function NobilixPrivacyPolicyPage() {
         <p>
           We may update this Privacy Policy from time to time to reflect changes
           in our practices or applicable law. Material changes will be posted on
-          this page with an updated "Last updated" date. We encourage you to
+          this page with an updated “Last updated” date. We encourage you to
           review this policy periodically.
         </p>
       </section>

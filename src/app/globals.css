@@ -970,8 +970,11 @@
 
 /* Mobile — matches Tailwind md: breakpoint so hamburger ↔ desktop nav never both vanish */
 @media (max-width: 767px) {
-  /* Hide desktop nav; hamburger (md:hidden) takes over below this breakpoint */
-  .public-header__nav { display: none; }
+  /* Hide desktop nav; hamburger (md:hidden) takes over below this breakpoint.
+     Selector must out-specify ".public-header nav" (one class + one type,
+     see above) or the always-on `display: flex` there wins and the desktop
+     nav links render stacked above/behind the hamburger button. */
+  .public-header .public-header__nav { display: none; }
   /* CTA is already in the hamburger menu; hide it to save header space */
   .header-cta { display: none; }
 

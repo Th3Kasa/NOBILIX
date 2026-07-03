@@ -1,12 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/motion/reveal";
+import { TrapManAudioPlayer } from "@/components/trapman/audio-player";
 import { CharacterShowcase } from "@/components/trapman/character-showcase";
 import { CityHero } from "@/components/trapman/city-hero";
 import { GameplayGallery } from "@/components/trapman/gameplay-gallery";
 import { LeaderboardPreview } from "@/components/trapman/leaderboard-preview";
 import { MusicStrip } from "@/components/trapman/music-strip";
-import { ShopShowcase } from "@/components/trapman/shop-showcase";
 import { TrapManHeader } from "@/components/trapman/trapman-header";
 import { WorldSystem } from "@/components/trapman/world-system";
 
@@ -14,6 +14,9 @@ export default function TrapManPage() {
   return (
     <>
       <TrapManHeader />
+      {/* Fixed to the viewport, present across the whole page — not scoped
+          to the music section, so the transport is always reachable. */}
+      <TrapManAudioPlayer />
       <div id="trapman-main">
         <section id="trapman-hero" aria-labelledby="trapman-title">
           <CityHero />
@@ -47,11 +50,6 @@ export default function TrapManPage() {
             <p className="trapman-kicker">Music culture</p>
             <h2>Move through a city that pulses like a track.</h2>
             <MusicStrip />
-          </section>
-        </Reveal>
-        <Reveal>
-          <section id="shop" className="trapman-story-section">
-            <ShopShowcase />
           </section>
         </Reveal>
         <Reveal>

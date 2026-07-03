@@ -27,9 +27,6 @@ export function NobilixHeader() {
         ))}
       </nav>
       <div className="public-header__right">
-        <Link className="header-cta" href="/console">
-          Console
-        </Link>
         <MobileNavigation items={navigationItems} />
       </div>
     </header>
