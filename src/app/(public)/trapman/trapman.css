@@ -2203,74 +2203,6 @@ h2.legal-toc-heading {
   display: grid;
   place-items: center;
 }
-.tm-podium-ring {
-  position: absolute;
-  bottom: 12%;
-  width: 78%;
-  aspect-ratio: 3.2 / 1;
-  border-radius: 50%;
-  border: 3px solid var(--char-accent);
-  box-shadow:
-    0 0 1.5rem var(--char-accent),
-    inset 0 0 1.5rem color-mix(in srgb, var(--char-accent) 45%, transparent);
-  animation: tm-podium-ring-pulse 3.2s ease-in-out infinite;
-  transition: border-color .3s ease, box-shadow .3s ease;
-}
-.tm-podium-ring--outer {
-  width: 96%;
-  bottom: 8%;
-  border-width: 1px;
-  opacity: .5;
-  animation-delay: .4s;
-}
-@keyframes tm-podium-ring-pulse {
-  0%, 100% { transform: scale(1); opacity: .85; }
-  50% { transform: scale(1.035); opacity: 1; }
-}
-.tm-podium-glow {
-  position: absolute;
-  bottom: 10%;
-  width: 60%;
-  height: 55%;
-  border-radius: 50%;
-  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--char-accent) 45%, transparent), transparent 72%);
-  filter: blur(4px);
-  transition: background .3s ease;
-}
-.tm-podium-avatar {
-  position: relative;
-  z-index: 1;
-  bottom: 8%;
-  width: 40%;
-  aspect-ratio: 1;
-  display: grid;
-  place-items: center;
-  border-radius: 1.4rem;
-  border: 2px solid var(--char-accent);
-  background: linear-gradient(160deg, color-mix(in srgb, var(--char-accent) 24%, #0a0114), rgb(3 2 7 / .92));
-  box-shadow: 0 0 2.4rem color-mix(in srgb, var(--char-accent) 55%, transparent);
-  animation: tm-podium-avatar-idle 2.4s ease-in-out infinite;
-  transition: border-color .3s ease, box-shadow .3s ease;
-}
-@keyframes tm-podium-avatar-idle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6%); }
-}
-.tm-podium-avatar__initial {
-  font-family: var(--font-pixel), monospace;
-  font-size: clamp(1.8rem, 5vw, 2.6rem);
-  color: var(--char-accent);
-  text-shadow: 0 0 1rem var(--char-accent);
-}
-.tm-podium-base {
-  position: absolute;
-  bottom: 4%;
-  width: 84%;
-  height: 10%;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--char-accent) 30%, #030207);
-  box-shadow: 0 0 2rem color-mix(in srgb, var(--char-accent) 30%, transparent);
-}
 .tm-podium-controls {
   display: flex;
   align-items: center;
@@ -2477,8 +2409,6 @@ h2.legal-toc-heading {
 @media (prefers-reduced-motion: reduce) {
   .tm-hero-skyline,
   .tm-skyline__windows,
-  .tm-podium-ring,
-  .tm-podium-avatar,
   .tm-maze-divider__coins circle,
   .tm-chrome-wordmark__sparkle {
     animation: none !important;
@@ -2706,4 +2636,11 @@ h1.tm-chrome-wordmark {
 @media (prefers-reduced-motion: reduce) {
   .tm-floating-player,
   .tm-floating-player__toggle svg { transition: none; }
+}
+
+/* Clearance for the floating music player: keep the last section's content
+   scrollable above the fixed bar (the bar also auto-hides at the support
+   links, this is belt-and-braces for mid-page reading). */
+#trapman-main {
+  padding-bottom: 6.5rem;
 }

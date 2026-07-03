@@ -51,10 +51,10 @@ export function CharacterShowcase() {
     >
       <div className="tm-podium-scene tm-podium-scene--video" aria-hidden="true">
         {/* Generated idle loop of Lil Golo + Shotta on the podium (real
-            character references). CinematicVideo mounts the <video> only
-            client-side (SSR-safe autoplay) and falls back to the poster on
-            reduced-motion or load failure; the CSS scene underneath remains
-            the no-JS fallback. */}
+            character references). CinematicVideo renders the poster <Image>
+            server-side and swaps in the <video> client-side, so there is
+            always artwork here — the old CSS ring/avatar fallback scene was
+            layering on top of the video and has been removed. */}
         <CinematicVideo
           className="tm-podium-scene__video"
           src="/assets/generated/trapman/characters-loop.mp4"
@@ -62,13 +62,6 @@ export function CharacterShowcase() {
           posterWidth={1536}
           posterHeight={864}
         />
-        <div className="tm-podium-ring" />
-        <div className="tm-podium-ring tm-podium-ring--outer" />
-        <div className="tm-podium-glow" />
-        <div className="tm-podium-avatar">
-          <span className="tm-podium-avatar__initial">{character.name.charAt(0)}</span>
-        </div>
-        <div className="tm-podium-base" />
       </div>
 
       <div className="tm-podium-controls">
