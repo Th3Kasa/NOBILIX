@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-07-03T04:49:31.477Z",
+  "generatedAt": "2026-07-03T06:38:39.968Z",
   "reviewedAt": "2026-07-02T08:08:36.209Z",
   "assets": [
     {
@@ -11,13 +11,13 @@
       "height": 864,
       "source": "MuAPI Flux 2 Dev original text-to-image generation",
       "purpose": "Nobilix studio homepage hero material",
-      "prompt": "Original dark editorial hero image for a premium independent game studio based in Sydney, Australia. Abstract top-down isometric view of a pristine pixel-art city grid — some tiles placed, some still void — suggesting a world under active construction. A single restrained neon-violet column of light rises from the active build point. Deep matte black background, precise geometric obsidian forms, minimal palette of charcoal and violet with one acid-lime construction-cursor accent. Wide cinematic 16:9 composition with generous negative space for web typography. Studio craft, pixel precision, dark Swiss editorial restraint. No people, no text, no logos, no generic office interior, no photorealism, no stock CGI, no cliché gaming props, no keyboards or monitors.",
+      "prompt": "Original dark editorial hero image for a premium independent game studio based in Sydney, Australia. Abstract top-down isometric view of a pristine pixel-art city grid — some tiles placed, some still void — suggesting a world under active construction. A single restrained neon-violet column of light rises from the active build point and is the unmistakable focal point of the frame, reading clearly even at low contrast on a dark page. Deep cool obsidian-black background (no warm charcoal-brown cast), precise geometric obsidian forms, minimal palette of cool charcoal and violet with exactly one tiny acid-lime construction-cursor accent as the sole warm note. The bottom 15% of the frame stays calm and completely empty of any markings for a caption chip overlay. Wide cinematic 16:9 composition with generous empty negative space, entirely free of any inscribed captions or labels. Studio craft, pixel precision, dark Swiss editorial restraint.",
       "model": "MuAPI Flux 2 Dev",
       "endpoint": "flux-2-dev",
       "seed": null,
-      "generatedAt": "2026-06-27T09:06:11.088Z",
+      "generatedAt": "2026-07-03T06:29:29.802Z",
       "approved": true,
-      "approval": "Manual visual review"
+      "approval": "Owner visual review in chat (2026-07-03)"
     },
     {
       "id": "nobilix-project-transition",
@@ -25,15 +25,15 @@
       "path": "nobilix/project-transition.webp",
       "width": 1440,
       "height": 900,
-      "source": "Higgsfield Nano Banana Pro original text-to-image generation (2026-07-03 redesign pass)",
+      "source": "MuAPI Flux 2 Dev original text-to-image generation",
       "purpose": "Nobilix portfolio transition plate",
-      "prompt": "Original editorial transition plate for an independent game studio portfolio page. Left two-thirds deep obsidian studio space with subtle charcoal geometric texture; right third desaturated 16-bit pixel-art city fragments materialising from darkness with harbour waterline reflection. A single thin cyan-to-violet gradient seam marks the transition zone. Gallery-catalogue restraint.",
-      "model": "Higgsfield Nano Banana Pro",
-      "endpoint": "nano_banana_pro",
+      "prompt": "Original dark 16-bit pixel-art transition plate for a game studio portfolio page, one continuous pixel-art composition. Left two-thirds: the studio's calm dark isometric obsidian pixel grid — empty tile sockets and a few placed dark building tiles, very low light, almost pure darkness. Right third: the same grid coming alive as a neon pixel city — small rooftop silhouettes, glowing cyan windows, a violet-lit tower fragment and harbour waterline reflection, deliberately desaturated compared to full arcade neon (a preview of the game world rendering into existence). A single thin cyan-to-violet gradient seam marks the hand-off between the two zones. Crisp hard pixel edges throughout, disciplined dark negative space on the left. No readable text, no letters, no numbers, no logos, no characters, no UI, no photorealism, no smooth 3D render.",
+      "model": "MuAPI Flux 2 Dev",
+      "endpoint": "flux-2-dev",
       "seed": null,
-      "generatedAt": "2026-07-03T04:49:31.477Z",
+      "generatedAt": "2026-07-03T06:38:39.968Z",
       "approved": false,
-      "approval": "Pending manual visual review (agent pre-reviewed against media brief)"
+      "approval": "Pending owner review (pixel-art rework per owner feedback 2026-07-03)"
     },
     {
       "id": "trapman-city-hero",
@@ -43,13 +43,13 @@
       "height": 864,
       "source": "MuAPI Flux 2 Dev original text-to-image generation",
       "purpose": "TrapMan wide neon-city hero atmosphere",
-      "prompt": "Original wide 16-bit pixel-art night cityscape representing Sydney, Australia, for an arcade runner game website. Wide view across layered rooftops and elevated rail lines. Left waterfront features an abstracted curved shell-roof silhouette evoking an opera house in chunky pixel blocks. Centre-right shows a slim tapering tower spire inspired by Sydney's CBD landmark. Clustered glass-tower blocks reflect cyan neon in dark harbour pixel water below. Deep indigo sky, amber street-lamp pools, cyan window rhythm, electric magenta light bars, wet pixel harbour reflections. Three distinct parallax layers: distant harbour-and-skyline, mid-ground rooftop route with elevated train tracks, foreground balustrades and fire-escape rails framing a clear horizontal running corridor. Graphic hand-authored sprite aesthetic, limited colour clusters, crisp hard pixel edges, cinematic depth. Absolutely no signs, glyphs, symbols, letters, numbers, characters, gameplay UI, scores, logos, photorealism, smooth 3D rendering, or generic cyberpunk portrait.",
+      "prompt": "Original wide 16-bit pixel-art night cityscape representing Sydney, Australia, for an arcade runner game website, matched to the game's own home-screen palette: deep black-violet sky, hot magenta and violet neon outlining the skyline, electric cyan window rhythm, restrained gold spark accents. Wide view across layered rooftops and elevated rail lines. Left waterfront features an abstracted curved shell-roof silhouette evoking an opera house outlined in glowing magenta neon strokes over chunky pixel blocks. Centre-right shows a slim tapering tower spire inspired by Sydney's CBD landmark with cyan-lit pixel windows. Glass-tower blocks reflect cyan and magenta neon in dark harbour pixel water below, and a faint perspective neon grid suggests the foreground plane. Three distinct parallax layers: distant harbour-and-skyline, mid-ground rooftop route with elevated train tracks, foreground balustrades framing a clear horizontal running corridor. Graphic hand-authored sprite aesthetic, limited colour clusters, crisp hard pixel edges, cinematic depth. Absolutely no signs, glyphs, symbols, letters, numbers, characters, gameplay UI, scores, logos, photorealism, smooth 3D rendering, or generic cyberpunk portrait.",
       "model": "MuAPI Flux 2 Dev",
       "endpoint": "flux-2-dev",
       "seed": null,
-      "generatedAt": "2026-06-27T09:06:11.985Z",
+      "generatedAt": "2026-07-03T06:29:29.802Z",
       "approved": true,
-      "approval": "Manual visual review"
+      "approval": "Owner visual review in chat (2026-07-03)"
     },
     {
       "id": "trapman-city-mobile",
@@ -59,13 +59,13 @@
       "height": 1536,
       "source": "MuAPI Flux 2 Dev original text-to-image generation",
       "purpose": "TrapMan mobile portrait city atmosphere",
-      "prompt": "Original vertical 16-bit pixel-art night cityscape representing Sydney, Australia, for a mobile arcade runner website. Dramatic upward view through a narrow Sydney laneway: wrought-iron lace balconies on terrace houses either side, sandstone colonial wall texture in chunky pixel blocks, modern glass CBD towers above reflecting cyan neon. Narrow strip of deep indigo sky at the top shows pixel Southern Cross constellation stars. Magenta electrical glow, amber street-lamp pools, pixel rain drops catching neon light, strong vertical depth, uncluttered centre for web copy. Handcrafted limited-palette sprite art with crisp hard edges. No characters, no gameplay UI, no scores, no readable text, no logos, no photorealism, no smooth 3D render, no generic cyberpunk portrait.",
+      "prompt": "Original vertical 16-bit pixel-art night cityscape representing Sydney, Australia, for a mobile arcade runner website, matched to the game's own home-screen palette: deep black-violet sky, hot magenta and violet neon edges, electric cyan window glow, restrained gold sparks. Dramatic upward view through a narrow Sydney laneway: wrought-iron lace balconies on terrace houses either side outlined in soft magenta neon, chunky pixel wall blocks, modern glass CBD towers above reflecting cyan and violet neon. Narrow strip of black-violet sky at the top shows pixel Southern Cross constellation stars. A faint perspective neon grid glows on the laneway floor. Strong vertical depth, uncluttered centre for web copy. Handcrafted limited-palette sprite art with crisp hard edges. No characters, no gameplay UI, no scores, no readable text, no logos, no photorealism, no smooth 3D render, no generic cyberpunk portrait.",
       "model": "MuAPI Flux 2 Dev",
       "endpoint": "flux-2-dev",
       "seed": null,
-      "generatedAt": "2026-06-27T09:06:12.577Z",
+      "generatedAt": "2026-07-03T06:29:29.802Z",
       "approved": true,
-      "approval": "Manual visual review"
+      "approval": "Owner visual review in chat (2026-07-03)"
     },
     {
       "id": "trapman-gameplay-atmosphere",
@@ -105,15 +105,15 @@
       "path": "nobilix/principles-plate.webp",
       "width": 1536,
       "height": 864,
-      "source": "Higgsfield Nano Banana Pro original text-to-image generation (2026-07-03 redesign pass)",
+      "source": "MuAPI Flux 2 Dev original text-to-image generation",
       "purpose": "Nobilix studio-principles section editorial plate",
-      "prompt": "Original dark editorial photograph-style composition, pure architectural still life, completely free of any signage or lettering. A macro study of a single obsidian drafting-table corner under a low raking light: a folded charcoal blueprint sheet showing only abstract grid lines and dots (never words or letterforms), a thin neon-violet laser-level hairline crossing the frame on a subtle diagonal, deep layered shadow gradients receding in depth so the composition stays interesting at a fixed crop, one sharp cool specular highlight. No lime or yellow light anywhere in the frame. Extremely restrained, gallery-catalogue minimalism, the entire left two-thirds of the frame is pure empty black negative space with absolutely nothing drawn in it. Cold, precise, architectural mood.",
-      "model": "Higgsfield Nano Banana Pro",
-      "endpoint": "nano_banana_pro",
+      "prompt": "Original dark 16-bit pixel-art editorial plate for a premium retro-arcade game studio website, same visual universe as an isometric obsidian pixel city under construction. A macro close-up of one corner of the dark isometric city grid: a few obsidian pixel-art building tiles mid-placement, one tile hovering slightly above its empty grid socket, a thin neon-violet laser guide-line crossing the frame on a subtle diagonal, faint cyan grid seams glowing between placed tiles. Deep cool black background, crisp hard pixel edges, restrained charcoal-and-violet palette. Extremely calm, luxurious, gallery-catalogue restraint — the left two-thirds of the frame is near-empty dark negative space. No lime or yellow anywhere. No characters, no readable text, no letters, no numbers, no logos, no UI, no photorealism, no smooth 3D render.",
+      "model": "MuAPI Flux 2 Dev",
+      "endpoint": "flux-2-dev",
       "seed": null,
-      "generatedAt": "2026-07-03T04:49:31.477Z",
+      "generatedAt": "2026-07-03T06:38:39.968Z",
       "approved": false,
-      "approval": "Pending manual visual review (agent pre-reviewed against media brief)"
+      "approval": "Pending owner review (pixel-art rework per owner feedback 2026-07-03)"
     },
     {
       "id": "nobilix-contact-plate",
@@ -121,15 +121,15 @@
       "path": "nobilix/contact-plate.webp",
       "width": 1536,
       "height": 864,
-      "source": "Higgsfield Nano Banana Pro original text-to-image generation (2026-07-03 redesign pass)",
+      "source": "MuAPI Flux 2 Dev original text-to-image generation",
       "purpose": "Nobilix homepage contact section editorial plate",
-      "prompt": "Original dark editorial architectural photograph, completely free of any signage, lettering, or interface elements. A single narrow beam of restrained neon-violet light entering a pitch-black obsidian corridor from an unseen source, illuminating faint architectural seams in the bare wall texture, soft cyan ambient bounce light at the edges. No lime or yellow light anywhere in the frame. Quiet, spacious, gallery-opening mood.",
-      "model": "Higgsfield Nano Banana Pro",
-      "endpoint": "nano_banana_pro",
+      "prompt": "Original dark 16-bit pixel-art editorial plate for a premium retro-arcade game studio website contact section, same visual universe as an isometric obsidian pixel city under construction. A quiet pixel-art scene: one softly glowing violet doorway opening in a dark obsidian pixel wall, warm violet light spilling out across a few dark floor tiles in chunky pixel gradients, faint cyan ambient bounce at the frame edges, a single tiny pixel star above. Evokes 'a door is open' — welcoming but extremely calm and spacious. Deep black negative space fills most of the frame. Crisp hard pixel edges, restrained palette, gallery restraint. No lime or yellow.",
+      "model": "MuAPI Flux 2 Dev",
+      "endpoint": "flux-2-dev",
       "seed": null,
-      "generatedAt": "2026-07-03T04:49:31.477Z",
+      "generatedAt": "2026-07-03T06:38:39.968Z",
       "approved": false,
-      "approval": "Pending manual visual review (agent pre-reviewed against media brief)"
+      "approval": "Pending owner review (pixel-art rework per owner feedback 2026-07-03)"
     },
     {
       "id": "nobilix-legal-header-plate",
@@ -281,13 +281,13 @@
       "path": "nobilix/studio-hero.mp4",
       "source": "MuAPI Kling v3.0 Pro original text-to-video generation",
       "purpose": "Nobilix studio hero cinematic atmospheric loop",
-      "prompt": "Ultra-cinematic slow atmospheric loop for a premium independent game studio website hero. Abstract top-down isometric dark pixel-art city grid being built tile by tile in slow motion — obsidian tiles materialising out of black void, a single neon-violet light column pulsing gently where construction is active, one acid-lime cursor spark floating above the active tile. Deep charcoal and void-black palette, soft volumetric glow from the violet build light, subtle 16mm film grain. Completely still except for the gentle violet light pulse and new tiles quietly appearing. No camera movement. No people, no text, no logos, no generic office, no product shots, no generic cyberpunk, no bright highlights.",
+      "prompt": "Ultra-cinematic slow atmospheric loop for a premium independent game studio website hero. Abstract top-down isometric dark pixel-art city grid being built tile by tile in slow motion — obsidian tiles materialising out of black void, a single neon-violet light column pulsing gently where construction is active and reading as the clear focal point, one tiny acid-lime cursor spark floating above the active tile as the sole warm note. Deep cool obsidian and void-black palette (no warm brown cast), soft volumetric glow from the violet build light, subtle 16mm film grain, the bottom 15% of frame staying calm and dark. Completely still except for the gentle violet light pulse and new tiles quietly appearing. No camera movement. No people, no text, no logos, no generic office, no product shots, no generic cyberpunk, no bright highlights.",
       "model": "MuAPI Kling v3.0 Pro",
       "endpoint": "kling-v3.0-pro-text-to-video",
       "seed": null,
-      "generatedAt": "2026-06-27T09:19:10.104Z",
+      "generatedAt": "2026-07-03T06:29:29.802Z",
       "approved": true,
-      "approval": "Manual visual review"
+      "approval": "Owner visual review in chat (2026-07-03)"
     },
     {
       "id": "trapman-city-hero-video",
@@ -295,13 +295,13 @@
       "path": "trapman/city-hero.mp4",
       "source": "MuAPI Kling v3.0 Pro original text-to-video generation",
       "purpose": "TrapMan city hero cinematic pixel loop (desktop)",
-      "prompt": "Cinematic looping 16-bit pixel-art Sydney night cityscape for an arcade runner game website. Wide view across layered rooftops and elevated rail lines. Left waterfront: an abstracted curved shell-roof pixel silhouette evoking an opera house. Centre: slim tapering CBD tower spire. Harbour pixel water below with neon reflections rippling as animated pixels. Cyan windows flickering with subtle life, electric magenta neon bars pulsing rhythmically, amber street-lamp pools glowing, pixel train lights crossing the upper skyline. Three-layer parallax depth with smooth background drift. Deep indigo sky, crisp hard pixel edges, limited Sydney night colour palette. Perfectly loopable 5-second cycle.",
+      "prompt": "Cinematic looping 16-bit pixel-art Sydney night cityscape for an arcade runner game website, matched to the game's own home-screen palette: deep black-violet sky, hot magenta and violet neon skyline outlines, electric cyan windows, restrained gold sparks. Wide view across layered rooftops and elevated rail lines. Left waterfront: an abstracted curved shell-roof pixel silhouette evoking an opera house outlined in glowing magenta neon. Centre: slim tapering CBD tower spire with cyan-lit windows. Harbour pixel water below with magenta and cyan neon reflections rippling as animated pixels. Cyan windows flickering with subtle life, magenta neon outlines pulsing rhythmically, pixel train lights crossing the upper skyline, faint perspective neon grid glowing in the foreground. Three-layer parallax depth with smooth background drift. Crisp hard pixel edges, limited colour clusters. Perfectly loopable 5-second cycle.",
       "model": "MuAPI Kling v3.0 Pro",
       "endpoint": "kling-v3.0-pro-text-to-video",
       "seed": null,
-      "generatedAt": "2026-06-27T09:23:27.708Z",
+      "generatedAt": "2026-07-03T06:29:29.802Z",
       "approved": true,
-      "approval": "Manual visual review"
+      "approval": "Owner visual review in chat (2026-07-03)"
     },
     {
       "id": "trapman-city-mobile-video",
@@ -309,13 +309,13 @@
       "path": "trapman/city-mobile.mp4",
       "source": "MuAPI Kling v3.0 Pro original text-to-video generation",
       "purpose": "TrapMan city hero cinematic pixel loop (mobile portrait)",
-      "prompt": "Cinematic looping vertical 16-bit pixel-art Sydney night cityscape for a mobile arcade runner game website. Dramatic upward view through a narrow Sydney laneway: wrought-iron lace balconies on terrace houses either side, chunky sandstone colonial pixel walls, modern CBD glass towers above with cyan neon reflections. Pixel Southern Cross stars visible in the narrow deep-indigo sky strip at top. Cyan windows flickering, magenta electrical glow pulsing, amber street lamp pools, pixel rain drops catching neon light. Vertical depth parallax with layers moving at different speeds. Handcrafted limited-palette sprite art, crisp hard pixel edges. Perfectly loopable 5-second vertical cycle.",
+      "prompt": "Cinematic looping vertical 16-bit pixel-art Sydney night cityscape for a mobile arcade runner game website, matched to the game's own home-screen palette: deep black-violet sky, hot magenta and violet neon edges, electric cyan glow, restrained gold sparks. Dramatic upward view through a narrow Sydney laneway: wrought-iron lace balconies on terrace houses either side outlined in soft magenta neon, chunky pixel walls, modern CBD glass towers above with cyan and violet neon reflections. Pixel Southern Cross stars in the narrow black-violet sky strip at top. Cyan windows flickering, magenta glow pulsing, faint perspective neon grid shimmering on the laneway floor, pixel rain drops catching neon light. Vertical depth parallax with layers moving at different speeds. Handcrafted limited-palette sprite art, crisp hard pixel edges. Perfectly loopable 5-second vertical cycle.",
       "model": "MuAPI Kling v3.0 Pro",
       "endpoint": "kling-v3.0-pro-text-to-video",
       "seed": null,
-      "generatedAt": "2026-06-27T09:28:02.029Z",
+      "generatedAt": "2026-07-03T06:29:29.802Z",
       "approved": true,
-      "approval": "Manual visual review"
+      "approval": "Owner visual review in chat (2026-07-03)"
     },
     {
       "id": "trapman-gameplay-video",
@@ -344,6 +344,20 @@
       "generatedAt": "2026-06-27T09:36:33.623Z",
       "approved": true,
       "approval": "Manual visual review"
+    },
+    {
+      "id": "trapman-characters-loop",
+      "kind": "video",
+      "path": "trapman/characters-loop.mp4",
+      "source": "MuAPI nano-banana-2-edit start frame (real game screenshots as character references) + Kling v3.0 Pro image-to-video",
+      "purpose": "TrapMan character-podium idle loop of Lil Golo and Shotta (poster: trapman/characters-loop-poster.webp)",
+      "prompt": "Start frame: the two runners from the game home screens (Lil Golo, Shotta) side by side on the neon podium, Sydney neon skyline, no text. Animation: gentle idle only — breathing bob, blink, chain glint, ring pulse, gold sparks; static camera; loopable 5s.",
+      "model": "MuAPI Kling v3.0 Pro (image-to-video)",
+      "endpoint": "kling-v3.0-pro-image-to-video",
+      "seed": null,
+      "generatedAt": "2026-07-03T06:38:39.968Z",
+      "approved": false,
+      "approval": "Pending owner review (built from real character references per owner direction)"
     }
   ]
 }

@@ -3,6 +3,8 @@
 import { useState } from "react";
 import type React from "react";
 
+import { CinematicVideo } from "@/components/motion/cinematic-video";
+
 const CHARACTERS = [
   {
     id: "lil-golo",
@@ -47,18 +49,19 @@ export function CharacterShowcase() {
       className="tm-podium-stage"
       style={{ "--char-accent": character.accent } as React.CSSProperties}
     >
-      <div className="tm-podium-scene" aria-hidden="true">
-        {/* ── Future media slot: trapman/characters-loop.mp4 ──────────────
-            A short animated loop of the two runners idling on this podium,
-            generated later via the MuAPI pipeline (see
-            docs/media-brief-trapman.md §"Podium loop"). When the asset
-            lands, drop it in here as:
-              <video className="tm-podium-scene__video" autoPlay muted loop
-                     playsInline poster="/assets/generated/trapman/characters-loop-poster.webp">
-                <source src="/assets/generated/trapman/characters-loop.mp4" type="video/mp4" />
-              </video>
-            positioned absolutely over the ring, with the CSS badge below
-            remaining as the no-JS / reduced-motion / load-failure fallback. */}
+      <div className="tm-podium-scene tm-podium-scene--video" aria-hidden="true">
+        {/* Generated idle loop of Lil Golo + Shotta on the podium (real
+            character references). CinematicVideo mounts the <video> only
+            client-side (SSR-safe autoplay) and falls back to the poster on
+            reduced-motion or load failure; the CSS scene underneath remains
+            the no-JS fallback. */}
+        <CinematicVideo
+          className="tm-podium-scene__video"
+          src="/assets/generated/trapman/characters-loop.mp4"
+          poster="/assets/generated/trapman/characters-loop-poster.webp"
+          posterWidth={1536}
+          posterHeight={864}
+        />
         <div className="tm-podium-ring" />
         <div className="tm-podium-ring tm-podium-ring--outer" />
         <div className="tm-podium-glow" />
