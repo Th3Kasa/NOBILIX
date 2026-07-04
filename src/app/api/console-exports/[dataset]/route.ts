@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { listUsers } from "@/lib/users";
 import { listLeaderboard } from "@/lib/leaderboard";
 import { recordAudit } from "@/lib/audit";
 import { getPurchasesData } from "@/app/console/(dashboard)/trapman/purchases/data";
+import { listPlayers } from "@/app/console/(dashboard)/trapman/users/data";
 
 /**
  * Console data exports — CSV downloads for datasets confirmed to have real
@@ -74,7 +74,7 @@ export async function GET(
     );
     filename = "trapman-purchases.csv";
   } else if (dataset === "users") {
-    const result = await listUsers({ limit: 1000 });
+    const result = await listPlayers({ limit: 1000 });
     if (!result.connected) {
       return NextResponse.json(
         { error: result.error ?? "Firebase unreachable" },
@@ -83,17 +83,19 @@ export async function GET(
     }
     const columns = [
       "uid",
-      "displayName",
+      "username",
       "email",
       "country",
-      "character",
-      "level",
-      "highScore",
       "isGuest",
-      "createdAt",
-      "lastSeenAt",
+      "currentLevel",
+      "completedLevels",
+      "purchaseCount",
+      "pushReachable",
     ];
-    csv = toCsv(result.users, columns);
+    csv = toCsv(
+      result.players.map((p) => ({ ...p })),
+      columns,
+    );
     filename = "trapman-users.csv";
   } else {
     const result = await listLeaderboard(1000, 0);

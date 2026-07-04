@@ -1,12 +1,16 @@
 import Link from "next/link";
-import { format } from "date-fns";
-import { AlertTriangle, ChevronRight } from "lucide-react";
+import {
+  AlertTriangle,
+  Bell,
+  BellOff,
+  ChevronRight,
+} from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import { listUsers } from "@/lib/users";
 import { countryFlag, formatNumber } from "@/lib/utils";
+import { listPlayers } from "./data";
 import { UsersFilter } from "./users-filter";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +19,7 @@ type SP = {
   q?: string;
   country?: string;
   guest?: string;
-  cursor?: string;
+  offset?: string;
 };
 
 export default async function UsersPage({
@@ -26,19 +30,20 @@ export default async function UsersPage({
   const sp = await searchParams;
   const guest =
     sp.guest === "guest" || sp.guest === "registered" ? sp.guest : "all";
-  const result = await listUsers({
+  const offset = sp.offset ? Math.max(0, Number(sp.offset) || 0) : 0;
+  const result = await listPlayers({
     search: sp.q?.trim() || undefined,
     country: sp.country?.trim() || undefined,
     guest,
-    cursor: sp.cursor ? Number(sp.cursor) : null,
+    offset,
   });
 
-  const buildHref = (cursor: number) => {
+  const buildHref = (nextOffset: number) => {
     const p = new URLSearchParams();
     if (sp.q) p.set("q", sp.q);
     if (sp.country) p.set("country", sp.country);
     if (sp.guest) p.set("guest", sp.guest);
-    p.set("cursor", String(cursor));
+    p.set("offset", String(nextOffset));
     return `/console/trapman/users?${p.toString()}`;
   };
 
@@ -65,7 +70,7 @@ export default async function UsersPage({
 
       <Card className="console-glass mt-4">
         <CardContent className="p-0">
-          {result.users.length === 0 ? (
+          {result.players.length === 0 ? (
             <div className="console-empty-state">
               <p className="relative p-8 text-center text-sm text-muted-foreground">
                 No players found.
@@ -79,47 +84,66 @@ export default async function UsersPage({
                     <th className="px-4 py-3 font-medium">Player</th>
                     <th className="px-4 py-3 font-medium">Country</th>
                     <th className="px-4 py-3 font-medium">Level</th>
-                    <th className="px-4 py-3 font-medium">High score</th>
+                    <th className="px-4 py-3 font-medium">Levels done</th>
+                    <th className="px-4 py-3 font-medium">Purchases</th>
+                    <th className="px-4 py-3 font-medium">Push</th>
                     <th className="px-4 py-3 font-medium">Type</th>
-                    <th className="px-4 py-3 font-medium">Created</th>
                     <th className="px-4 py-3" />
                   </tr>
                 </thead>
                 <tbody>
-                  {result.users.map((u) => (
+                  {result.players.map((p) => (
                     <tr
-                      key={u.uid}
+                      key={p.uid}
                       className="border-b border-border/60 last:border-0 hover:bg-accent/40"
                     >
                       <td className="px-4 py-3">
                         <div className="font-medium">
-                          {u.displayName ?? (
+                          {p.username ?? (
                             <span className="text-muted-foreground">
                               (no name)
                             </span>
                           )}
                         </div>
                         <div className="font-mono text-xs text-muted-foreground">
-                          {u.email ?? u.uid}
+                          {p.email ?? p.uid}
                         </div>
                       </td>
                       <td className="px-4 py-3">
-                        {u.country ? (
+                        {p.country ? (
                           <span>
-                            {countryFlag(u.country)} {u.country}
+                            {countryFlag(p.country)} {p.country}
                           </span>
                         ) : (
                           "—"
                         )}
                       </td>
                       <td className="px-4 py-3 font-mono tabular-nums">
-                        {u.level != null ? formatNumber(u.level) : "—"}
+                        {p.currentLevel != null
+                          ? formatNumber(p.currentLevel)
+                          : "—"}
                       </td>
                       <td className="px-4 py-3 font-mono tabular-nums">
-                        {u.highScore != null ? formatNumber(u.highScore) : "—"}
+                        {p.completedLevels != null
+                          ? formatNumber(p.completedLevels)
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-3 font-mono tabular-nums">
+                        {p.purchaseCount > 0 ? formatNumber(p.purchaseCount) : "—"}
                       </td>
                       <td className="px-4 py-3">
-                        {u.isGuest ? (
+                        {p.pushReachable ? (
+                          <span className="inline-flex items-center gap-1 text-[var(--console-live)]">
+                            <Bell className="size-3.5" aria-hidden="true" /> Yes
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 text-muted-foreground">
+                            <BellOff className="size-3.5" aria-hidden="true" /> No
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        {p.isGuest ? (
                           <Badge variant="secondary" className="font-mono uppercase tracking-wide">
                             Guest
                           </Badge>
@@ -129,15 +153,10 @@ export default async function UsersPage({
                           </Badge>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-muted-foreground">
-                        {u.createdAt
-                          ? format(new Date(u.createdAt as number), "MMM d, yyyy")
-                          : "—"}
-                      </td>
                       <td className="px-4 py-3 text-right">
                         <Link
-                          href={`/console/trapman/users/${u.uid}`}
-                          className="inline-flex items-center text-primary transition-transform hover:translate-x-0.5 hover:underline"
+                          href={`/console/trapman/users/${p.uid}`}
+                          className="inline-flex min-h-11 items-center text-primary transition-transform hover:translate-x-0.5 hover:underline"
                         >
                           View <ChevronRight className="size-4" />
                         </Link>
@@ -151,16 +170,21 @@ export default async function UsersPage({
         </CardContent>
       </Card>
 
-      {result.nextCursor && (
-        <div className="mt-4 flex justify-center">
+      <div className="mt-4 flex items-center justify-between gap-4">
+        <p className="text-xs text-muted-foreground">
+          Showing {result.players.length === 0 ? 0 : offset + 1}–
+          {offset + result.players.length} of {result.totalMatching} matching
+          player{result.totalMatching === 1 ? "" : "s"}
+        </p>
+        {result.nextOffset != null && (
           <Link
-            href={buildHref(result.nextCursor)}
+            href={buildHref(result.nextOffset)}
             className={buttonVariants({ variant: "outline" })}
           >
             Load more
           </Link>
-        </div>
-      )}
+        )}
+      </div>
     </>
   );
 }

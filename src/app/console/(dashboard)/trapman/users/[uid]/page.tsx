@@ -35,6 +35,18 @@ export default async function UserDetailPage({
   const ts = (v: unknown) =>
     typeof v === "number" ? format(new Date(v), "PPpp") : "—";
 
+  // The live game writes currentLevel/completedLevels, not the documented
+  // level field; the mapper preserves them as extra properties.
+  const extra = user as unknown as {
+    currentLevel?: unknown;
+    completedLevels?: unknown;
+  };
+  const currentLevel =
+    typeof extra.currentLevel === "number" ? extra.currentLevel : null;
+  const completedLevels = Array.isArray(extra.completedLevels)
+    ? extra.completedLevels.length
+    : null;
+
   return (
     <>
       <Link
@@ -92,7 +104,17 @@ export default async function UserDetailPage({
               label="Level"
               value={
                 <span className="font-mono tabular-nums">
-                  {user.level != null ? formatNumber(user.level) : "—"}
+                  {(currentLevel ?? user.level) != null
+                    ? formatNumber((currentLevel ?? user.level) as number)
+                    : "—"}
+                </span>
+              }
+            />
+            <Field
+              label="Levels completed"
+              value={
+                <span className="font-mono tabular-nums">
+                  {completedLevels != null ? formatNumber(completedLevels) : "—"}
                 </span>
               }
             />
