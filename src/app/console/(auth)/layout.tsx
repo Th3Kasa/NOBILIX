@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+
+// Belt-and-braces with robots.ts: the operator console must never be indexed.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
+
 export default function AuthLayout({
   children,
 }: {

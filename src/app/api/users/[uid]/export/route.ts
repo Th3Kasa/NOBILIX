@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { requireWriteAccess } from "@/lib/authz";
 import { buildUserExport } from "@/lib/users";
 import { recordAudit } from "@/lib/audit";
 
@@ -7,9 +7,17 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ uid: string }> },
 ) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // Per-player data export is a write-level privilege (same policy as the
+  // bulk CSV exports): viewer-role admins must not download player data.
+  let admin;
+  try {
+    admin = await requireWriteAccess();
+  } catch (err) {
+    const readOnly = err instanceof Error && err.message.includes("read-only");
+    return NextResponse.json(
+      { error: readOnly ? "Exports require write access." : "Unauthorized" },
+      { status: readOnly ? 403 : 401 },
+    );
   }
 
   const { uid } = await params;
@@ -19,8 +27,8 @@ export async function GET(
   }
 
   await recordAudit({
-    actorId: session.user.id,
-    actorEmail: session.user.email ?? "",
+    actorId: admin.id,
+    actorEmail: admin.email,
     action: "user.export",
     target: uid,
   });

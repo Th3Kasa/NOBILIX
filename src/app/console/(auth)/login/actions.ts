@@ -109,11 +109,26 @@ export async function loginAction(
     if (!admin || !(await verifyPassword(admin, password))) {
       return { step: "credentials", error: "Session expired — please start again." };
     }
+    if (isLocked(admin)) {
+      return {
+        step: "credentials",
+        error:
+          "Account temporarily locked after too many attempts. Try again in 15 minutes.",
+      };
+    }
     if (!admin.totpSecretEnc) {
       return { step: "credentials", error: "Setup expired — please start again." };
     }
     const secret = decrypt(admin.totpSecretEnc);
     if (!verifyTotp(code, secret)) {
+      // Wrong enrollment codes trip the same 5×/15min lockout as bad
+      // passwords — otherwise this phase would allow unlimited TOTP guessing.
+      await registerFailedAttempt(admin);
+      await recordAudit({
+        actorId: admin.id,
+        actorEmail: admin.email,
+        action: "auth.totp.enroll_bad_code",
+      });
       return {
         step: "enroll",
         qrDataUrl: prev.qrDataUrl,

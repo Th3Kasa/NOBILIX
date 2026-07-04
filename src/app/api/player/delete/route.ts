@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { getAuthAdmin } from "@/lib/firebase/auth";
 import { PLAYER_SESSION_COOKIE } from "@/lib/player-session";
 import { deletePlayerAccount } from "@/lib/player-deletion";
+import { checkRateLimit, rateLimited } from "@/lib/rate-limit";
 
 const REQUIRED_CONFIRMATION = "DELETE TRAPMAN";
 const MAX_AUTH_AGE_SECONDS = 5 * 60; // 5 minutes
@@ -41,6 +42,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         },
         { status: 401 }
       );
+    }
+
+    // 2b. Per-account rate limit: deletion is idempotent but expensive
+    // (multi-collection fan-out) — cap spam from a compromised session.
+    const limit = await checkRateLimit(`player-delete:${decoded.uid}`, 3, 60 * 60_000);
+    if (!limit.allowed) {
+      return rateLimited(limit.retryAfterSeconds);
     }
 
     // 3. Validate request body — only confirmation string accepted; uid never from body

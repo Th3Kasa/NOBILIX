@@ -2,12 +2,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getAuthAdmin } from "@/lib/firebase/auth";
 import { PLAYER_SESSION_COOKIE } from "@/lib/player-session";
+import { checkRateLimit, clientIpFrom, rateLimited } from "@/lib/rate-limit";
 
 const SESSION_DURATION_MS = 5 * 24 * 60 * 60 * 1000; // 5 days
 const MAX_ID_TOKEN_AGE_SECONDS = 5 * 60; // 5 minutes
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   try {
+    const ipLimit = await checkRateLimit(
+      `player-session-ip:${clientIpFrom(req)}`,
+      10,
+      60_000,
+    );
+    if (!ipLimit.allowed) {
+      return rateLimited(ipLimit.retryAfterSeconds);
+    }
+
     const body = (await req.json()) as unknown;
     if (
       typeof body !== "object" ||
@@ -27,6 +37,16 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
         { error: "Token too old — please sign in again" },
         { status: 401 }
       );
+    }
+
+    // Per-account cap after the token is verified (uid is trustworthy here).
+    const uidLimit = await checkRateLimit(
+      `player-session-uid:${decoded.uid}`,
+      20,
+      60 * 60_000,
+    );
+    if (!uidLimit.allowed) {
+      return rateLimited(uidLimit.retryAfterSeconds);
     }
 
     // Exchange the ID token for a long-lived session cookie

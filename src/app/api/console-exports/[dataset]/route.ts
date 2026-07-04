@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
+import { requireWriteAccess } from "@/lib/authz";
 import { listLeaderboard } from "@/lib/leaderboard";
 import { recordAudit } from "@/lib/audit";
 import { getPurchasesData } from "@/app/console/(dashboard)/trapman/purchases/data";
@@ -34,9 +34,17 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ dataset: string }> },
 ) {
-  const session = await auth();
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // Bulk data exports are a write-level privilege: viewer-role admins are
+  // read-only in the UI and must not be able to bulk-download player data.
+  let admin;
+  try {
+    admin = await requireWriteAccess();
+  } catch (err) {
+    const readOnly = err instanceof Error && err.message.includes("read-only");
+    return NextResponse.json(
+      { error: readOnly ? "Exports require write access." : "Unauthorized" },
+      { status: readOnly ? 403 : 401 },
+    );
   }
 
   const { dataset } = await params;
@@ -114,8 +122,8 @@ export async function GET(
   }
 
   await recordAudit({
-    actorId: session.user.id,
-    actorEmail: session.user.email ?? "",
+    actorId: admin.id,
+    actorEmail: admin.email,
     action: "export.download",
     target: dataset,
   });

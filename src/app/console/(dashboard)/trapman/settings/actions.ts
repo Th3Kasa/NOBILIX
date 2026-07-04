@@ -19,7 +19,7 @@ const schema = z
     currentPassword: z.string().min(1, "Enter your current password."),
     newPassword: z
       .string()
-      .min(8, "New password must be at least 8 characters."),
+      .min(12, "New password must be at least 12 characters."),
     confirmPassword: z.string().min(1, "Confirm your new password."),
   })
   .refine((d) => d.newPassword === d.confirmPassword, {
@@ -49,6 +49,14 @@ export async function changePasswordAction(
   });
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Check the form." };
+  }
+
+  const emailLocalPart = session.email.split("@")[0]?.toLowerCase() ?? "";
+  if (
+    emailLocalPart.length > 2 &&
+    parsed.data.newPassword.toLowerCase().includes(emailLocalPart)
+  ) {
+    return { error: "New password must not contain your email name." };
   }
 
   const admin = await getAdminById(session.id);

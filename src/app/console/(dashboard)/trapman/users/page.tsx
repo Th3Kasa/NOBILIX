@@ -31,9 +31,14 @@ export default async function UsersPage({
   const guest =
     sp.guest === "guest" || sp.guest === "registered" ? sp.guest : "all";
   const offset = sp.offset ? Math.max(0, Number(sp.offset) || 0) : 0;
+  // Sanitize free-text params before they reach Firestore queries: cap the
+  // search prefix length and only accept ISO 3166-1 alpha-2 country codes.
+  const search = sp.q?.trim().slice(0, 64) || undefined;
+  const countryRaw = sp.country?.trim() ?? "";
+  const country = /^[A-Za-z]{2}$/.test(countryRaw) ? countryRaw : undefined;
   const result = await listPlayers({
-    search: sp.q?.trim() || undefined,
-    country: sp.country?.trim() || undefined,
+    search,
+    country,
     guest,
     offset,
   });

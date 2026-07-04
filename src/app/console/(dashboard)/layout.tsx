@@ -1,8 +1,14 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { auth } from "@/auth";
 import { PlatformSidebar } from "@/components/nav/platform-sidebar";
 import { Topbar } from "@/components/nav/topbar";
 import { ConsoleMobileNav } from "@/components/nav/console-mobile-nav";
+
+// Belt-and-braces with robots.ts: the operator console must never be indexed.
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
+};
 
 const platformNavigationItems = [
   { href: "/console", label: "Projects", description: "All Nobilix projects" },
