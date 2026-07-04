@@ -55,8 +55,10 @@ test("data module pages preserve honest empty and unavailable states", () => {
   assert.match(overview, /Firebase connection required/);
   assert.match(ads, /unavailableReason/);
   assert.match(ads, /No ad analytics available yet/);
-  assert.match(gameplay, /unavailableReason/);
-  assert.match(gameplay, /No gameplay data available yet/);
+  // Gameplay is a live-data module now — keeps honest connection-error and
+  // zero-data states instead of a schema-pending placeholder.
+  assert.match(gameplay, /Couldn&apos;t reach Firebase/);
+  assert.match(gameplay, /No level data recorded yet/);
 
   // Analytics/Purchases/Exports are live-data modules now — they must keep
   // honest connection-error and zero-data states instead of placeholders.

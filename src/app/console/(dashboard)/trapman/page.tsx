@@ -4,7 +4,6 @@ import {
   UserPlus,
   Ghost,
   AlertTriangle,
-  Info,
   ShoppingCart,
   BellRing,
   Receipt,
@@ -301,27 +300,16 @@ export default async function TrapManOverviewPage() {
         </Card>
       )}
 
-      {/* 6. Unavailable data-source panel */}
-      {m.unavailable.length > 0 && (
-        <Card className="console-empty-state mb-6 border-[var(--console-violet-border)] bg-[var(--console-violet-tint)]">
-          <CardContent className="relative p-4">
-            <div className="console-pixel-label mb-3 flex items-center gap-2 text-[var(--console-violet)]">
-              <Info className="size-4" aria-hidden="true" />
-              Data sources pending verification
-            </div>
-            <ul className="space-y-1.5">
-              {m.unavailable.map((label) => (
-                <li
-                  key={label}
-                  className="flex items-start gap-2 text-xs text-muted-foreground"
-                >
-                  <span className="mt-1 size-1.5 shrink-0 rounded-full bg-[var(--console-violet)]/50" />
-                  {label}
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
+      {/* 6. Source note — the two revenue figures measure different things. */}
+      {(live.connected || ga4.connected) && (
+        <p className="text-xs text-muted-foreground">
+          Two revenue figures are shown deliberately:{" "}
+          <strong className="text-foreground">Store revenue</strong> sums the
+          in-app purchase receipts stored on player profiles, while{" "}
+          <strong className="text-foreground">GA4 revenue</strong> is the
+          purchase revenue Google Analytics recorded over the last 30 days.
+          They come from independent sources and will rarely match exactly.
+        </p>
       )}
     </>
   );
