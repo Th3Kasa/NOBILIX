@@ -41,9 +41,8 @@ function formatTime(seconds: number): string {
 /**
  * Floating in-game-styled music player, fixed to the bottom of the
  * viewport (mirrors the collapsible bar in the real gameplay screenshot).
- * Starts with CEEBS and attempts autoplay on arrival; when the browser
- * blocks it, playback starts on the visitor's first interaction anywhere on
- * the page instead. Tracks advance automatically and wrap around.
+ * Starts paused and minimised — nothing plays until the visitor clicks
+ * play. Once started, tracks advance automatically and wrap around.
  *
  * Auto-collapses (fades, non-interactive) once the page footer scrolls
  * into view so it never sits on top of the footer's legal links.
@@ -57,42 +56,15 @@ export function TrapManAudioPlayer() {
   const [volume, setVolume] = useState(0.65);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   const [nearFooter, setNearFooter] = useState(false);
-  const wantsAutoplay = useRef(true);
 
   const track = TRACKS[index];
 
   const play = useCallback(() => {
     audioRef.current?.play().catch(() => {
-      /* blocked — the gesture listener below will retry */
+      /* play() only runs from a user gesture, so this rarely rejects */
     });
-  }, []);
-
-  // Attempt autoplay once; if blocked, arm a one-time first-gesture starter.
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio || !wantsAutoplay.current) return;
-    wantsAutoplay.current = false;
-
-    let armed = false;
-    const startOnGesture = () => {
-      audio.play().catch(() => {});
-      disarm();
-    };
-    const disarm = () => {
-      if (!armed) return;
-      armed = false;
-      document.removeEventListener("pointerdown", startOnGesture);
-      document.removeEventListener("keydown", startOnGesture);
-    };
-
-    audio.play().catch(() => {
-      armed = true;
-      document.addEventListener("pointerdown", startOnGesture, { once: true });
-      document.addEventListener("keydown", startOnGesture, { once: true });
-    });
-    return disarm;
   }, []);
 
   // Keep the <audio> element's volume in sync with the slider.
