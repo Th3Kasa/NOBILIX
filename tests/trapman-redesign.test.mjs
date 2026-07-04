@@ -15,7 +15,6 @@ test("TrapMan route presents the complete animated project world", () => {
     "characters",
     "world",
     "music",
-    "shop",
     "leaderboard",
     "account",
     "support",
@@ -24,7 +23,9 @@ test("TrapMan route presents the complete animated project world", () => {
   }
 
   assert.match(page, /WorldSystem/);
-  assert.match(page, /ShopShowcase/);
+  // The shop section was intentionally cut; the floating in-game music
+  // player replaced the section-scoped audio.
+  assert.match(page, /TrapManAudioPlayer/);
   assert.match(page, /Reveal/);
   assert.match(page, /Pixel soul\. Premium stage\./);
 });
@@ -34,7 +35,6 @@ test("TrapMan uses generated atmosphere assets and no game screenshots", () => {
   const gallery = read("src/components/trapman/gameplay-gallery.tsx");
   const characters = read("src/components/trapman/character-showcase.tsx");
   const world = read("src/components/trapman/world-system.tsx");
-  const shop = read("src/components/trapman/shop-showcase.tsx");
   const music = read("src/components/trapman/music-strip.tsx");
 
   for (const asset of [
@@ -43,11 +43,11 @@ test("TrapMan uses generated atmosphere assets and no game screenshots", () => {
     "gameplay-atmosphere.webp",
     "music-atmosphere.webp",
   ]) {
-    assert.match(`${hero}\n${world}\n${shop}\n${music}\n${gallery}`, new RegExp(asset));
+    assert.match(`${hero}\n${world}\n${music}\n${gallery}`, new RegExp(asset));
   }
-  assert.doesNotMatch(`${hero}\n${world}\n${shop}\n${gallery}`, /portal\.webp/, "portal.webp must not appear (removed)");
+  assert.doesNotMatch(`${hero}\n${world}\n${gallery}`, /portal\.webp/, "portal.webp must not appear (removed)");
 
-  const allSources = `${hero}\n${gallery}\n${characters}\n${shop}`;
+  const allSources = `${hero}\n${gallery}\n${characters}`;
   for (const screenshot of [
     "home-lil-golo.png",
     "home-shotta.png",
@@ -58,7 +58,9 @@ test("TrapMan uses generated atmosphere assets and no game screenshots", () => {
     assert.doesNotMatch(allSources, new RegExp(screenshot), `Game screenshot must not appear: ${screenshot}`);
   }
 
-  assert.match(hero, /trapman-logo\.png/);
+  // The official logo now lives in the sticky header rather than the hero.
+  const header = read("src/components/trapman/trapman-header.tsx");
+  assert.match(header, /trapman-logo\.png/);
 });
 
 test("TrapMan animation is Motion-backed, pausable, and reduced-motion aware", () => {
@@ -74,15 +76,21 @@ test("TrapMan animation is Motion-backed, pausable, and reduced-motion aware", (
 });
 
 test("TrapMan audio never autoplays", () => {
+  // Playback lives in the floating audio player; it must start paused and
+  // must never carry an autoPlay attribute. (Its internal `autoplay` track
+  // -advance parameter only runs after the user has pressed play.)
+  const player = read("src/components/trapman/audio-player.tsx");
+  assert.doesNotMatch(player, /autoPlay/);
+  assert.match(player, /setPlaying\]\s*=\s*useState\(false\)/);
+  // The music section itself must not embed its own audio element.
   const music = read("src/components/trapman/music-strip.tsx");
-  assert.match(music, /preload="none"/);
-  assert.doesNotMatch(music, /autoplay|autoPlay/);
+  assert.doesNotMatch(music, /<audio/);
 });
 
 test("new TrapMan world components exist", () => {
   for (const path of [
     "src/components/trapman/world-system.tsx",
-    "src/components/trapman/shop-showcase.tsx",
+    "src/components/trapman/audio-player.tsx",
   ]) {
     assert.equal(existsSync(resolve(root, path)), true, `${path} must exist`);
   }

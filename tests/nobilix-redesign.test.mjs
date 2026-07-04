@@ -88,8 +88,7 @@ test("portfolio remains scalable without inventing future projects", () => {
 
   assert.match(projectCard, /ProjectDefinition/);
   assert.match(projectCard, /project\.status/);
-  assert.match(projectCard, /project\.publicPath/);
-  assert.match(projectCard, /project\.accountPath/);
+  assert.match(projectCard, /project\.description/);
   assert.match(showcase, /PROJECTS\.trapman/);
   assert.match(showcase, /main project/i);
   assert.match(showcase, /more worlds are being shaped/i);

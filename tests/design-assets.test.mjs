@@ -202,7 +202,7 @@ test("asset generator validates the full plan without credentials or API calls",
   );
 
   assert.equal(stderr, "");
-  assert.match(stdout, /Validated 22 design asset definitions/);
+  assert.match(stdout, /Validated 23 design asset definitions/);
   assert.doesNotMatch(stdout, /MUAPI_API_KEY/i);
 });
 
