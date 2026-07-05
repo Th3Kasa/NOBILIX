@@ -21,7 +21,7 @@ export function ProjectShowcase() {
       <Reveal delay={0.1} className="project-showcase__copy">
         <p className="eyebrow">
           <span className="eyebrow__dot" aria-hidden="true" />
-          02 / Main project
+          Main project
         </p>
         <h2 id="projects-title">
           TrapMan is where Nobilix is <em>focused right now</em>.

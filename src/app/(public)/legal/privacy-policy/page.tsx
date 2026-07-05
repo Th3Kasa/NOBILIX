@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/legal/privacy-policy" },
 };
 
-const LAST_UPDATED = "2026-06-27";
+const LAST_UPDATED = "2026-07-06";
 
 export default function NobilixPrivacyPolicyPage() {
   return (
@@ -18,7 +18,7 @@ export default function NobilixPrivacyPolicyPage() {
         <p>
           Nobilix Pty Ltd (ABN pending) (<strong>“Nobilix”</strong>,{" "}
           <strong>“we”</strong>, <strong>“us”</strong>, <strong>“our”</strong>)
-          is a game development studio incorporated in New South Wales,
+          is an independent technology studio incorporated in New South Wales,
           Australia. We operate the nobilix.com website, the TrapMan mobile
           game, and associated developer tools.
         </p>

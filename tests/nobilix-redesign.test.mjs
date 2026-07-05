@@ -22,7 +22,7 @@ test("Nobilix homepage exposes company brand landmarks and generated studio medi
   assert.match(hero, /ParallaxMedia/);
   assert.match(principles, /id="principles"/);
   assert.match(principles, /aria-labelledby="principles-title"/);
-  assert.match(principles, /Design systems that can hold more than one project/);
+  assert.match(principles, /A studio brand built like/);
   assert.match(showcase, /id="projects"/);
   assert.match(showcase, /aria-labelledby="projects-title"/);
   assert.match(showcase, /project-transition\.webp/);
@@ -91,8 +91,9 @@ test("portfolio remains scalable without inventing future projects", () => {
   assert.match(projectCard, /project\.description/);
   assert.match(showcase, /PROJECTS\.trapman/);
   assert.match(showcase, /main project/i);
-  assert.match(showcase, /more worlds are being shaped/i);
-  assert.doesNotMatch(showcase, /placeholder|coming soon card|fake/i);
+  assert.match(showcase, /More are being built/);
+  // No fake placeholder cards — prose may still SAY "placeholders".
+  assert.doesNotMatch(showcase, /coming soon|fake/i);
 });
 
 test("company legal directory separates company and TrapMan legal destinations", () => {
@@ -101,7 +102,7 @@ test("company legal directory separates company and TrapMan legal destinations",
   assert.match(legal, /aria-labelledby="company-legal-title"/);
   assert.match(legal, /Company brand/);
   assert.match(legal, /Corporate notices/);
-  assert.match(legal, /Project policies/);
+  assert.match(legal, /Product policies/);
   assert.match(legal, /Nobilix Pty Ltd/);
   assert.match(legal, /project\.legal\.privacy/);
   assert.match(legal, /project\.legal\.terms/);

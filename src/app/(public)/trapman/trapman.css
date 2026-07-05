@@ -415,7 +415,9 @@
   z-index: var(--z-scene-scrim);
   background:
     radial-gradient(circle at 50% 34%, transparent 0 18rem, rgb(3 2 7 / .42) 32rem),
-    linear-gradient(180deg, rgb(3 2 7 / .1), #030207 96%);
+    radial-gradient(ellipse at 22% 78%, rgb(140 39 255 / .22) 0, transparent 46%),
+    radial-gradient(ellipse at 82% 30%, rgb(241 68 255 / .16) 0, transparent 50%),
+    linear-gradient(180deg, rgb(3 2 7 / .06), rgb(15 4 28 / .3) 55%, #030207 96%);
 }
 .city-ambient-motion {
   position: absolute;
@@ -443,6 +445,7 @@
     linear-gradient(0deg, transparent 0 72%, rgb(140 39 255 / .2) 72% 73%, transparent 73%);
 }
 .hero-copy {
+  position: relative;
   max-width: 54rem;
   text-align: left;
   align-items: flex-start;
@@ -452,6 +455,20 @@
   background: linear-gradient(135deg, rgb(3 2 7 / .78), rgb(22 5 38 / .62));
   box-shadow: 0 2rem 7rem rgb(241 68 255 / .18);
   backdrop-filter: blur(14px);
+}
+/* Soft violet/magenta ambience glowing behind the copy panel — static
+   radial wash, sits under the panel's own z-stack via negative z-index
+   so it never intercepts pointer/focus on the CTAs above it. */
+.hero-copy::before {
+  content: "";
+  position: absolute;
+  inset: -18% -14%;
+  z-index: -1;
+  background:
+    radial-gradient(ellipse 70% 60% at 30% 40%, rgb(140 39 255 / .32) 0, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 75% 70%, rgb(241 68 255 / .22) 0, transparent 72%);
+  filter: blur(2rem);
+  pointer-events: none;
 }
 .trapman-kicker {
   color: var(--tm-cyan);
@@ -1952,7 +1969,11 @@ h2.legal-toc-heading {
   color: transparent;
   -webkit-text-fill-color: transparent;
   position: relative;
-  filter: drop-shadow(0 3px 0 #6b1fb8) drop-shadow(0 6px 0 #4a1480) drop-shadow(0 0 1.6rem rgb(241 68 255 / .55));
+  filter:
+    drop-shadow(0 3px 0 #6b1fb8)
+    drop-shadow(0 6px 0 #4a1480)
+    drop-shadow(0 0 .5rem rgb(191 248 255 / .5))
+    drop-shadow(0 0 1.8rem rgb(241 68 255 / .6));
 }
 .tm-chrome-wordmark__sparkle {
   font-size: .32em;
@@ -1985,8 +2006,13 @@ h2.legal-toc-heading {
   max-height: 28rem;
   pointer-events: none;
   /* Static glow only: animating drop-shadow re-rasterizes the whole
-     full-width SVG every frame and stalls the compositor. */
-  filter: drop-shadow(0 0 .55rem rgb(241 68 255 / .55)) drop-shadow(0 0 1.6rem rgb(140 39 255 / .35));
+     full-width SVG every frame and stalls the compositor. Layered near
+     (tight, hot) + far (soft, wide) passes read as a real neon-sign glow
+     without adding motion. */
+  filter:
+    drop-shadow(0 0 .3rem rgb(255 157 241 / .65))
+    drop-shadow(0 0 .8rem rgb(241 68 255 / .55))
+    drop-shadow(0 0 2.2rem rgb(140 39 255 / .4));
 }
 .tm-skyline__windows { animation: tm-window-flicker 3.4s steps(2, jump-none) infinite; }
 @keyframes tm-window-flicker {

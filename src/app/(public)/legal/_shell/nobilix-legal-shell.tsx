@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import Image from "next/image";
 import Link from "next/link";
 
 const NOBILIX_LEGAL_PAGES = [
@@ -31,17 +30,6 @@ export function NobilixLegalShell({
           <li aria-current="page">{title}</li>
         </ol>
       </nav>
-
-      <div className="nobilix-legal-art neon-border" aria-hidden="true">
-        <Image
-          src="/assets/generated/nobilix/legal-header-plate.webp"
-          alt=""
-          width={1440}
-          height={480}
-          sizes="(max-width: 900px) 100vw, 82rem"
-          priority
-        />
-      </div>
 
       <header className="nobilix-legal-header">
         <div className="nobilix-legal-entity">

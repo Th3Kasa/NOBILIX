@@ -688,8 +688,9 @@
   margin-top: 3rem;
 }
 .studio-principles__plate {
-  position: sticky;
-  top: 6rem;
+  /* In normal flow, centered beside the list — a pinned (sticky) image here
+     read as "stuck" while the principles scrolled past it. */
+  align-self: center;
   border-radius: var(--radius-editorial);
   overflow: hidden;
   border: 1px solid var(--company-hairline);
@@ -998,10 +999,9 @@
 
   .legal-directory__grid { grid-template-columns: 1fr; }
 
-  /* Principles collapse to a single stacked column; drop the sticky plate
-     and asymmetric indents so the reading order stays linear on small screens. */
+  /* Principles collapse to a single stacked column; drop the asymmetric
+     indents so the reading order stays linear on small screens. */
   .studio-principles__layout { grid-template-columns: 1fr; }
-  .studio-principles__plate { position: static; }
   .studio-principle--2,
   .studio-principle--3 { padding-inline-start: 0; }
 }
@@ -1030,8 +1030,7 @@
 /* ─── Nobilix legal pages ──────────────────────────────────────── */
 /*
   Text-first and calm by design: legal readability outranks art density
-  here. One optional header band image at most (see .nobilix-legal-art
-  below) — no per-section decoration.
+  here — pure typography, no per-section decoration.
 */
 .nobilix-legal-shell {
   max-width: 82rem;
@@ -1060,8 +1059,11 @@
   flex-wrap: wrap;
   align-items: flex-end;
   gap: 1.5rem 3rem;
-  margin-bottom: 2rem;
-  padding-bottom: 2rem;
+  margin-top: 1.5rem;
+  margin-bottom: 2.5rem;
+  padding-top: 1.75rem;
+  padding-bottom: 2.25rem;
+  border-top: 1px solid var(--company-hairline);
   border-bottom: 1px solid var(--company-hairline);
 }
 .nobilix-legal-entity {
@@ -1229,22 +1231,6 @@
 }
 .nobilix-legal-cross-link:hover { color: var(--company-accent); }
 
-/* Optional single header-band plate — skip entirely and the shell reads as
-   pure typography, which is equally valid for this section. */
-.nobilix-legal-art {
-  margin-bottom: 2rem;
-  border-radius: var(--radius-editorial);
-  overflow: hidden;
-  border: 1px solid var(--company-hairline);
-}
-.nobilix-legal-art img {
-  display: block;
-  width: 100%;
-  height: auto;
-  max-height: 14rem;
-  object-fit: cover;
-}
-
 @media (max-width: 840px) {
   .nobilix-legal-body { grid-template-columns: 1fr; }
   .nobilix-legal-toc { position: static; }
@@ -1403,6 +1389,19 @@
 .public-shell .section-kicker h2 em {
   color: var(--neon-cyan);
   font-style: normal;
+}
+
+/* Small-caps kicker labels (project status, legal-directory eyebrow, legal
+   TOC headings) render at var(--company-accent), which resolves to raw
+   --neon-violet on this dark substrate — ~3.6:1 at .7-.72rem, below the
+   4.5:1 AA floor for body-size text. Lighten toward paper just enough to
+   clear AA (~5:1) without changing the violet used everywhere else
+   (buttons, glows, borders). */
+.public-shell .studio-principle p,
+.public-shell .project-card > p:first-of-type,
+.public-shell .legal-directory article > p:first-child,
+.public-shell .nobilix-legal-toc-heading {
+  color: color-mix(in oklch, var(--neon-violet) 80%, var(--paper) 20%);
 }
 
 /* Buttons: primary uses violet with glow; secondary is a glass hairline */

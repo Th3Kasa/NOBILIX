@@ -11,9 +11,9 @@ export default function LegalDirectoryPage() {
       </p>
       <h1 id="company-legal-title">Legal and product policies</h1>
       <p>
-        Nobilix Pty Ltd is the company. Each product keeps its own terms,
-        privacy notice, and account controls — grouped below by the product
-        they apply to.
+        Nobilix Pty Ltd is the company behind our products. Each product keeps
+        its own terms, privacy notice, and account controls — grouped below by
+        product.
       </p>
 
       <div className="legal-directory__grid">
@@ -21,8 +21,8 @@ export default function LegalDirectoryPage() {
           <p>Corporate notices</p>
           <h2>Nobilix Pty Ltd</h2>
           <p>
-            Studio-level notices cover Nobilix as the company, portfolio owner,
-            and console operator in New South Wales, Australia.
+            These notices cover Nobilix Pty Ltd itself — the company behind
+            the portfolio, registered in New South Wales, Australia.
           </p>
           <Link href="/legal/privacy-policy">Privacy Policy</Link>
           <Link href="/legal/terms-of-use">Terms of Use</Link>

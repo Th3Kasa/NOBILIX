@@ -7,21 +7,21 @@ const principles = [
     label: "Identity",
     title: "Every product gets its own voice.",
     copy:
-      "Nobilix stays quiet and consistent so each product can speak for itself — never buried under the company brand.",
+      "Nobilix stays calm in the background so each product can express its own culture — no company jargon, no extra layers.",
   },
   {
     index: "02",
     label: "Care",
     title: "Support, legal, and account paths stay in reach.",
     copy:
-      "Policies and notices are grouped by product, written in plain language, and always reachable from the main navigation.",
+      "Notices and policies stay separate for each product, easy to read, and always within reach from the main navigation.",
   },
   {
     index: "03",
     label: "Craft",
     title: "Every interaction has a reason.",
     copy:
-      "Movement and feedback guide and reassure — never decorate for its own sake — and always respect reduced-motion settings.",
+      "Motion — the way things move and respond on screen — guides and reassures, never decorates. Prefer less movement? The site respects that automatically.",
   },
 ];
 

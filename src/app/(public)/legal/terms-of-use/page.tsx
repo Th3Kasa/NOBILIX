@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/legal/terms-of-use" },
 };
 
-const LAST_UPDATED = "2026-06-27";
+const LAST_UPDATED = "2026-07-06";
 
 export default function NobilixTermsOfUsePage() {
   return (
@@ -32,9 +32,10 @@ export default function NobilixTermsOfUsePage() {
       <section id="about">
         <h2>About Nobilix</h2>
         <p>
-          Nobilix Pty Ltd is a game development studio incorporated in New
-          South Wales, Australia. We develop and publish mobile games, including
-          TrapMan, and operate the associated developer infrastructure.
+          Nobilix Pty Ltd is an independent technology studio incorporated in
+          New South Wales, Australia. We build and publish products around
+          people — including the TrapMan mobile game — and operate the
+          associated developer infrastructure.
         </p>
       </section>
 

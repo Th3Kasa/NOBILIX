@@ -17,8 +17,6 @@ export default function NobilixHomePage() {
   return (
     <>
       <StudioHero />
-      {/* Reviewer feedback: this definition earns its place right after the
-          hero, not buried below the portfolio. */}
       <section
         id="studio"
         className="nobilix-studio-section"
@@ -27,7 +25,7 @@ export default function NobilixHomePage() {
         <Reveal>
           <p className="eyebrow">
             <span className="eyebrow__dot" aria-hidden="true" />
-            01 / Studio
+            Studio
           </p>
           <h2 id="studio-title">
             A quiet company behind <em>bold products</em>.
@@ -62,13 +60,10 @@ export default function NobilixHomePage() {
           </p>
           <h2 id="contact-title">Support, publishing, and studio enquiries.</h2>
           <p>
-            Use the console for operations, TrapMan support paths for player
-            requests, and the company legal directory for Nobilix notices.
+            Need help with TrapMan, have a support question, or looking for
+            legal information? You&apos;ll find the right link below.
           </p>
           <div className="nobilix-contact-section__actions">
-            {/* TODO(copy): confirm label — was "Open console" before the console CTA
-                was demoted to footer-only; promoted the support email as the
-                primary contact action in its place. */}
             <a
               className="nobilix-button nobilix-button--primary magnetic-hover"
               href="mailto:help.nobilix@outlook.com"
