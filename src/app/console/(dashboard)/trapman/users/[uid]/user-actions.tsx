@@ -112,8 +112,9 @@ export function UserActions({
             <Trash2 className="size-4" /> Delete player
           </Button>
           <p className="pt-2 text-xs text-muted-foreground">
-            Deletion is a compliant hard delete — it removes the Firestore profile
-            and the Firebase Auth record, and is recorded in the audit log.
+            Deletion is a compliant hard delete — it permanently removes the
+            player&apos;s profile and sign-in account, and is recorded in the
+            audit log.
           </p>
         </CardContent>
       </Card>
@@ -178,8 +179,8 @@ export function UserActions({
         <div className="mb-4 flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/10 p-3 text-sm text-destructive">
           <ShieldAlert className="mt-0.5 size-4 shrink-0" />
           <span>
-            This cannot be undone. It hard-deletes the player&apos;s Firestore
-            profile and Firebase Auth account.
+            This cannot be undone. It permanently deletes the player&apos;s
+            profile and sign-in account.
           </span>
         </div>
         <form action={delAction} className="space-y-3">

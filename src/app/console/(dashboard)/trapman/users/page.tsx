@@ -66,8 +66,8 @@ export default async function UsersPage({
           <CardContent className="relative flex items-start gap-3 p-4 text-sm">
             <AlertTriangle className="mt-0.5 size-4 shrink-0 text-[var(--console-action)]" />
             <span className="text-muted-foreground">
-              Couldn&apos;t reach Firebase. Add service-account credentials to see
-              live players.
+              Couldn&apos;t reach the game&apos;s database. Live players will
+              appear once the connection details are added.
             </span>
           </CardContent>
         </Card>

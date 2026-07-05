@@ -20,33 +20,33 @@ export default async function AnalyticsPage() {
     <>
       <PageHeader
         title="Analytics"
-        description="Behavioural data from Google Analytics plus distributions from the live users collection."
+        description="How players behave, from Google Analytics and the live player list."
       />
 
       {ga4.connected && (
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
-            label="Active (1 day)"
+            label="Active today"
             value={ga4.activeUsers1d}
             icon={Activity}
           />
           <StatCard
-            label="Active (7 days)"
+            label="Active (last 7 days)"
             value={ga4.activeUsers7d}
             icon={Activity}
           />
           <StatCard
-            label="Active (28 days)"
+            label="Active (last 28 days)"
             value={ga4.activeUsers28d}
             icon={Activity}
           />
           <StatCard
-            label="Top country (GA4)"
+            label="Top country"
             value={ga4.countries[0]?.country ?? null}
             icon={Globe2}
             hint={
               ga4.countries[0]
-                ? `${ga4.countries[0].activeUsers} active users`
+                ? `${ga4.countries[0].activeUsers} active players`
                 : undefined
             }
           />
@@ -59,10 +59,11 @@ export default async function AnalyticsPage() {
             <AlertTriangle className="mt-0.5 size-4 shrink-0 text-[var(--console-action)]" />
             <div>
               <p className="font-medium text-[var(--console-action)]">
-                Not connected to Firebase
+                Not connected to the game&apos;s database
               </p>
               <p className="text-muted-foreground">
-                {data.error ?? "Add service-account credentials to see live analytics."}
+                {data.error ??
+                  "Live analytics will appear once the Firebase connection details are added to the app's environment settings."}
               </p>
             </div>
           </CardContent>
@@ -80,10 +81,10 @@ export default async function AnalyticsPage() {
               hint={data.sampleSize >= 1000 ? "Capped at first 1,000 docs" : undefined}
             />
             <StatCard
-              label="Registered share"
+              label="Signed-up share"
               value={registeredShare != null ? `${registeredShare}%` : "—"}
               icon={TrendingUp}
-              hint="Non-guest accounts"
+              hint="Players with an account"
             />
           </div>
 
@@ -111,7 +112,7 @@ export default async function AnalyticsPage() {
             <Card className="console-glass mt-4">
               <CardHeader>
                 <CardTitle className="text-base">
-                  Active users by country (GA4, last 30 days)
+                  Active players by country (Google Analytics, last 30 days)
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
@@ -129,9 +130,9 @@ export default async function AnalyticsPage() {
                   ))}
                 </div>
                 <p className="mt-3 text-xs text-muted-foreground">
-                  GA4 derives country from device IP; the chart above uses the
-                  country saved on the player profile — small differences are
-                  expected.
+                  Google Analytics works out the country from the device&apos;s
+                  internet connection; the chart above uses the country saved
+                  on the player profile — small differences are expected.
                 </p>
               </CardContent>
             </Card>

@@ -2,6 +2,17 @@
 
 export type AdminRole = "owner" | "admin" | "viewer";
 
+/**
+ * Per-admin layout for the project overview. `order` and `hidden` hold
+ * widget ids from the overview registry; ids the registry no longer knows
+ * are ignored on read, and new widgets default to visible at the end.
+ */
+export interface OverviewPrefs {
+  order: string[];
+  hidden: string[];
+  updatedAt?: number;
+}
+
 export interface AdminRecord {
   id: string;
   email: string;
@@ -15,6 +26,7 @@ export interface AdminRecord {
   lockedUntil: number | null; // epoch ms
   lastLoginAt: number | null;
   createdAt: number;
+  overviewPrefs?: OverviewPrefs | null;
 }
 
 /** Admin object exposed to the session (no secrets). */
@@ -23,6 +35,28 @@ export interface SessionAdmin {
   email: string;
   name: string;
   role: AdminRole;
+}
+
+/**
+ * A WebAuthn credential registered by an admin. Stored in `_admin_passkeys`
+ * with the base64url credentialId as the document id, so login lookups are a
+ * single doc read.
+ */
+export interface PasskeyRecord {
+  /** Document id — equals credentialId. */
+  id: string;
+  credentialId: string;
+  adminId: string;
+  /** base64url of the COSE public key bytes. */
+  publicKey: string;
+  counter: number;
+  transports: string[];
+  deviceType: "singleDevice" | "multiDevice";
+  backedUp: boolean;
+  /** User-facing label, e.g. "MacBook Touch ID". */
+  name: string;
+  createdAt: number;
+  lastUsedAt: number | null;
 }
 
 /** A game player as stored in Firestore users/{uid}. Fields confirmed in Phase 0. */

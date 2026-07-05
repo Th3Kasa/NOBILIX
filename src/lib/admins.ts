@@ -1,8 +1,9 @@
 import "server-only";
 import bcrypt from "bcryptjs";
+import { FieldValue } from "firebase-admin/firestore";
 import { getDb } from "@/lib/firebase/firestore";
 import { CRM } from "@/lib/firebase/collections";
-import type { AdminRecord } from "@/types";
+import type { AdminRecord, OverviewPrefs } from "@/types";
 
 /**
  * Data-access for the 3 admin accounts. Admins live in the `_admin` collection,
@@ -25,6 +26,7 @@ function toRecord(id: string, data: FirebaseFirestore.DocumentData): AdminRecord
     lockedUntil: data.lockedUntil ?? null,
     lastLoginAt: data.lastLoginAt ?? null,
     createdAt: data.createdAt ?? 0,
+    overviewPrefs: data.overviewPrefs ?? null,
   };
 }
 
@@ -97,4 +99,23 @@ export async function updatePassword(
 ): Promise<void> {
   const passwordHash = await hashPassword(newPassword);
   await getDb().collection(CRM.admins).doc(adminId).update({ passwordHash });
+}
+
+/** Save an admin's personal overview layout. */
+export async function updateOverviewPrefs(
+  adminId: string,
+  prefs: OverviewPrefs,
+): Promise<void> {
+  await getDb()
+    .collection(CRM.admins)
+    .doc(adminId)
+    .update({ overviewPrefs: { ...prefs, updatedAt: Date.now() } });
+}
+
+/** Remove an admin's overview layout so the default returns. */
+export async function resetOverviewPrefs(adminId: string): Promise<void> {
+  await getDb()
+    .collection(CRM.admins)
+    .doc(adminId)
+    .update({ overviewPrefs: FieldValue.delete() });
 }

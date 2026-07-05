@@ -52,18 +52,18 @@ test("data module pages preserve honest empty and unavailable states", () => {
   const exports_ = read("src/app/console/(dashboard)/trapman/exports/page.tsx");
 
   assert.match(overview, /unavailable/);
-  assert.match(overview, /Firebase connection required/);
+  assert.match(overview, /connect the game&apos;s database first/);
   assert.match(ads, /unavailableReason/);
   assert.match(ads, /No ad analytics available yet/);
   // Gameplay is a live-data module now — keeps honest connection-error and
   // zero-data states instead of a schema-pending placeholder.
-  assert.match(gameplay, /Couldn&apos;t reach Firebase/);
+  assert.match(gameplay, /Couldn&apos;t reach the game&apos;s database/);
   assert.match(gameplay, /No level data recorded yet/);
 
   // Analytics/Purchases/Exports are live-data modules now — they must keep
   // honest connection-error and zero-data states instead of placeholders.
-  assert.match(analytics, /Not connected to Firebase/);
-  assert.match(purchases, /Not connected to Firebase/);
+  assert.match(analytics, /Not connected to the game&apos;s database/);
+  assert.match(purchases, /Not connected to the game&apos;s database/);
   assert.match(purchases, /No purchase records yet/);
   assert.match(exports_, /Nothing to export yet/);
 

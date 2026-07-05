@@ -1,8 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+
+function subscribeReducedMotion(onChange: () => void) {
+  const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mq.addEventListener("change", onChange);
+  return () => mq.removeEventListener("change", onChange);
+}
+
+const getReducedMotion = () =>
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// Server snapshot: treat as reduced so the poster renders until hydration.
+const getServerReducedMotion = () => true;
 
 interface CinematicVideoProps {
   /** Path to the generated .mp4 file */
@@ -36,18 +48,14 @@ export function CinematicVideo({
   sizes,
   priority,
 }: CinematicVideoProps) {
-  const [useVideo, setUseVideo] = useState(false);
   const [failed, setFailed] = useState(false);
+  const prefersReducedMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotion,
+    getServerReducedMotion,
+  );
 
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    if (!mq.matches) setUseVideo(true);
-    const handler = (e: MediaQueryListEvent) => setUseVideo(!e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-
-  if (!useVideo || failed) {
+  if (prefersReducedMotion || failed) {
     return (
       <Image
         src={poster}

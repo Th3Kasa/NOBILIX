@@ -40,8 +40,9 @@ export default async function LeaderboardPage() {
       {!connected && (
         <div className="console-empty-state mb-4 rounded-lg border border-[var(--console-action-border)] bg-[var(--console-action-tint)] px-4 py-3 text-sm text-[var(--console-action)]">
           <span className="relative">
-            Firebase connection failed: {error ?? "unknown error"}. Add your
-            service-account credentials to .env.local to connect.
+            Couldn&apos;t connect to the game&apos;s database:{" "}
+            {error ?? "unknown error"}. Add the connection details to the
+            app&apos;s environment settings.
           </span>
         </div>
       )}

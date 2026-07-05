@@ -55,10 +55,11 @@ export default async function PurchasesPage() {
             <AlertTriangle className="mt-0.5 size-4 shrink-0 text-[var(--console-action)]" />
             <div>
               <p className="font-medium text-[var(--console-action)]">
-                Not connected to Firebase
+                Not connected to the game&apos;s database
               </p>
               <p className="text-muted-foreground">
-                {data.error ?? "Add service-account credentials to read purchase records."}
+                {data.error ??
+                  "Purchase records will appear once the connection details are added."}
               </p>
             </div>
           </CardContent>
@@ -98,7 +99,7 @@ export default async function PurchasesPage() {
                 label="Revenue (AUD)"
                 value={formatAud(totalRevenueAud)}
                 icon={Receipt}
-                hint={`Live ECB rate · ${fx.asOf}`}
+                hint={`Converted at today's exchange rate · ${fx.asOf}`}
               />
             ) : (
               data.revenueByCurrency.slice(0, 1).map((rev) => (
@@ -107,7 +108,7 @@ export default async function PurchasesPage() {
                   label={`Revenue (${rev.currency})`}
                   value={formatOriginal(rev.total, rev.currency)}
                   icon={Receipt}
-                  hint="FX unavailable — original currency"
+                  hint="Exchange rate unavailable — shown in the original currency"
                 />
               ))
             )}
@@ -161,7 +162,7 @@ export default async function PurchasesPage() {
                 </div>
                 {fx.connected && (
                   <p className="mt-3 text-xs text-muted-foreground">
-                    Converted at the live ECB reference rate ({fx.asOf}).
+                    Converted at today&apos;s official exchange rate ({fx.asOf}).
                   </p>
                 )}
               </CardContent>

@@ -27,7 +27,7 @@ export default async function GameplayPage() {
           <CardContent className="flex items-start gap-3 p-6">
             <AlertTriangle className="mt-0.5 size-4 shrink-0 text-[var(--console-action)]" />
             <p className="text-sm text-muted-foreground">
-              Couldn&apos;t reach Firebase: {data.error}
+              Couldn&apos;t reach the game&apos;s database: {data.error}
             </p>
           </CardContent>
         </Card>

@@ -41,6 +41,7 @@ export default async function ExportsPage() {
             </p>
             <a
               href="/api/console-exports/users"
+              download
               className={cn(buttonVariants({ variant: "outline" }), "w-full")}
             >
               <Download className="size-4" aria-hidden="true" />
@@ -71,6 +72,7 @@ export default async function ExportsPage() {
             </p>
             <a
               href="/api/console-exports/leaderboard"
+              download
               className={cn(buttonVariants({ variant: "outline" }), "w-full")}
             >
               <Download className="size-4" aria-hidden="true" />
@@ -103,6 +105,7 @@ export default async function ExportsPage() {
               </p>
               <a
                 href="/api/console-exports/purchases"
+                download
                 className={cn(buttonVariants({ variant: "outline" }), "w-full")}
               >
                 <Download className="size-4" aria-hidden="true" />

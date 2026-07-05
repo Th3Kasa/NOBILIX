@@ -14,30 +14,30 @@ export default async function AdsPage() {
     <>
       <PageHeader
         title="Ads"
-        description="Ad interaction analytics from Google Analytics and Firestore."
+        description="How players interact with ads, from Google Analytics and the game's database."
       />
 
       {ga4.connected ? (
         <>
           <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <StatCard
-              label="Ads clicked (30d)"
+              label="Ads clicked (last 30 days)"
               value={ga4.adClicked30d}
               icon={MousePointerClick}
-              hint="GA4 ad_clicked events"
+              hint="Counted by Google Analytics"
             />
             <StatCard
-              label="Ads closed (30d)"
+              label="Ads closed (last 30 days)"
               value={ga4.adClosed30d}
               icon={SquareX}
-              hint="GA4 ad_closed events"
+              hint="Counted by Google Analytics"
             />
           </div>
           <Card className="console-glass mb-6">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <BarChart3 className="size-4 text-[var(--console-violet)]" aria-hidden="true" />
-                All events (last 30 days, GA4)
+                All events (last 30 days, Google Analytics)
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
@@ -74,7 +74,7 @@ export default async function AdsPage() {
               <div className="flex size-10 items-center justify-center rounded-lg bg-[var(--console-violet-tint)] text-[var(--console-violet)]">
                 <Info className="size-5" aria-hidden="true" />
               </div>
-              <p className="text-sm font-medium">Firestore ad metrics unavailable</p>
+              <p className="text-sm font-medium">Ad numbers from the game&apos;s database unavailable</p>
               <p className="max-w-md text-sm text-muted-foreground">
                 {data.unavailableReason}
               </p>
