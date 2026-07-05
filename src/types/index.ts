@@ -59,17 +59,31 @@ export interface PasskeyRecord {
   lastUsedAt: number | null;
 }
 
-/** A game player as stored in Firestore users/{uid}. Fields confirmed in Phase 0. */
+/**
+ * A game player as stored in Firestore users/{uid}.
+ *
+ * The game client is the source of truth and actually writes `username`,
+ * `currentLevel`, `completedLevels`, `isGuest`, `fcmToken`, and `purchases`
+ * (an embedded map of receipts) — it never writes `createdAt` or
+ * `displayName`. The older names (`displayName`, `level`) are kept for
+ * documents written by earlier game builds; readers fall back across both.
+ */
 export interface GameUser {
   uid: string;
-  displayName?: string | null;
+  username?: string | null;
+  displayName?: string | null; // legacy name for username
   email?: string | null;
   country?: string | null; // ISO 3166-1 alpha-2
   character?: string | null;
-  level?: number | null;
+  currentLevel?: number | null;
+  level?: number | null; // legacy name for currentLevel
+  /** Level numbers the player has finished. */
+  completedLevels?: number[] | null;
   highScore?: number | null;
   fcmToken?: string | null;
   isGuest?: boolean;
+  /** Embedded purchase receipts keyed by purchase id. */
+  purchases?: Record<string, unknown> | null;
   createdAt?: number | null;
   lastSeenAt?: number | null;
   /** Any extra fields discovered at runtime are preserved. */

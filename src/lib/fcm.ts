@@ -28,19 +28,42 @@ export async function resolveAudienceTokens(
 
   if (audience.type === "segment") {
     const f = audience.filters;
+    // Only equality filters go to Firestore: they're served by the automatic
+    // single-field indexes (merged), so no composite index can ever be
+    // missing here. Range filters run in memory below — the game writes
+    // `currentLevel` (not the documented `level`), and optional range
+    // combinations would otherwise demand a lattice of composite indexes.
     if (f.country) q = q.where("country", "==", f.country.toUpperCase());
     if (f.character) q = q.where("character", "==", f.character);
-    if (f.minLevel != null) q = q.where("level", ">=", f.minLevel);
-    if (f.maxLevel != null) q = q.where("level", "<=", f.maxLevel);
-    if (f.lastActiveDays != null) {
-      const since = Date.now() - f.lastActiveDays * ONE_DAY_MS;
-      q = q.where("lastSeenAt", ">=", since);
-    }
   }
 
   const snap = await q.limit(MAX_RECIPIENTS).get();
   for (const doc of snap.docs) {
-    const t = doc.data()?.fcmToken ?? doc.data()?.fcm_token;
+    const data = doc.data();
+
+    if (audience.type === "segment") {
+      const f = audience.filters;
+      const level =
+        typeof data.currentLevel === "number"
+          ? data.currentLevel
+          : typeof data.level === "number"
+            ? data.level
+            : null;
+      if (f.minLevel != null && (level == null || level < f.minLevel)) continue;
+      if (f.maxLevel != null && (level == null || level > f.maxLevel)) continue;
+      if (f.lastActiveDays != null) {
+        const since = Date.now() - f.lastActiveDays * ONE_DAY_MS;
+        const seen =
+          typeof data.lastSeenAt === "number"
+            ? data.lastSeenAt
+            : typeof data.lastActiveAt === "number"
+              ? data.lastActiveAt
+              : null;
+        if (seen == null || seen < since) continue;
+      }
+    }
+
+    const t = data?.fcmToken ?? data?.fcm_token;
     if (t) tokens.add(t);
   }
   return [...tokens];

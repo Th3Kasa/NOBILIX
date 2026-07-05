@@ -20,8 +20,6 @@ const EDITABLE_FIELDS = [
 ] as const;
 export type EditableField = (typeof EDITABLE_FIELDS)[number];
 
-// Firestore prefix-search upper bound: highest BMP private-use codepoint.
-const HIGH_SENTINEL = "";
 
 function mapUser(
   id: string,
@@ -48,72 +46,12 @@ function mapUser(
   };
 }
 
-export interface ListUsersParams {
-  search?: string;
-  country?: string;
-  guest?: "all" | "guest" | "registered";
-  limit?: number;
-  cursor?: number | null; // createdAt of last item for pagination
-}
-
-export interface ListUsersResult {
-  users: GameUser[];
-  nextCursor: number | null;
-  connected: boolean;
-  error?: string;
-}
-
-export async function listUsers(
-  params: ListUsersParams = {},
-): Promise<ListUsersResult> {
-  const { search, country, guest = "all", limit = 50, cursor } = params;
-  try {
-    const db = getDb();
-    let q: FirebaseFirestore.Query = db.collection(GAME.users);
-
-    // Exact email lookup short-circuits everything else.
-    if (search && search.includes("@")) {
-      const snap = await q
-        .where("email", "==", search.toLowerCase())
-        .limit(limit)
-        .get();
-      return {
-        users: snap.docs.map((d) => mapUser(d.id, d.data())),
-        nextCursor: null,
-        connected: true,
-      };
-    }
-
-    if (country) q = q.where("country", "==", country.toUpperCase());
-    if (guest === "guest") q = q.where("isGuest", "==", true);
-    if (guest === "registered") q = q.where("isGuest", "==", false);
-
-    if (search) {
-      // Prefix search on displayName (Firestore range trick).
-      q = q.orderBy("displayName").startAt(search).endAt(search + HIGH_SENTINEL);
-    } else {
-      q = q.orderBy("createdAt", "desc");
-      if (cursor) q = q.startAfter(cursor);
-    }
-
-    const snap = await q.limit(limit).get();
-    const users = snap.docs.map((d) => mapUser(d.id, d.data()));
-    const last = users[users.length - 1];
-    const nextCursor =
-      !search && users.length === limit && last?.createdAt
-        ? (last.createdAt as number)
-        : null;
-
-    return { users, nextCursor, connected: true };
-  } catch (err) {
-    return {
-      users: [],
-      nextCursor: null,
-      connected: false,
-      error: err instanceof Error ? err.message : "Unknown error",
-    };
-  }
-}
+// NOTE: the old listUsers() lived here with where(country/isGuest) +
+// orderBy(displayName|createdAt) queries. It was dead code (the players page
+// uses users/data.ts, which scans and filters in memory because the game
+// never writes createdAt/displayName), and each of its filter combinations
+// would have thrown FAILED_PRECONDITION on first use — Firestore has no
+// composite indexes declared for them. Removed rather than indexed.
 
 export async function getUser(uid: string): Promise<GameUser | null> {
   const doc = await getDb().collection(GAME.users).doc(uid).get();

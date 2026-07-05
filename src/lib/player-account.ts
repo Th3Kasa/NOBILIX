@@ -92,10 +92,11 @@ export async function getPlayerAccountSnapshot(
   // (e.g. an environment that hasn't migrated off the standalone collection).
   if (purchases.length === 0 && (typeof embedded !== "object" || embedded === null)) {
     try {
+      // No orderBy: uid+purchasedAt would need a composite index that has
+      // never been declared; ≤100 rows sort fine in memory.
       const purchasesSnap = await db
         .collection(GAME.purchases)
         .where("uid", "==", uid)
-        .orderBy("purchasedAt", "desc")
         .limit(100)
         .get();
 
@@ -115,6 +116,7 @@ export async function getPlayerAccountSnapshot(
               : d.purchasedAt?.toMillis?.() ?? null,
         };
       });
+      purchases.sort((a, b) => (b.purchasedAt ?? 0) - (a.purchasedAt ?? 0));
     } catch {
       // Legacy collection may not exist at all in a fully-migrated
       // environment — that's expected, not an error. Keep purchases empty.

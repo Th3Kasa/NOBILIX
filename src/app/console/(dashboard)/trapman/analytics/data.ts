@@ -1,4 +1,5 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
 import { getDb } from "@/lib/firebase/firestore";
 import { GAME } from "@/lib/firebase/collections";
 
@@ -42,7 +43,7 @@ function bucketLabel(level: number): string {
   return `${start}-${end}`;
 }
 
-export async function getAnalyticsData(): Promise<AnalyticsData> {
+async function fetchAnalyticsData(): Promise<AnalyticsData> {
   try {
     const db = getDb();
     const snap = await db.collection(GAME.users).limit(MAX_SAMPLE).get();
@@ -105,3 +106,15 @@ export async function getAnalyticsData(): Promise<AnalyticsData> {
     };
   }
 }
+
+/**
+ * 30s shared cache: one 1,000-doc scan serves every admin for the whole
+ * auto-refresh window instead of a scan per request. (unstable_cache is
+ * deprecated in favour of "use cache", which needs the app-wide
+ * cacheComponents migration — out of scope here.)
+ */
+export const getAnalyticsData = unstable_cache(
+  fetchAnalyticsData,
+  ["trapman-analytics"],
+  { revalidate: 30, tags: ["trapman-console"] },
+);

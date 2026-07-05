@@ -1,4 +1,5 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
 import { getDb } from "@/lib/firebase/firestore";
 import { GAME } from "@/lib/firebase/collections";
 
@@ -44,7 +45,7 @@ function isParsablePurchase(value: unknown): boolean {
   );
 }
 
-export async function getLiveMetrics(): Promise<LiveMetrics> {
+async function fetchLiveMetrics(): Promise<LiveMetrics> {
   try {
     const db = getDb();
     const [usersSnap, boardSnap] = await Promise.all([
@@ -141,3 +142,16 @@ export async function getLiveMetrics(): Promise<LiveMetrics> {
     };
   }
 }
+
+/**
+ * 30s shared cache, matching the dashboard's auto-refresh cadence: each
+ * tick serves every admin from ONE 1,000-doc scan instead of a scan per
+ * admin per request. (unstable_cache is deprecated in favour of "use
+ * cache", but that requires opting the whole app into cacheComponents —
+ * a separate migration.)
+ */
+export const getLiveMetrics = unstable_cache(
+  fetchLiveMetrics,
+  ["trapman-live-metrics"],
+  { revalidate: 30, tags: ["trapman-console"] },
+);

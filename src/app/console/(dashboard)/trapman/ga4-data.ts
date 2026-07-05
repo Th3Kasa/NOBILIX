@@ -1,4 +1,5 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
 import { JWT } from "google-auth-library";
 import { env } from "@/lib/env";
 
@@ -94,7 +95,7 @@ async function batchRunReports(
 const num = (row: ReportRow | undefined, index: number): number =>
   Number(row?.metricValues?.[index]?.value ?? 0) || 0;
 
-export async function getGa4Snapshot(): Promise<Ga4Snapshot> {
+async function fetchGa4Snapshot(): Promise<Ga4Snapshot> {
   const empty: Omit<Ga4Snapshot, "connected" | "error"> = {
     activeUsers1d: 0,
     activeUsers7d: 0,
@@ -190,3 +191,15 @@ export async function getGa4Snapshot(): Promise<Ga4Snapshot> {
     return { connected: false, ...empty, error: friendly };
   }
 }
+
+/**
+ * 60s shared cache: the GA4 Data API has daily token quotas, and its
+ * figures only move on Google's processing cadence anyway — refreshing
+ * more often than once a minute buys nothing. (unstable_cache is
+ * deprecated in favour of "use cache"; app-wide migration out of scope.)
+ */
+export const getGa4Snapshot = unstable_cache(
+  fetchGa4Snapshot,
+  ["trapman-ga4"],
+  { revalidate: 60, tags: ["trapman-console"] },
+);

@@ -1,4 +1,5 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
 import { getDb } from "@/lib/firebase/firestore";
 import { GAME } from "@/lib/firebase/collections";
 
@@ -60,15 +61,18 @@ function countParsablePurchases(value: unknown): number {
   return count;
 }
 
-export async function listPlayers(
-  params: ListPlayersParams = {},
-): Promise<ListPlayersResult> {
-  const { search, country, guest = "all", limit = 50, offset = 0 } = params;
+interface PlayerScan {
+  connected: boolean;
+  players: PlayerRow[];
+  error?: string;
+}
+
+async function fetchPlayerScan(): Promise<PlayerScan> {
   try {
     const db = getDb();
     const snap = await db.collection(GAME.users).limit(MAX_SAMPLE).get();
 
-    let players: PlayerRow[] = snap.docs.map((doc) => {
+    const players: PlayerRow[] = snap.docs.map((doc) => {
       const d = doc.data();
       return {
         uid: doc.id,
@@ -91,7 +95,45 @@ export async function listPlayers(
       };
     });
 
-    if (search?.trim()) {
+    return { connected: true, players };
+  } catch (err) {
+    return {
+      connected: false,
+      players: [],
+      error: err instanceof Error ? err.message : "Unknown error",
+    };
+  }
+}
+
+/**
+ * 30s shared cache on the RAW scan only — search/filter/paging run
+ * per-request below, so a hundred different searches still cost one
+ * 1,000-doc scan per refresh window, not one scan each. (unstable_cache is
+ * deprecated in favour of "use cache", which needs the app-wide
+ * cacheComponents migration — out of scope here.)
+ */
+const getPlayerScan = unstable_cache(fetchPlayerScan, ["trapman-players-scan"], {
+  revalidate: 30,
+  tags: ["trapman-console"],
+});
+
+export async function listPlayers(
+  params: ListPlayersParams = {},
+): Promise<ListPlayersResult> {
+  const { search, country, guest = "all", limit = 50, offset = 0 } = params;
+  const scan = await getPlayerScan();
+  if (!scan.connected) {
+    return {
+      players: [],
+      totalMatching: 0,
+      nextOffset: null,
+      connected: false,
+      error: scan.error,
+    };
+  }
+  let players = [...scan.players];
+
+  if (search?.trim()) {
       const needle = search.trim().toLowerCase();
       players = needle.includes("@")
         ? players.filter((p) => p.email?.toLowerCase() === needle)
@@ -111,18 +153,9 @@ export async function listPlayers(
       return a.uid.localeCompare(b.uid);
     });
 
-    const totalMatching = players.length;
-    const page = players.slice(offset, offset + limit);
-    const nextOffset = offset + limit < totalMatching ? offset + limit : null;
+  const totalMatching = players.length;
+  const page = players.slice(offset, offset + limit);
+  const nextOffset = offset + limit < totalMatching ? offset + limit : null;
 
-    return { players: page, totalMatching, nextOffset, connected: true };
-  } catch (err) {
-    return {
-      players: [],
-      totalMatching: 0,
-      nextOffset: null,
-      connected: false,
-      error: err instanceof Error ? err.message : "Unknown error",
-    };
-  }
+  return { players: page, totalMatching, nextOffset, connected: true };
 }
