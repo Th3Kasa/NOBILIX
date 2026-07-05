@@ -7,9 +7,9 @@ import { StudioHero } from "@/components/public/studio-hero";
 import { StudioPrinciples } from "@/components/public/studio-principles";
 
 export const metadata: Metadata = {
-  title: "Nobilix — Independent digital studio",
+  title: "Nobilix — Independent technology studio",
   description:
-    "Nobilix is a neutral studio brand building distinct digital projects, starting with TrapMan.",
+    "Nobilix is an independent technology studio in Sydney, building products around people — starting with TrapMan.",
   alternates: { canonical: "/" },
 };
 
@@ -17,8 +17,8 @@ export default function NobilixHomePage() {
   return (
     <>
       <StudioHero />
-      <StudioPrinciples />
-      <ProjectShowcase />
+      {/* Reviewer feedback: this definition earns its place right after the
+          hero, not buried below the portfolio. */}
       <section
         id="studio"
         className="nobilix-studio-section"
@@ -30,15 +30,17 @@ export default function NobilixHomePage() {
             01 / Studio
           </p>
           <h2 id="studio-title">
-            A quiet company layer for <em>loud project worlds</em>.
+            A quiet company behind <em>bold products</em>.
           </h2>
           <p>
-            Nobilix holds the business, legal, console, and portfolio structure.
-            Each project gets its own visual identity, data disclosures, and
-            product home — without forcing the studio brand to imitate the game.
+            Nobilix holds the business, legal, and operational structure. Each
+            product gets its own identity, its own data practices, and its own
+            home — so the company can stay quiet while the work stands out.
           </p>
         </Reveal>
       </section>
+      <StudioPrinciples />
+      <ProjectShowcase />
       <section
         id="contact"
         className="nobilix-contact-section"

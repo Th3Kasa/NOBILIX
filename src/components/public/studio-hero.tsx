@@ -11,21 +11,22 @@ export function StudioHero() {
           <p className="studio-brand-badge pixel-type" aria-hidden="true">NOBILIX</p>
           <p className="eyebrow">
             <span className="eyebrow__dot" aria-hidden="true" />
-            Independent game studio · Sydney, AU
+            Independent technology studio · Sydney, AU
           </p>
         </Reveal>
         <Reveal delay={0.08}>
           <h1 id="company-title">
-            Build worlds.
+            Built for people.
             <br />
-            <em>Stay distinct.</em>
+            <em>Powered by possibility.</em>
           </h1>
         </Reveal>
         <Reveal delay={0.16}>
           <p className="studio-hero__lede">
-            Nobilix is a game studio built for distinct project identities.
-            Each title gets its own visual language, data disclosures, and
-            product home — without forcing the studio brand to compete.
+            Nobilix is an independent technology studio in Sydney, building
+            products that put people first. Each one gets its own identity,
+            its own home, and clear data practices — never hidden behind the
+            company name.
           </p>
           <div className="studio-hero__actions" aria-label="Primary actions">
             <Link className="nobilix-button nobilix-button--primary magnetic-hover" href="/trapman">

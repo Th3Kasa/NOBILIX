@@ -24,11 +24,12 @@ export function ProjectShowcase() {
           02 / Main project
         </p>
         <h2 id="projects-title">
-          TrapMan is the <em>main project</em> currently.
+          TrapMan is where Nobilix is <em>focused right now</em>.
         </h2>
         <p>
-          The portfolio starts with one real project instead of invented tiles.
-          More worlds are being shaped, and the system is ready when they are.
+          The portfolio starts with one real product, not a wall of
+          placeholders. More are being built — and this page is ready to hold
+          them.
         </p>
         <ProjectCard project={mainProject} />
         <Link className="nobilix-text-link magnetic-hover" href={mainProject.publicPath}>

@@ -5,23 +5,23 @@ const principles = [
   {
     index: "01",
     label: "Identity",
-    title: "Design systems that can hold more than one project.",
+    title: "Every product gets its own voice.",
     copy:
-      "Nobilix stays calm and editorial so each project can express its own culture without confusing the company layer.",
+      "Nobilix stays quiet and consistent so each product can speak for itself — never buried under the company brand.",
   },
   {
     index: "02",
     label: "Care",
-    title: "Legal, support, and account paths stay visible.",
+    title: "Support, legal, and account paths stay in reach.",
     copy:
-      "Company notices and project policies are separated, readable, and reachable from the main navigation.",
+      "Policies and notices are grouped by product, written in plain language, and always reachable from the main navigation.",
   },
   {
     index: "03",
-    label: "Motion",
-    title: "Animation adds orientation, never friction.",
+    label: "Craft",
+    title: "Every interaction has a reason.",
     copy:
-      "Motion is used for reveal, continuity, and atmosphere while respecting reduced-motion preferences.",
+      "Movement and feedback guide and reassure — never decorate for its own sake — and always respect reduced-motion settings.",
   },
 ];
 

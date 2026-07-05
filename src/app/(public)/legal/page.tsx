@@ -9,11 +9,11 @@ export default function LegalDirectoryPage() {
         <span className="eyebrow__dot" aria-hidden="true" />
         Company brand
       </p>
-      <h1 id="company-legal-title">Legal and project policies</h1>
+      <h1 id="company-legal-title">Legal and product policies</h1>
       <p>
-        Nobilix is the company brand. Project-specific terms, privacy notices,
-        data disclosures, and account deletion instructions live with the
-        project they govern.
+        Nobilix Pty Ltd is the company. Each product keeps its own terms,
+        privacy notice, and account controls — grouped below by the product
+        they apply to.
       </p>
 
       <div className="legal-directory__grid">
@@ -28,7 +28,7 @@ export default function LegalDirectoryPage() {
           <Link href="/legal/terms-of-use">Terms of Use</Link>
         </article>
         <article className="magnetic-hover">
-          <p>Project policies</p>
+          <p>Product policies</p>
           <h2>{project.name}</h2>
           <Link href={project.legal.privacy}>Privacy Policy</Link>
           <Link href={project.legal.terms}>Terms of Use</Link>
