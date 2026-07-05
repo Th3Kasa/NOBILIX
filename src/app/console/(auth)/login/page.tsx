@@ -6,9 +6,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getWebAuthnConfig } from "@/lib/webauthn";
 import { LoginForm } from "./login-form";
+import { PasskeyLoginButton } from "./passkey-login-button";
 
 export default function LoginPage() {
+  // Hidden entirely when the deployment has no relying-party config —
+  // never a half-working button.
+  const passkeysEnabled = getWebAuthnConfig() !== null;
   return (
     <Card className="console-auth-card console-hairline-glow border-border/60 shadow-xl backdrop-blur">
       <CardHeader className="items-center text-center">
@@ -21,8 +26,9 @@ export default function LoginPage() {
           Company console access for TrapMan operations, review, and support.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="space-y-4">
         <LoginForm />
+        {passkeysEnabled && <PasskeyLoginButton />}
       </CardContent>
     </Card>
   );

@@ -25,4 +25,6 @@ export const CRM = {
   competitions: "_crm_competitions", // _crm_competitions/{autoId} — archived competition snapshots
   exports: "_crm_exports", // _crm_exports/{autoId}
   metrics: "_crm_metrics", // _crm_metrics/{yyyy-mm-dd}
+  passkeys: "_admin_passkeys", // _admin_passkeys/{credentialId-base64url}
+  loginTickets: "_admin_login_tickets", // _admin_login_tickets/{sha256(ticket) hex}
 } as const;

@@ -39,6 +39,13 @@ const schema = z.object({
   // GA4 property ID for the Analytics Data API. Optional — falls back to the
   // TrapMan property's known ID when unset.
   GA4_PROPERTY_ID: z.string().optional(),
+
+  // --- WebAuthn / passkeys (console admin sign-in) ---
+  // RP ID is the registrable domain (e.g. "nobilix.com"); origin is the exact
+  // console origin including scheme (e.g. "https://www.nobilix.com").
+  // Both unset → localhost defaults in dev, passkeys disabled in production.
+  WEBAUTHN_RP_ID: z.string().optional(),
+  WEBAUTHN_ORIGIN: z.string().url().optional(),
 });
 
 export type Env = z.infer<typeof schema>;

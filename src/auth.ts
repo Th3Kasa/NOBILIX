@@ -13,12 +13,18 @@ import {
 import { decrypt } from "@/lib/crypto";
 import { verifyTotp } from "@/lib/totp";
 import { recordAudit } from "@/lib/audit";
+import { consumeLoginTicket } from "@/lib/login-tickets";
 import type { AdminRole } from "@/types";
 
 const credentialsSchema = z.object({
   email: z.string().email(),
   password: z.string().min(1),
   totp: z.string().min(6).max(8),
+});
+
+// 32 random bytes base64url-encoded → 43 chars.
+const ticketSchema = z.object({
+  ticket: z.string().min(40).max(48),
 });
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -83,6 +89,37 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           actorEmail: admin.email,
           action: "auth.login.success",
         });
+
+        return {
+          id: admin.id,
+          email: admin.email,
+          name: admin.name,
+          role: admin.role,
+        };
+      },
+    }),
+    /**
+     * Passkey session bridge. The WebAuthn assertion is verified in the
+     * finishPasskeyLogin server action, which mints a single-use ticket and
+     * spends it here without it ever reaching the browser. The ticket check
+     * is load-bearing: this provider is HTTP-reachable at
+     * /api/auth/callback/passkey like any other.
+     */
+    Credentials({
+      id: "passkey",
+      name: "Passkey",
+      credentials: { ticket: {} },
+      async authorize(raw) {
+        const parsed = ticketSchema.safeParse(raw);
+        if (!parsed.success) return null;
+
+        // Transactional consume — a ticket can never be spent twice.
+        const adminId = await consumeLoginTicket(parsed.data.ticket);
+        if (!adminId) return null;
+
+        // Defense in depth: the action already checked these.
+        const admin = await getAdminById(adminId);
+        if (!admin || isLocked(admin)) return null;
 
         return {
           id: admin.id,

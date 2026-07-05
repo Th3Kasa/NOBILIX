@@ -2,13 +2,30 @@ import { auth } from "@/auth";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { listPasskeysForAdmin } from "@/lib/passkeys";
+import { getWebAuthnConfig } from "@/lib/webauthn";
 import { ChangePasswordForm } from "./change-password-form";
+import { PasskeysCard, type PasskeyListItem } from "./passkeys-card";
 
 export const dynamic = "force-dynamic";
 
 export default async function SettingsPage() {
   const session = await auth();
   const user = session?.user;
+
+  const passkeysEnabled = getWebAuthnConfig() !== null;
+  let passkeys: PasskeyListItem[] = [];
+  if (passkeysEnabled && user?.id) {
+    passkeys = (await listPasskeysForAdmin(user.id).catch(() => [])).map(
+      (pk) => ({
+        credentialId: pk.credentialId,
+        name: pk.name,
+        createdAt: pk.createdAt,
+        lastUsedAt: pk.lastUsedAt,
+        backedUp: pk.backedUp,
+      }),
+    );
+  }
 
   return (
     <>
@@ -37,6 +54,15 @@ export default async function SettingsPage() {
                 {user?.role ?? "—"}
               </Badge>
             </div>
+          </CardContent>
+        </Card>
+
+        <Card className="console-glass">
+          <CardHeader>
+            <CardTitle>Passkeys</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PasskeysCard passkeys={passkeys} enabled={passkeysEnabled} />
           </CardContent>
         </Card>
 
