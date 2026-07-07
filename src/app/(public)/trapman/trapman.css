@@ -144,20 +144,6 @@
   to   { transform: scaleX(1); transform-origin: left; }
 }
 
-/* ── Entrance reveal ───────────────────────────────────────── */
-.reveal {
-  opacity: 0;
-  translate: 0 24px;
-  transition: opacity .5s ease, translate .5s ease;
-}
-.reveal.visible {
-  opacity: 1;
-  translate: 0 0;
-}
-@media (prefers-reduced-motion: reduce) {
-  .reveal { opacity: 1; translate: none; transition: none; }
-}
-
 /* ── Gameplay Gallery ──────────────────────────────────────── */
 .gameplay-gallery {
   /* Single column: the feature-card row inside manages its own horizontal
@@ -1035,24 +1021,6 @@
 .shop-item-card:hover {
   transform: translateY(-3px);
 }
-.shop-item-card__plate {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-}
-.shop-item-card__plate img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: .55;
-  filter: saturate(1.2);
-}
-.shop-item-card__plate::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(0deg, rgb(3 2 7 / .92) 10%, rgb(3 2 7 / .35) 80%);
-}
 .shop-item-card__glyph {
   position: relative;
   z-index: 1;
@@ -1766,7 +1734,6 @@ h2.legal-toc-heading {
 .city-hero__atmosphere,
 .character-stage__plate img,
 .world-plate img,
-.shop-item-card__plate img,
 .leaderboard-stage__plate img,
 .trapman-account-cta__plate img {
   filter: saturate(1.14) contrast(1.05) hue-rotate(-6deg);
@@ -1945,36 +1912,15 @@ h2.legal-toc-heading {
 }
 
 /* ── Maze-line motif: section dividers built from the gameplay
-   corridor language, with a scroll-reveal "line draw" animation. ── */
+   corridor language. The draw-in ("line draw" path + staggered coin
+   fade) is driven by motion in maze-divider.tsx (whileInView), not CSS —
+   only static sizing lives here. */
 .tm-maze-divider {
   display: block;
   width: 100%;
   height: auto;
   margin-top: 2.5rem;
   filter: drop-shadow(0 0 .5rem rgb(57 233 255 / .45));
-}
-.tm-maze-divider__path {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  transition: stroke-dashoffset 1.6s ease;
-}
-.reveal.visible .tm-maze-divider__path { stroke-dashoffset: 0; }
-.tm-maze-divider__coins {
-  opacity: 0;
-  transition: opacity .6s ease .9s;
-}
-.reveal.visible .tm-maze-divider__coins { opacity: 1; }
-.tm-maze-divider__coins circle {
-  /* No per-circle drop-shadow: a filter plus continuous opacity animation
-     forces a filter re-raster per frame per coin. */
-  animation: tm-coin-pulse 1.6s ease-in-out infinite;
-}
-.tm-maze-divider__coins circle:nth-child(2) { animation-delay: .15s; }
-.tm-maze-divider__coins circle:nth-child(3) { animation-delay: .3s; }
-.tm-maze-divider__coins circle:nth-child(4) { animation-delay: .45s; }
-@keyframes tm-coin-pulse {
-  0%, 100% { opacity: .55; }
-  50% { opacity: 1; }
 }
 .tm-section-divider--top { margin-top: 0; margin-bottom: 1.5rem; transform: scaleY(-1); }
 
@@ -2273,18 +2219,12 @@ h2.legal-toc-heading {
 @media (prefers-reduced-motion: reduce) {
   .tm-hero-skyline,
   .tm-skyline__windows,
-  .tm-maze-divider__coins circle,
   .tm-chrome-wordmark__sparkle {
     animation: none !important;
   }
-  .tm-maze-divider__path {
-    transition: none !important;
-    stroke-dashoffset: 0 !important;
-  }
-  .tm-maze-divider__coins {
-    transition: none !important;
-    opacity: 1 !important;
-  }
+  /* MazeDivider's draw/fade is handled by useReducedMotion in
+     maze-divider.tsx (renders fully drawn, static) — no CSS override
+     needed. */
 }
 
 /* Chrome wordmark sizing: must beat the generic `.hero-copy h1` clamp, which
