@@ -1,3 +1,4 @@
+import { PROJECTS } from "@/config/projects";
 import { CinematicVideo } from "@/components/motion/cinematic-video";
 import { ParallaxMedia } from "@/components/motion/parallax-media";
 import { ChromeWordmark } from "./chrome-wordmark";
@@ -5,6 +6,8 @@ import { CityMotion } from "./city-motion";
 import { NeonSkyline } from "./neon-skyline";
 
 export function CityHero() {
+  const { googlePlay, appStore } = PROJECTS.trapman.storeLinks;
+
   return (
     <div className="city-hero" aria-labelledby="trapman-title">
       <CityMotion />
@@ -48,14 +51,38 @@ export function CityHero() {
           shop, characters, and account support all in one place.
         </p>
         <div className="tm-store-links tm-store-links--primary" aria-label="Get TrapMan">
-          <a className="tm-store-badge magnetic-hover" href="#the-run">
-            <span className="tm-store-badge__eyebrow">Get it on</span>
-            <span className="tm-store-badge__name">Google Play</span>
-          </a>
-          <a className="tm-store-badge magnetic-hover" href="#the-run">
-            <span className="tm-store-badge__eyebrow">Download on the</span>
-            <span className="tm-store-badge__name">App Store</span>
-          </a>
+          {googlePlay ? (
+            <a
+              className="tm-store-badge magnetic-hover"
+              href={googlePlay}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span className="tm-store-badge__eyebrow">Get it on</span>
+              <span className="tm-store-badge__name">Google Play</span>
+            </a>
+          ) : (
+            <span className="tm-store-badge tm-store-badge--pending">
+              <span className="tm-store-badge__eyebrow">Coming soon to</span>
+              <span className="tm-store-badge__name">Google Play</span>
+            </span>
+          )}
+          {appStore ? (
+            <a
+              className="tm-store-badge magnetic-hover"
+              href={appStore}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span className="tm-store-badge__eyebrow">Download on the</span>
+              <span className="tm-store-badge__name">App Store</span>
+            </a>
+          ) : (
+            <span className="tm-store-badge tm-store-badge--pending">
+              <span className="tm-store-badge__eyebrow">Coming soon to</span>
+              <span className="tm-store-badge__name">the App Store</span>
+            </span>
+          )}
         </div>
       </div>
 

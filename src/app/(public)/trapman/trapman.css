@@ -607,19 +607,6 @@
   height: auto;
   animation: portal-float 4.8s ease-in-out infinite alternate;
 }
-.shop-showcase__stage {
-  min-height: 34rem;
-  display: grid;
-  place-items: center;
-  background: radial-gradient(circle, rgb(241 68 255 / .18), transparent 52%);
-}
-.shop-showcase__portal {
-  position: absolute;
-  width: min(72%, 28rem);
-  height: auto;
-  opacity: .82;
-  animation: portal-float 4.4s ease-in-out infinite alternate-reverse;
-}
 /* ── Gameplay feature cards: horizontal row, scrolls on narrow viewports
    instead of stacking, snap-aligned so a swipe lands on one card. ── */
 .gameplay-features {
@@ -751,31 +738,6 @@
   line-height: 1.68;
 }
 
-/* ── Shop feature list ────────────────────────────────────── */
-.shop-feature-list {
-  list-style: none;
-  padding: 0;
-  margin: 1.5rem 0 0;
-  display: flex;
-  flex-direction: column;
-  gap: .65rem;
-}
-.shop-feature-list li {
-  display: flex;
-  align-items: center;
-  gap: .75rem;
-  font-size: .92rem;
-  color: #cdeaff;
-}
-.shop-feature-list li::before {
-  content: '';
-  flex-shrink: 0;
-  width: .5rem;
-  height: .5rem;
-  border-radius: 50%;
-  background: var(--tm-cyan);
-  box-shadow: 0 0 .6rem var(--tm-cyan);
-}
 .music-strip__player {
   display: flex;
   flex-direction: column;
@@ -865,10 +827,38 @@
 
 /* ── Shop glow orb (replaces portal.webp in shop) ───────────── */
 .shop-showcase__stage {
+  position: relative;
   min-height: 34rem;
   display: grid;
   place-items: center;
+  overflow: hidden;
+  border-radius: 2.4rem;
+  border: 1px solid rgb(241 68 255 / .22);
+  box-shadow: 0 2rem 6rem rgb(241 68 255 / .14);
   background: radial-gradient(circle, rgb(241 68 255 / .12), transparent 62%);
+}
+/* Real in-game capture standing in for the ambient plate other sections
+   use — restrained opacity keeps the glow orb + screenshot as the focal
+   point rather than competing with the background art. */
+.shop-showcase__atmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: .3;
+  filter: saturate(1.1) contrast(1.05);
+}
+.shop-showcase__screenshot {
+  position: relative;
+  z-index: 1;
+  width: min(58%, 17rem);
+  height: auto;
+  display: block;
+  border-radius: 1.2rem;
+  border: 1px solid rgb(241 68 255 / .4);
+  box-shadow: 0 1.5rem 4rem rgb(241 68 255 / .3);
 }
 .shop-glow-orb {
   position: relative;
@@ -1079,23 +1069,30 @@
   z-index: 1;
   width: 2.75rem;
   height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: .85rem;
   margin-bottom: 1rem;
+  color: var(--tm-cyan);
   background: color-mix(in srgb, var(--tm-cyan) 18%, transparent);
   border: 1px solid color-mix(in srgb, var(--tm-cyan) 45%, transparent);
   box-shadow: 0 0 1.2rem color-mix(in srgb, var(--tm-cyan) 35%, transparent);
 }
 .shop-item-card[data-accent="magenta"] .shop-item-card__glyph {
+  color: var(--tm-magenta);
   background: color-mix(in srgb, var(--tm-magenta) 18%, transparent);
   border-color: color-mix(in srgb, var(--tm-magenta) 45%, transparent);
   box-shadow: 0 0 1.2rem color-mix(in srgb, var(--tm-magenta) 35%, transparent);
 }
 .shop-item-card[data-accent="yellow"] .shop-item-card__glyph {
+  color: var(--tm-yellow);
   background: color-mix(in srgb, var(--tm-yellow) 18%, transparent);
   border-color: color-mix(in srgb, var(--tm-yellow) 45%, transparent);
   box-shadow: 0 0 1.2rem color-mix(in srgb, var(--tm-yellow) 35%, transparent);
 }
 .shop-item-card[data-accent="violet"] .shop-item-card__glyph {
+  color: var(--tm-violet);
   background: color-mix(in srgb, var(--tm-violet) 18%, transparent);
   border-color: color-mix(in srgb, var(--tm-violet) 45%, transparent);
   box-shadow: 0 0 1.2rem color-mix(in srgb, var(--tm-violet) 35%, transparent);
@@ -1112,6 +1109,34 @@
   color: #fff;
   line-height: 1.4;
 }
+.shop-item-card__desc {
+  position: relative;
+  z-index: 1;
+  margin-top: .35rem;
+  font-size: .82rem;
+  color: #cdeaff;
+  line-height: 1.55;
+}
+.shop-item-card__badge {
+  position: absolute;
+  z-index: 1;
+  top: 1rem;
+  right: 1rem;
+  padding: .3rem .6rem;
+  border: 1px solid rgb(140 39 255 / .5);
+  border-radius: .6rem;
+  background: rgb(3 2 7 / .7);
+  color: var(--tm-violet);
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.shop-item-card[data-coming-soon] .shop-item-card__label,
+.shop-item-card[data-coming-soon] .shop-item-card__desc {
+  opacity: .75;
+}
+.shop-cta { margin-top: 3rem; }
 
 /* ── Leaderboard: ranked plate alongside the score table ──────── */
 .leaderboard-stage {
@@ -2087,6 +2112,22 @@ h2.legal-toc-heading {
 }
 .tm-store-links--primary .tm-store-badge__eyebrow { opacity: .85; }
 .tm-store-badge__name { font-size: .92rem; font-weight: 800; }
+
+/* Pending variant: the store listing doesn't exist yet, so the badge is
+   informational, not a dead link. Dimmed border, no hover lift, no pointer
+   affordance — honest "coming soon" per art-direction's "no fake anything". */
+.tm-store-badge--pending {
+  border-color: rgb(255 255 255 / .16) !important;
+  background: rgb(3 2 7 / .4) !important;
+  color: rgb(255 255 255 / .68) !important;
+  box-shadow: none !important;
+  cursor: default;
+}
+.tm-store-badge--pending:hover {
+  border-color: rgb(255 255 255 / .16) !important;
+  transform: none !important;
+}
+.tm-store-badge--pending .tm-store-badge__eyebrow { opacity: .6; }
 
 /* ── Perspective neon grid floor (already present via .city-hero::after);
    reinforced parallax-safe variant for sections beyond the hero. ── */

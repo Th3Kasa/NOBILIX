@@ -7,6 +7,7 @@ import { CityHero } from "@/components/trapman/city-hero";
 import { GameplayGallery } from "@/components/trapman/gameplay-gallery";
 import { LeaderboardPreview } from "@/components/trapman/leaderboard-preview";
 import { MusicStrip } from "@/components/trapman/music-strip";
+import { ShopSection } from "@/components/trapman/shop-section";
 import { TrapManHeader } from "@/components/trapman/trapman-header";
 import { WorldSystem } from "@/components/trapman/world-system";
 
@@ -50,6 +51,11 @@ export default function TrapManPage() {
             <p className="trapman-kicker">Music culture</p>
             <h2>Move through a city that pulses like a track.</h2>
             <MusicStrip />
+          </section>
+        </Reveal>
+        <Reveal>
+          <section id="shop" className="trapman-story-section">
+            <ShopSection />
           </section>
         </Reveal>
         <Reveal>

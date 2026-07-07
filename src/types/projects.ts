@@ -22,6 +22,10 @@ export interface ProjectDefinition {
   logoPath: string;
   publicPath: string;
   accountPath: string | null;
+  storeLinks: {
+    googlePlay: string | null;
+    appStore: string | null;
+  };
   legal: {
     privacy: string;
     terms: string;

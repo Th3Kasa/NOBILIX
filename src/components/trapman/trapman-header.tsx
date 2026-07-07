@@ -4,6 +4,7 @@ import Link from "next/link";
 const links = [
   { href: "/trapman#the-run", label: "Run" },
   { href: "/trapman#world", label: "World" },
+  { href: "/trapman#shop", label: "Shop" },
   { href: "/trapman#leaderboard", label: "Leaderboard" },
   { href: "/trapman/account", label: "Account" },
   { href: "/trapman#support", label: "Support" },

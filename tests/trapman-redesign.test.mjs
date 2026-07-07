@@ -15,6 +15,7 @@ test("TrapMan route presents the complete animated project world", () => {
     "characters",
     "world",
     "music",
+    "shop",
     "leaderboard",
     "account",
     "support",
@@ -23,8 +24,8 @@ test("TrapMan route presents the complete animated project world", () => {
   }
 
   assert.match(page, /WorldSystem/);
-  // The shop section was intentionally cut; the floating in-game music
-  // player replaced the section-scoped audio.
+  assert.match(page, /ShopSection/);
+  // The floating in-game music player replaced the section-scoped audio.
   assert.match(page, /TrapManAudioPlayer/);
   assert.match(page, /Reveal/);
   assert.match(page, /Pixel soul\. Premium stage\./);
@@ -61,6 +62,15 @@ test("TrapMan uses generated atmosphere assets and no game screenshots", () => {
   // The official logo now lives in the sticky header rather than the hero.
   const header = read("src/components/trapman/trapman-header.tsx");
   assert.match(header, /trapman-logo\.png/);
+});
+
+test("shop section is the deliberate exception: it exhibits the real in-game screenshot", () => {
+  // Every other section recreates the game in original stage art; the shop
+  // section intentionally breaks that rule and shows the real capture.
+  const shop = read("src/components/trapman/shop-section.tsx");
+  assert.match(shop, /shop-plate\.webp/);
+  assert.match(shop, /shop\.png/);
+  assert.match(shop, /Reveal/);
 });
 
 test("TrapMan animation is Motion-backed, pausable, and reduced-motion aware", () => {

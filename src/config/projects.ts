@@ -10,6 +10,12 @@ export const PROJECTS = {
     logoPath: "/assets/trapman-logo.png",
     publicPath: "/trapman",
     accountPath: "/trapman/account",
+    // Real store URLs pending from the owner — until supplied the hero
+    // badges render as an honest "coming soon" state (see city-hero.tsx).
+    storeLinks: {
+      googlePlay: null,
+      appStore: null,
+    },
     legal: {
       privacy: "/trapman/privacy-policy",
       terms: "/trapman/terms-of-use",
