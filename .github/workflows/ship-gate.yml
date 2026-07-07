@@ -1,0 +1,31 @@
+# Ship Gate — the pre-preview QA gate, runnable from the Alfred command center
+# (workflow_dispatch) or manually from the Actions tab. Mirrors the checklist in
+# Projects/skills/ship-gate-preview.md: build green + tests + lint. The visual
+# pass (mobile screenshots, placeholder sweep) stays with Claude via /ship-gate.
+#
+# If the build needs secrets (e.g. Firebase), add them under Settings → Secrets
+# and wire them into the env block below.
+
+name: Ship Gate
+
+on:
+  workflow_dispatch:
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+      - name: Install
+        run: npm ci
+      - name: Build (must be green before any preview URL)
+        run: npm run build
+      - name: Tests
+        run: npm test --if-present
+      - name: Lint
+        run: npm run lint --if-present
