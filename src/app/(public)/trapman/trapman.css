@@ -315,7 +315,7 @@
   backdrop-filter: blur(18px);
 }
 .trapman-header__brand,
-.trapman-header nav a {
+.trapman-header__nav a {
   min-height: 44px;
   display: inline-flex;
   align-items: center;
@@ -333,12 +333,12 @@
   width: 64px;
   height: 64px;
 }
-.trapman-header nav {
+.trapman-header__nav {
   display: flex;
   flex-wrap: wrap;
   gap: .45rem;
 }
-.trapman-header nav a {
+.trapman-header__nav a {
   border: 1px solid rgb(57 233 255 / .22);
   border-radius: .8rem;
   padding-inline: .8rem;
@@ -349,7 +349,28 @@
   text-transform: uppercase;
   transition: transform .18s ease;
 }
-.trapman-header nav a:hover { transform: translateY(-1px); color: #fff; }
+.trapman-header__nav a:hover { transform: translateY(-1px); color: #fff; }
+
+/* Mobile trigger — cyan border language, matches the rest of TrapMan chrome
+   rather than the neutral default MobileNavigation trigger styling. */
+.tm-mobile-nav-trigger {
+  border-color: rgb(57 233 255 / .35);
+  background: rgb(3 2 7 / .5);
+  color: var(--tm-cyan);
+}
+.tm-mobile-nav-trigger:hover {
+  border-color: rgb(57 233 255 / .6);
+}
+
+/* Hide desktop nav; hamburger (md:hidden) takes over below this breakpoint —
+   matches the public header pattern (globals.css) so the two navs never
+   both vanish or both show. Scoped past .trapman-header__nav specifically:
+   the mobile nav's own slide-out panel also contains a <nav>, and it lives
+   in the DOM under .trapman-header too (MobileNavigation isn't a portal),
+   so a bare `.trapman-header nav` selector would leak this styling onto it. */
+@media (max-width: 767px) {
+  .trapman-header .trapman-header__nav { display: none; }
+}
 .city-hero {
   min-height: min(980px, calc(100svh - 76px));
   align-items: end;
@@ -1179,17 +1200,24 @@
   gap: 1rem;
 }
 
-@media (max-width: 820px) {
+/* Narrow desktop/tablet only: the inline nav is still visible here (the
+   hamburger only takes over at 767px and below, see .trapman-header__nav's
+   hide rule near its definition), so give it room to wrap into a full-width
+   scrollable strip under the brand rather than crowding the header row. */
+@media (min-width: 768px) and (max-width: 820px) {
   .trapman-header {
     align-items: flex-start;
     flex-direction: column;
   }
-  .trapman-header nav {
+  .trapman-header__nav {
     width: 100%;
     overflow-x: auto;
     flex-wrap: nowrap;
     padding-bottom: .25rem;
   }
+}
+
+@media (max-width: 820px) {
   .city-hero {
     min-height: 940px;
     align-items: start;
