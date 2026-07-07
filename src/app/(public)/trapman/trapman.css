@@ -1,17 +1,6 @@
+/* Tokens (--tm-*) live in ../../../styles/trapman-tokens.css, shared with
+   .player-account-shell — see that file for why. */
 .trapman-site {
-  --tm-black: #030207;
-  --tm-violet: #8c27ff;
-  --tm-magenta: #f144ff;
-  --tm-cyan: #39e9ff;
-  --tm-yellow: #ffd436;
-
-  /* Calmer glow variant — for account/support/legal sections nested inside
-     the otherwise-loud TrapMan page, where full neon saturation would hurt
-     legibility of utility content and legal-adjacent CTAs. */
-  --tm-calm-ink: #d7f6ff;
-  --tm-calm-border: rgb(57 233 255 / .16);
-  --tm-calm-glow: 0 0 1px rgb(57 233 255 / .3), 0 0 1.2rem rgb(57 233 255 / .08);
-
   min-height: 100vh;
   background: var(--tm-black);
   color: #fff;
@@ -1307,10 +1296,7 @@
   .leaderboard-cta,
   .player-password-field button,
   .player-login-btn,
-  .trapman-login-back,
-  .player-action-btn,
-  .player-account-retry-btn,
-  .player-account-support-link {
+  .trapman-login-back {
     transition: none !important;
   }
   .shop-item-card:hover,
@@ -1322,12 +1308,14 @@
   }
 }
 
-/* TrapMan player account and legal surfaces
+/* TrapMan login and legal surfaces
    Both use the calmer --tm-calm-* tokens rather than the full neon glow
    ramp — this is utility/legal-adjacent content where legibility beats
-   saturation, while staying visibly TrapMan via the cyan accent. */
+   saturation, while staying visibly TrapMan via the cyan accent. The
+   player dashboard shares these --tm-calm-* tokens too (see
+   ../../../styles/trapman-tokens.css) but its own rules now live in
+   (player)/trapman/account/account.css, not here. */
 .trapman-login-page,
-.player-account-shell,
 .legal-shell {
   min-height: 100svh;
   background:
@@ -1341,11 +1329,6 @@
   padding: clamp(1rem, 5vw, 4rem);
 }
 .trapman-login-card,
-.player-account-error-card,
-.player-account-loading,
-.player-progression-panel,
-.player-purchase-history,
-.player-account-actions,
 .legal-draft-notice,
 .legal-content,
 .legal-toc {
@@ -1359,7 +1342,6 @@
   padding: clamp(1.4rem, 5vw, 3rem);
 }
 .trapman-login-card h1,
-.player-dashboard-title,
 .legal-title {
   margin-top: .75rem;
   color: #fff;
@@ -1369,8 +1351,6 @@
 }
 .trapman-login-subtitle,
 .legal-last-updated,
-.player-dashboard-identity,
-.player-empty-state,
 .delete-account-support-note {
   color: var(--tm-calm-ink);
   line-height: 1.65;
@@ -1414,11 +1394,8 @@
 .player-password-field button,
 .player-login-btn,
 .trapman-login-back,
-.player-action-btn,
 .delete-account-submit-btn,
 .delete-account-signin-btn,
-.player-account-retry-btn,
-.player-account-support-link,
 .legal-toc-link,
 .legal-cross-link {
   min-height: 44px;
@@ -1434,10 +1411,7 @@
 }
 .player-password-field button:hover,
 .player-login-btn:hover,
-.trapman-login-back:hover,
-.player-action-btn:hover,
-.player-account-retry-btn:hover,
-.player-account-support-link:hover {
+.trapman-login-back:hover {
   border-color: rgb(57 233 255 / .5);
   transform: translateY(-1px);
 }
@@ -1453,191 +1427,35 @@
   opacity: .9;
 }
 .player-login-btn:disabled,
-.delete-account-submit-btn:disabled,
-.player-action-btn--signout:disabled {
+.delete-account-submit-btn:disabled {
   opacity: .55;
   cursor: not-allowed;
   transform: none;
 }
 .player-login-error,
 .delete-account-error,
-.delete-account-warning,
-.player-danger-zone {
+.delete-account-warning {
   border: 1px solid rgb(255 67 105 / .45);
   border-radius: 1rem;
   background: rgb(255 67 105 / .1);
   padding: 1rem;
 }
-.player-account-header {
-  position: sticky;
-  top: 0;
-  z-index: var(--z-header);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  border-bottom: 1px solid rgb(57 233 255 / .18);
-  background: rgb(3 2 7 / .78);
-  padding: .9rem clamp(1rem, 5vw, 4rem);
-  backdrop-filter: blur(16px);
-}
-.player-account-logo-link {
-  color: #fff;
-  font-weight: 950;
-  letter-spacing: .08em;
-}
-.player-account-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .5rem;
-}
-.player-account-nav a {
-  min-height: 44px;
-  display: inline-flex;
-  align-items: center;
-  border: 1px solid rgb(57 233 255 / .22);
-  border-radius: .8rem;
-  color: #bff8ff;
-  padding-inline: .8rem;
-}
-.player-account-main,
 .legal-shell {
   padding: clamp(1.25rem, 5vw, 4rem);
   position: relative;
 }
-.player-dashboard-header {
-  max-width: 62rem;
-}
-
-/* ── Mission-control dashboard grid ────────────────────────────
-   Progression spans the full width (it's the primary readout);
-   purchase history and account actions sit side by side below —
-   this reads as a data console rather than a marketing panel. */
-.player-dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-areas:
-    "progression progression"
-    "purchases actions";
-  gap: 1.1rem;
-  margin-top: 2rem;
-}
-.player-progression-panel { grid-area: progression; }
-.player-purchase-history { grid-area: purchases; }
-.player-account-actions { grid-area: actions; }
-
-.player-progression-panel,
-.player-purchase-history,
-.player-account-actions,
-.player-account-loading,
-.player-account-error-card {
-  padding: clamp(1.2rem, 4vw, 2rem);
-}
-.player-progression-panel h2,
-.player-purchase-history h2,
-.player-account-actions h2 {
-  font-size: 1.1rem;
-  font-weight: 900;
-  letter-spacing: -.02em;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  gap: .55rem;
-}
-.player-progression-panel h2::before,
-.player-purchase-history h2::before,
-.player-account-actions h2::before {
-  content: '';
-  width: .5rem;
-  height: .5rem;
-  border-radius: 50%;
-  background: var(--tm-cyan);
-  box-shadow: 0 0 .5rem var(--tm-cyan);
-}
-.player-stats-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
-  gap: .8rem;
-  margin-top: 1.1rem;
-}
-.player-stat,
-.player-empty-state,
 .delete-account-reauthenticate-notice {
   border: 1px solid var(--tm-calm-border);
   border-radius: .9rem;
   background: rgb(255 255 255 / .03);
   padding: 1rem;
 }
-.player-stat dt {
-  color: var(--tm-cyan);
-  font-size: .72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .12em;
-}
-.player-stat dd {
-  margin-top: .4rem;
-  color: #fff;
-  font-size: 1.5rem;
-  font-weight: 900;
-  letter-spacing: -.02em;
-  font-variant-numeric: tabular-nums;
-}
-.player-purchase-list {
-  display: grid;
-  gap: .6rem;
-  margin-top: 1.1rem;
-}
-.player-purchase-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-  border: 1px solid var(--tm-calm-border);
-  border-radius: .7rem;
-  padding: .7rem .9rem;
-  background: rgb(255 255 255 / .02);
-}
-.player-purchase-product {
-  color: #fff;
-  font-weight: 700;
-  font-size: .88rem;
-}
-.player-purchase-date {
-  color: var(--tm-calm-ink);
-  font-size: .78rem;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-.player-action-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .75rem;
-  margin-top: 1.1rem;
-}
-.player-danger-zone {
-  margin-top: 1.25rem;
-}
-.player-danger-zone p {
-  font-size: .84rem;
-  color: var(--tm-calm-ink);
-  margin-bottom: .6rem;
-}
-.player-account-skeleton {
-  height: 12rem;
-  border-radius: 1rem;
-  background: linear-gradient(90deg, rgb(57 233 255 / .06), rgb(57 233 255 / .14), rgb(57 233 255 / .06));
-  animation: tm-skeleton 1.4s ease-in-out infinite alternate;
-}
 
-/* ── Account shell + login page bespoke plates ─────────────────
-   Restrained: low opacity, heavy scrim, so dashboard data stays the
-   focal point rather than competing with atmosphere art. */
-.player-account-shell {
-  position: relative;
-  isolation: isolate;
-}
-.player-account-shell__plate,
+/* ── Login page bespoke plate ───────────────────────────────────
+   Restrained: low opacity, heavy scrim, so the login card stays the
+   focal point rather than competing with atmosphere art. The player
+   dashboard's equivalent (.player-account-shell__plate) now lives in
+   account.css. */
 .trapman-login-page__plate {
   position: absolute;
   inset: 0;
@@ -1645,7 +1463,6 @@
   overflow: hidden;
   pointer-events: none;
 }
-.player-account-shell__plate img,
 .trapman-login-page__plate img {
   width: 100%;
   height: 100%;
@@ -1653,7 +1470,6 @@
   opacity: .16;
   filter: saturate(.6) brightness(.5);
 }
-.player-account-shell__plate::after,
 .trapman-login-page__plate::after {
   content: '';
   position: absolute;
@@ -1798,11 +1614,6 @@
   gap: 1rem;
 }
 
-@keyframes tm-skeleton {
-  from { opacity: .48; transform: translateY(0); }
-  to { opacity: 1; transform: translateY(-2px); }
-}
-
 /* ── Legal shell polish ───────────────────────────────────────── */
 .legal-breadcrumb ol { list-style: none; padding: 0; }
 .legal-breadcrumb a { color: var(--tm-cyan); text-decoration: none; opacity: .8; }
@@ -1892,24 +1703,10 @@ h2.legal-toc-heading {
   color: var(--tm-cyan);
 }
 
-@keyframes tm-skeleton {
-  from { opacity: .48; transform: translateY(0); }
-  to { opacity: 1; transform: translateY(-2px); }
-}
-
 @media (max-width: 820px) {
-  .player-account-nav { display: none; }
-  .player-dashboard-grid,
-  .player-stats-list,
   .legal-body,
   .legal-header {
     grid-template-columns: 1fr;
-  }
-  .player-dashboard-grid {
-    grid-template-areas:
-      "progression"
-      "purchases"
-      "actions";
   }
   .legal-toc { position: static; }
 }

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "@/styles/trapman-tokens.css";
 import "./trapman.css";
 
 export const metadata: Metadata = {
