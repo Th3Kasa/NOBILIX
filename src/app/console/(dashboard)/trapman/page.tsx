@@ -111,6 +111,24 @@ export default async function TrapManOverviewPage() {
 
   const attentionItems = await getAttentionItems(m, ga4, fx);
 
+  // Explains, in the Customize panel, why toggling on a widget whose source
+  // is currently down won't show anything. Firestore backs two independent
+  // fetches (the overview snapshot and the "live" one) so either failing
+  // counts as the source being unavailable.
+  const widgetUnavailableReasons: Partial<Record<"firestore" | "ga4" | "fx", string>> = {
+    ...(!m.connected
+      ? { firestore: "Not connected to the game's database" }
+      : !live.connected
+        ? { firestore: live.error ?? "Live metrics unavailable" }
+        : {}),
+    ...(!ga4.connected
+      ? { ga4: ga4.error ?? "Google Analytics not connected" }
+      : {}),
+    ...(!fx.connected
+      ? { fx: fx.error ?? "Exchange-rate conversion unavailable" }
+      : {}),
+  };
+
   // Store revenue (embedded receipts, mixed currencies) converted to AUD.
   let storeRevenueAud: number | null = null;
   if (fx.connected && live.revenueByCurrency.length > 0) {
@@ -383,7 +401,11 @@ export default async function TrapManOverviewPage() {
           description="A live picture of your players, updated straight from the game's database."
         />
         <div className="flex shrink-0 items-center gap-2">
-          <CustomizeOverview order={order} hidden={[...hidden]} />
+          <CustomizeOverview
+            order={order}
+            hidden={[...hidden]}
+            unavailableReasons={widgetUnavailableReasons}
+          />
           <LiveStatus connected={m.connected} />
         </div>
       </div>

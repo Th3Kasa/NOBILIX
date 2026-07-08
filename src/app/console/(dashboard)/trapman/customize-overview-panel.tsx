@@ -34,10 +34,12 @@ function SortableRow({
   id,
   visible,
   onVisibleChange,
+  unavailableReason,
 }: {
   id: string;
   visible: boolean;
   onVisibleChange: (visible: boolean) => void;
+  unavailableReason?: string;
 }) {
   const widget = getOverviewWidget(id);
   const {
@@ -72,6 +74,11 @@ function SortableRow({
       </button>
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm">{widget.name}</p>
+        {unavailableReason && (
+          <p className="truncate text-xs text-muted-foreground">
+            Won&apos;t display — {unavailableReason}
+          </p>
+        )}
       </div>
       <Badge variant="secondary" className="hidden shrink-0 sm:inline-flex">
         {widget.section}
@@ -88,10 +95,12 @@ function SortableRow({
 export default function CustomizeOverviewPanel({
   initialOrder,
   initialHidden,
+  unavailableReasons,
   onClose,
 }: {
   initialOrder: string[];
   initialHidden: string[];
+  unavailableReasons: Partial<Record<"firestore" | "ga4" | "fx", string>>;
   onClose: () => void;
 }) {
   const router = useRouter();
@@ -170,6 +179,11 @@ export default function CustomizeOverviewPanel({
                 id={id}
                 visible={!hidden.has(id)}
                 onVisibleChange={(visible) => setVisible(id, visible)}
+                unavailableReason={
+                  getOverviewWidget(id)?.source
+                    ? unavailableReasons[getOverviewWidget(id)!.source!]
+                    : undefined
+                }
               />
             ))}
           </ul>

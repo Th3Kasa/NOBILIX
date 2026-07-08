@@ -22,9 +22,11 @@ const CustomizeOverviewPanel = dynamic(
 export function CustomizeOverview({
   order,
   hidden,
+  unavailableReasons,
 }: {
   order: string[];
   hidden: string[];
+  unavailableReasons: Partial<Record<"firestore" | "ga4" | "fx", string>>;
 }) {
   const [open, setOpen] = React.useState(false);
 
@@ -50,6 +52,7 @@ export function CustomizeOverview({
         <CustomizeOverviewPanel
           initialOrder={order}
           initialHidden={hidden}
+          unavailableReasons={unavailableReasons}
           onClose={() => setOpen(false)}
         />
       </Modal>

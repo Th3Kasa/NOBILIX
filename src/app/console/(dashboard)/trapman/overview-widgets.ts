@@ -11,6 +11,12 @@ import type { OverviewPrefs } from "@/types";
 
 export type OverviewWidgetKind = "stat" | "table" | "chart" | "note";
 
+/** Which backend a widget's data comes from — used to explain why it's
+ *  not currently displaying anything (see resolveOverviewLayout callers
+ *  in page.tsx). Widgets fed by more than one source, or that always
+ *  render something, leave this unset. */
+export type OverviewWidgetSource = "firestore" | "ga4" | "fx";
+
 export interface OverviewWidgetDef {
   id: string;
   /** Plain-English name shown in the Customize panel. */
@@ -18,24 +24,26 @@ export interface OverviewWidgetDef {
   /** Visual grouping label — a hint in the panel, not a toggle unit. */
   section: string;
   kind: OverviewWidgetKind;
+  /** The single backend this widget depends on, if any. */
+  source?: OverviewWidgetSource;
 }
 
 export const OVERVIEW_WIDGETS: OverviewWidgetDef[] = [
-  { id: "players-total", name: "Total players", section: "Players", kind: "stat" },
-  { id: "players-registered", name: "Signed-up players", section: "Players", kind: "stat" },
-  { id: "players-guests", name: "Guest players", section: "Players", kind: "stat" },
+  { id: "players-total", name: "Total players", section: "Players", kind: "stat", source: "firestore" },
+  { id: "players-registered", name: "Signed-up players", section: "Players", kind: "stat", source: "firestore" },
+  { id: "players-guests", name: "Guest players", section: "Players", kind: "stat", source: "firestore" },
   { id: "players-new-7d", name: "New players (last 7 days)", section: "Players", kind: "stat" },
-  { id: "ga4-active-7d", name: "Active players (last 7 days)", section: "Google Analytics", kind: "stat" },
-  { id: "ga4-revenue-30d", name: "Google Analytics revenue (last 30 days)", section: "Google Analytics", kind: "stat" },
-  { id: "ga4-avg-session", name: "Average session length", section: "Google Analytics", kind: "stat" },
-  { id: "ga4-engaged-sessions", name: "Meaningful play sessions (last 30 days)", section: "Google Analytics", kind: "stat" },
-  { id: "store-purchases", name: "Store purchases", section: "Store & engagement", kind: "stat" },
-  { id: "store-revenue-aud", name: "Store revenue (AUD)", section: "Store & engagement", kind: "stat" },
-  { id: "push-reachable", name: "Players we can notify", section: "Store & engagement", kind: "stat" },
-  { id: "top-level", name: "Highest level reached", section: "Store & engagement", kind: "stat" },
-  { id: "latest-scores", name: "Latest scores coming in", section: "Activity", kind: "table" },
+  { id: "ga4-active-7d", name: "Active players (last 7 days)", section: "Google Analytics", kind: "stat", source: "ga4" },
+  { id: "ga4-revenue-30d", name: "Google Analytics revenue (last 30 days)", section: "Google Analytics", kind: "stat", source: "ga4" },
+  { id: "ga4-avg-session", name: "Average session length", section: "Google Analytics", kind: "stat", source: "ga4" },
+  { id: "ga4-engaged-sessions", name: "Meaningful play sessions (last 30 days)", section: "Google Analytics", kind: "stat", source: "ga4" },
+  { id: "store-purchases", name: "Store purchases", section: "Store & engagement", kind: "stat", source: "firestore" },
+  { id: "store-revenue-aud", name: "Store revenue (AUD)", section: "Store & engagement", kind: "stat", source: "firestore" },
+  { id: "push-reachable", name: "Players we can notify", section: "Store & engagement", kind: "stat", source: "firestore" },
+  { id: "top-level", name: "Highest level reached", section: "Store & engagement", kind: "stat", source: "firestore" },
+  { id: "latest-scores", name: "Latest scores coming in", section: "Activity", kind: "table", source: "firestore" },
   { id: "revenue-note", name: "Note about the two revenue numbers", section: "Notes", kind: "note" },
-  { id: "activity-30d", name: "Daily active players (last 30 days)", section: "Activity", kind: "chart" },
+  { id: "activity-30d", name: "Daily active players (last 30 days)", section: "Activity", kind: "chart", source: "ga4" },
 ];
 
 export const OVERVIEW_WIDGET_IDS = OVERVIEW_WIDGETS.map((w) => w.id);
