@@ -7,6 +7,14 @@ const navigationItems = [
   { href: "/legal", label: "Company legal", description: "Policies and notices" },
 ];
 
+// The mobile sheet also carries the Console entry the desktop CTA renders
+// separately (styled as `.header-cta`, not a plain nav link) — so mobile
+// visitors see it too without duplicating it into the desktop nav loop.
+const mobileNavigationItems = [
+  ...navigationItems,
+  { href: "/console", label: "Console", description: "Admin sign-in" },
+];
+
 export function NobilixHeader() {
   return (
     <header className="public-header">
@@ -27,7 +35,10 @@ export function NobilixHeader() {
         ))}
       </nav>
       <div className="public-header__right">
-        <MobileNavigation items={navigationItems} />
+        <Link href="/console" className="header-cta">
+          Console
+        </Link>
+        <MobileNavigation items={mobileNavigationItems} />
       </div>
     </header>
   );

@@ -32,20 +32,23 @@ test("public header offers responsive company navigation", () => {
   const header = read("src/components/public/nobilix-header.tsx");
 
   assert.match(header, /MobileNavigation/);
-  assert.match(header, /items=\{navigationItems\}/);
+  assert.match(header, /items=\{mobileNavigationItems\}/);
   assert.match(header, /Studio/);
   assert.match(header, /Projects/);
   assert.match(header, /Company legal/);
   assert.match(header, /aria-label="Nobilix home"/);
 });
 
-test("Console is only linked from the footer across every public-facing page", () => {
+test("Console is only linked from the footer and studio header across every public-facing page", () => {
   const footer = read("src/components/public/nobilix-footer.tsx");
-  // Discoverability is preserved via the footer and the direct /console URL.
+  // Discoverability is preserved via the footer, the studio header's CTA,
+  // and the direct /console URL — but nowhere inside the TrapMan game world
+  // or player account, which stay entirely player-facing.
   assert.match(footer, /href="\/console"/);
 
   const allowedFiles = new Set([
     resolve(root, "src/components/public/nobilix-footer.tsx"),
+    resolve(root, "src/components/public/nobilix-header.tsx"),
   ]);
 
   function collectFiles(dir) {
