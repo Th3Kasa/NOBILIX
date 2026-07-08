@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const REQUIRED_CONFIRMATION = "DELETE TRAPMAN";
 
@@ -79,6 +80,9 @@ export function DeleteAccountForm() {
           Your account has been successfully deleted. You will be redirected
           shortly.
         </p>
+        <Link href="/trapman" className="delete-account-continue-link">
+          Return to TrapMan now
+        </Link>
       </div>
     );
   }
