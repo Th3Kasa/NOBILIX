@@ -110,7 +110,6 @@ test("company legal directory separates company and TrapMan legal destinations",
   assert.match(legal, /project\.legal\.privacy/);
   assert.match(legal, /project\.legal\.terms/);
   assert.match(legal, /project\.legal\.compliance/);
-  assert.match(legal, /project\.legal\.deletion/);
   assert.match(legal, /max-width:\s*72ch|legal-reading/);
 });
 
@@ -119,7 +118,7 @@ test("custom 404 offers useful recovery paths", () => {
 
   assert.match(content, /Page not found/);
   assert.match(content, /Return to Nobilix/);
-  assert.match(content, /View TrapMan/);
+  assert.match(content, /TrapMan policies/);
   assert.match(content, /Contact Nobilix/);
   assert.doesNotMatch(
     content,

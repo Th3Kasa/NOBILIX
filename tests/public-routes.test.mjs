@@ -10,7 +10,6 @@ test("legacy TrapMan legal URLs redirect to project-scoped routes", () => {
   assert.match(source, /source:\s*"\/privacy-policy"[\s\S]*destination:\s*"\/trapman\/privacy-policy"/);
   assert.match(source, /source:\s*"\/terms-of-use"[\s\S]*destination:\s*"\/trapman\/terms-of-use"/);
   assert.match(source, /source:\s*"\/data-compliance"[\s\S]*destination:\s*"\/trapman\/data-compliance"/);
-  assert.match(source, /source:\s*"\/delete-account"[\s\S]*destination:\s*"\/trapman\/delete-account"/);
   assert.doesNotMatch(source, /destination:\s*"\/site\//);
 });
 

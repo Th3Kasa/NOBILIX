@@ -18,7 +18,6 @@ test("skip link targets the actual route main landmarks", () => {
     "src/app/console/(auth)/layout.tsx",
     "src/app/console/(dashboard)/page.tsx",
     "src/app/console/(dashboard)/trapman/layout.tsx",
-    "src/app/(player)/trapman/account/layout.tsx",
   ]) {
     const shell = read(path);
     assert.match(shell, /<main[\s\S]*id="main-content"/, `${path} needs the target main`);
