@@ -7,8 +7,8 @@ import { cn } from "@/lib/utils";
 
 const PLATFORM_NAV = [
   { href: "/console", label: "Projects", icon: LayoutGrid },
-  { href: "/console/settings", label: "Admin profile", icon: User },
-  { href: "/console/audit", label: "Audit activity", icon: ScrollText },
+  { href: "/console/trapman/settings", label: "TrapMan settings", icon: User },
+  { href: "/console/trapman/audit", label: "TrapMan audit", icon: ScrollText },
 ] as const;
 
 export function PlatformSidebar() {
