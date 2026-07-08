@@ -33,3 +33,17 @@ export function countryFlag(iso?: string | null): string {
     .map((c) => 0x1f1e6 + (c.charCodeAt(0) - 65));
   return String.fromCodePoint(...codePoints);
 }
+
+/**
+ * Format an ISO date string (e.g. a legal page's `lastUpdated` constant) as
+ * a long en-AU date — "6 July 2026". Shared by both legal shells so the
+ * two brand-distinct surfaces still agree on date formatting.
+ */
+export function formatLegalDate(isoDate: string): string {
+  const date = new Date(isoDate);
+  return date.toLocaleDateString("en-AU", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}

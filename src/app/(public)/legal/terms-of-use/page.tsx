@@ -12,7 +12,11 @@ const LAST_UPDATED = "2026-07-06";
 
 export default function NobilixTermsOfUsePage() {
   return (
-    <NobilixLegalShell title="Terms of Use" lastUpdated={LAST_UPDATED}>
+    <NobilixLegalShell
+      title="Terms of Use"
+      lastUpdated={LAST_UPDATED}
+      currentPath="/legal/terms-of-use"
+    >
       <section id="acceptance">
         <h2>Acceptance of Terms</h2>
         <p>

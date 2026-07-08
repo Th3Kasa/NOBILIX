@@ -15,7 +15,11 @@ export default async function TrapManDeleteAccountPage() {
   const session = await getPlayerSession();
 
   return (
-    <LegalShell title="Delete Account" lastUpdated="2026-06-22">
+    <LegalShell
+      title="Delete Account"
+      lastUpdated="2026-06-22"
+      currentPath="/trapman/delete-account"
+    >
       <section id="overview">
         <h2>Account Deletion</h2>
         <p>

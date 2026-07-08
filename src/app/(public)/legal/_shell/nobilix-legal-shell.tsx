@@ -1,20 +1,37 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { LegalToc, type LegalTocItem } from "@/components/legal/legal-toc";
+import { formatLegalDate } from "@/lib/utils";
 
-const NOBILIX_LEGAL_PAGES = [
+const NOBILIX_LEGAL_PAGES: LegalTocItem[] = [
   { href: "/legal/privacy-policy", label: "Privacy Policy" },
   { href: "/legal/terms-of-use", label: "Terms of Use" },
-] as const;
+];
+
+const NOBILIX_TOC_ITEMS: LegalTocItem[] = [
+  { href: "/legal", label: "Legal directory" },
+  ...NOBILIX_LEGAL_PAGES,
+];
+
+const TRAPMAN_TOC_ITEMS: LegalTocItem[] = [
+  { href: "/trapman/privacy-policy", label: "Privacy Policy" },
+  { href: "/trapman/terms-of-use", label: "Terms of Use" },
+  { href: "/trapman/data-compliance", label: "Data & Compliance" },
+];
 
 interface NobilixLegalShellProps {
   title: string;
   lastUpdated: string;
+  /** The current page's own route, e.g. "/legal/privacy-policy" — drives
+   * `aria-current="page"` on the matching table-of-contents link. */
+  currentPath: string;
   children: ReactNode;
 }
 
 export function NobilixLegalShell({
   title,
   lastUpdated,
+  currentPath,
   children,
 }: NobilixLegalShellProps) {
   return (
@@ -42,7 +59,7 @@ export function NobilixLegalShell({
           <h1 className="nobilix-legal-title">{title}</h1>
           <p className="nobilix-legal-updated">
             <span className="nobilix-legal-updated__mono">
-              Last updated <time dateTime={lastUpdated}>{formatDate(lastUpdated)}</time>
+              Last updated <time dateTime={lastUpdated}>{formatLegalDate(lastUpdated)}</time>
             </span>
           </p>
         </div>
@@ -51,39 +68,18 @@ export function NobilixLegalShell({
       <div className="nobilix-legal-body">
         <nav className="nobilix-legal-toc" aria-label="Nobilix legal documents">
           <h2 className="nobilix-legal-toc-heading">Nobilix Legal</h2>
-          <ul>
-            <li>
-              <Link href="/legal" className="nobilix-legal-toc-link">
-                Legal directory
-              </Link>
-            </li>
-            {NOBILIX_LEGAL_PAGES.map(({ href, label }) => (
-              <li key={href}>
-                <Link href={href} className="nobilix-legal-toc-link">
-                  {label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <LegalToc
+            items={NOBILIX_TOC_ITEMS}
+            currentPath={currentPath}
+            linkClassName="nobilix-legal-toc-link"
+          />
           <div className="nobilix-legal-toc-divider" />
           <h2 className="nobilix-legal-toc-heading">TrapMan Legal</h2>
-          <ul>
-            <li>
-              <Link href="/trapman/privacy-policy" className="nobilix-legal-toc-link">
-                Privacy Policy
-              </Link>
-            </li>
-            <li>
-              <Link href="/trapman/terms-of-use" className="nobilix-legal-toc-link">
-                Terms of Use
-              </Link>
-            </li>
-            <li>
-              <Link href="/trapman/data-compliance" className="nobilix-legal-toc-link">
-                Data &amp; Compliance
-              </Link>
-            </li>
-          </ul>
+          <LegalToc
+            items={TRAPMAN_TOC_ITEMS}
+            currentPath={currentPath}
+            linkClassName="nobilix-legal-toc-link"
+          />
         </nav>
 
         <article className="nobilix-legal-content">{children}</article>
@@ -104,13 +100,4 @@ export function NobilixLegalShell({
       </footer>
     </div>
   );
-}
-
-function formatDate(isoDate: string): string {
-  const date = new Date(isoDate);
-  return date.toLocaleDateString("en-AU", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
 }

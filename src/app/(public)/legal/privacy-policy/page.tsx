@@ -12,7 +12,11 @@ const LAST_UPDATED = "2026-07-06";
 
 export default function NobilixPrivacyPolicyPage() {
   return (
-    <NobilixLegalShell title="Privacy Policy" lastUpdated={LAST_UPDATED}>
+    <NobilixLegalShell
+      title="Privacy Policy"
+      lastUpdated={LAST_UPDATED}
+      currentPath="/legal/privacy-policy"
+    >
       <section id="introduction">
         <h2>Introduction</h2>
         <p>

@@ -19,6 +19,7 @@ export default function TrapManPrivacyPolicyPage() {
     <LegalShell
       title="Privacy Policy"
       lastUpdated={PRIVACY_POLICY_LAST_UPDATED}
+      currentPath="/trapman/privacy-policy"
     >
       <section id="introduction">
         <h2>{PRIVACY_SECTIONS.introduction.heading}</h2>
@@ -29,39 +30,46 @@ export default function TrapManPrivacyPolicyPage() {
         <h2>{PRIVACY_SECTIONS.dataWeCollect.heading}</h2>
         <p>{PRIVACY_SECTIONS.dataWeCollect.body}</p>
 
-        <table className="legal-data-table">
-          <caption>Confirmed collected data</caption>
-          <thead>
-            <tr>
-              <th scope="col">Data</th>
-              <th scope="col">System</th>
-              <th scope="col">Location</th>
-              <th scope="col">Purpose</th>
-              <th scope="col">Deletable</th>
-            </tr>
-          </thead>
-          <tbody>
-            {TRAPMAN_DATA_INVENTORY.map((entry) => (
-              <tr key={entry.key}>
-                <td>{entry.label}</td>
-                <td>{entry.system}</td>
-                <td>
-                  <code>{entry.location}</code>
-                </td>
-                <td>{entry.purpose}</td>
-                <td>
-                  {entry.deletable ? "Yes" : "Partial"}
-                  {"deletionNote" in entry && entry.deletionNote && (
-                    <span className="legal-deletion-note">
-                      {" "}
-                      {entry.deletionNote}
-                    </span>
-                  )}
-                </td>
+        <div
+          className="legal-table-scroll"
+          tabIndex={0}
+          role="region"
+          aria-label="Confirmed collected data table, scrolls sideways"
+        >
+          <table className="legal-data-table">
+            <caption>Confirmed collected data</caption>
+            <thead>
+              <tr>
+                <th scope="col">Data</th>
+                <th scope="col">System</th>
+                <th scope="col">Location</th>
+                <th scope="col">Purpose</th>
+                <th scope="col">Deletable</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {TRAPMAN_DATA_INVENTORY.map((entry) => (
+                <tr key={entry.key}>
+                  <td>{entry.label}</td>
+                  <td>{entry.system}</td>
+                  <td>
+                    <code>{entry.location}</code>
+                  </td>
+                  <td>{entry.purpose}</td>
+                  <td>
+                    {entry.deletable ? "Yes" : "Partial"}
+                    {"deletionNote" in entry && entry.deletionNote && (
+                      <span className="legal-deletion-note">
+                        {" "}
+                        {entry.deletionNote}
+                      </span>
+                    )}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <p className="legal-table-hint" aria-hidden="true">
           Scroll the table sideways to see every column.
         </p>

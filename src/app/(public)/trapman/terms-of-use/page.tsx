@@ -11,7 +11,11 @@ export const metadata: Metadata = {
 
 export default function TrapManTermsPage() {
   return (
-    <LegalShell title="Terms of Use" lastUpdated={TERMS_LAST_UPDATED}>
+    <LegalShell
+      title="Terms of Use"
+      lastUpdated={TERMS_LAST_UPDATED}
+      currentPath="/trapman/terms-of-use"
+    >
       {Object.values(TERMS_SECTIONS).map((section) => (
         <section
           key={section.heading}

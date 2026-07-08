@@ -1,22 +1,27 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { LegalToc, type LegalTocItem } from "@/components/legal/legal-toc";
+import { formatLegalDate } from "@/lib/utils";
 
-interface LegalPageEntry {
-  href: string;
-  label: string;
-}
-
-const TRAPMAN_LEGAL_PAGES: LegalPageEntry[] = [
+const TRAPMAN_LEGAL_PAGES: LegalTocItem[] = [
   { href: "/trapman/privacy-policy", label: "Privacy Policy" },
   { href: "/trapman/terms-of-use", label: "Terms of Use" },
   { href: "/trapman/data-compliance", label: "Data & Compliance" },
   { href: "/trapman/delete-account", label: "Delete Account" },
 ];
 
+const TOC_ITEMS: LegalTocItem[] = [
+  { href: "/legal", label: "Company legal" },
+  ...TRAPMAN_LEGAL_PAGES,
+];
+
 interface LegalShellProps {
   title: string;
   lastUpdated: string;
+  /** The current page's own route, e.g. "/trapman/privacy-policy" — drives
+   * `aria-current="page"` on the matching table-of-contents link. */
+  currentPath: string;
   children: ReactNode;
 }
 
@@ -29,7 +34,7 @@ interface LegalShellProps {
  * They must be reviewed by qualified legal counsel before being presented
  * as final legal advice.
  */
-export function LegalShell({ title, lastUpdated, children }: LegalShellProps) {
+export function LegalShell({ title, lastUpdated, currentPath, children }: LegalShellProps) {
   return (
     <div className="legal-shell">
       {/* Breadcrumb */}
@@ -66,7 +71,7 @@ export function LegalShell({ title, lastUpdated, children }: LegalShellProps) {
         <div className="legal-title-block">
           <h1 className="legal-title">{title}</h1>
           <p className="legal-last-updated">
-            Last updated: <time dateTime={lastUpdated}>{formatDate(lastUpdated)}</time>
+            Last updated: <time dateTime={lastUpdated}>{formatLegalDate(lastUpdated)}</time>
           </p>
         </div>
       </header>
@@ -75,20 +80,7 @@ export function LegalShell({ title, lastUpdated, children }: LegalShellProps) {
         {/* Sticky table of contents for cross-page navigation */}
         <nav className="legal-toc legal-contents-nav" aria-label="Legal pages">
           <h2 className="legal-toc-heading">TrapMan Legal</h2>
-          <ul>
-            <li>
-              <Link href="/legal" className="legal-toc-link">
-                Company legal
-              </Link>
-            </li>
-            {TRAPMAN_LEGAL_PAGES.map(({ href, label }) => (
-              <li key={href}>
-                <Link href={href} className="legal-toc-link">
-                  {label}
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <LegalToc items={TOC_ITEMS} currentPath={currentPath} linkClassName="legal-toc-link" />
         </nav>
 
         {/* Main legal content */}
@@ -113,13 +105,4 @@ export function LegalShell({ title, lastUpdated, children }: LegalShellProps) {
       </footer>
     </div>
   );
-}
-
-function formatDate(isoDate: string): string {
-  const date = new Date(isoDate);
-  return date.toLocaleDateString("en-AU", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
 }
