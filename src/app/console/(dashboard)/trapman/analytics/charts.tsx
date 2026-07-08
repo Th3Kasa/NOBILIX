@@ -53,6 +53,7 @@ export function CountryDistributionChart({
               outerRadius={78}
               paddingAngle={2}
               strokeWidth={0}
+              isAnimationActive={false}
             >
               {countries.map((entry, i) => (
                 <Cell key={entry.country} fill={PIE_COLORS[i % PIE_COLORS.length]} />
@@ -115,7 +116,13 @@ export function LevelDistributionChart({
             width={32}
           />
           <Tooltip content={<ChartTooltip />} cursor={{ fill: "var(--accent)" }} />
-          <Bar dataKey="count" fill="var(--neon-violet)" radius={[4, 4, 0, 0]} maxBarSize={36} />
+          <Bar
+            dataKey="count"
+            fill="var(--neon-violet)"
+            radius={[4, 4, 0, 0]}
+            maxBarSize={36}
+            isAnimationActive={false}
+          />
         </BarChart>
       </ResponsiveContainer>
     </div>
