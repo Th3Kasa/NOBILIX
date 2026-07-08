@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Send, Users, Globe, User, CheckCircle2, AlertCircle } from "lucide-react";
@@ -18,6 +18,28 @@ import { cn } from "@/lib/utils";
 
 type Audience = "single" | "segment" | "broadcast";
 
+const TITLE_MAX = 120;
+const BODY_MAX = 1000;
+/** Only announce the counter to screen readers once the room left starts
+ *  feeling tight — otherwise every keystroke would spam aria-live. */
+const NEAR_LIMIT = 20;
+
+function CharCounter({ length, max }: { length: number; max: number }) {
+  const remaining = max - length;
+  const near = remaining <= NEAR_LIMIT;
+  return (
+    <p
+      className={cn(
+        "text-right font-mono text-xs tabular-nums",
+        near ? "text-[var(--console-action)]" : "text-muted-foreground",
+      )}
+      aria-live={near ? "polite" : "off"}
+    >
+      {length}/{max}
+    </p>
+  );
+}
+
 function SendButton() {
   const { pending } = useFormStatus();
   return (
@@ -30,18 +52,54 @@ function SendButton() {
 
 export function Compose({ prefillUid }: { prefillUid?: string }) {
   const router = useRouter();
-  const [audience, setAudience] = useState<Audience>(
-    prefillUid ? "single" : "broadcast",
-  );
-  const [preview, previewDispatch] = useActionState(previewAction, {});
-  const [state, formAction] = useActionState<SendState, FormData>(
-    async (prev, fd) => {
-      const res = await sendCampaignAction(prev, fd);
-      if (res.ok) router.refresh();
+  const formRef = useRef<HTMLFormElement>(null);
+  const defaultAudience: Audience = prefillUid ? "single" : "broadcast";
+  const [audience, setAudience] = useState<Audience>(defaultAudience);
+  const [titleLength, setTitleLength] = useState(0);
+  const [bodyLength, setBodyLength] = useState(0);
+  // True once any audience/field input changes after a preview was computed
+  // — the shown count is no longer trustworthy until previewed again.
+  const [previewStale, setPreviewStale] = useState(false);
+  // True right after a successful send — hides the (now-reset) preview
+  // rather than showing a stale count for a blank form.
+  const [previewDismissed, setPreviewDismissed] = useState(false);
+
+  const [preview, previewDispatch, previewPending] = useActionState(
+    async (prev: { count?: number; error?: string }, fd: FormData) => {
+      const res = await previewAction(prev, fd);
+      // A fresh preview just landed — whatever made the old one stale (or
+      // hidden after a send) no longer applies.
+      setPreviewStale(false);
+      setPreviewDismissed(false);
       return res;
     },
     {},
   );
+  const [state, formAction] = useActionState<SendState, FormData>(
+    async (prev, fd) => {
+      const res = await sendCampaignAction(prev, fd);
+      if (res.ok) {
+        router.refresh();
+        formRef.current?.reset();
+        setAudience(defaultAudience);
+        setTitleLength(0);
+        setBodyLength(0);
+        setPreviewDismissed(true);
+        setPreviewStale(false);
+      }
+      return res;
+    },
+    {},
+  );
+
+  function markFieldsChanged() {
+    setPreviewStale(true);
+  }
+
+  function handleAudienceChange(value: Audience) {
+    setAudience(value);
+    markFieldsChanged();
+  }
 
   const tabs: { value: Audience; label: string; icon: typeof User }[] = [
     { value: "single", label: "One player", icon: User },
@@ -55,7 +113,12 @@ export function Compose({ prefillUid }: { prefillUid?: string }) {
         <CardTitle>Compose notification</CardTitle>
       </CardHeader>
       <CardContent>
-        <form action={formAction} className="space-y-4">
+        <form
+          ref={formRef}
+          action={formAction}
+          onChange={markFieldsChanged}
+          className="space-y-4"
+        >
           {/* Audience selector */}
           <div className="grid grid-cols-3 gap-2">
             {tabs.map((t) => {
@@ -64,7 +127,7 @@ export function Compose({ prefillUid }: { prefillUid?: string }) {
                 <button
                   type="button"
                   key={t.value}
-                  onClick={() => setAudience(t.value)}
+                  onClick={() => handleAudienceChange(t.value)}
                   className={cn(
                     "flex flex-col items-center gap-1 rounded-md border p-3 text-xs font-medium transition-colors",
                     active
@@ -120,22 +183,43 @@ export function Compose({ prefillUid }: { prefillUid?: string }) {
 
           <div className="space-y-1.5">
             <Label htmlFor="title">Title</Label>
-            <Input id="title" name="title" maxLength={120} required placeholder="New event is live!" />
+            <Input
+              id="title"
+              name="title"
+              maxLength={TITLE_MAX}
+              required
+              placeholder="New event is live!"
+              onChange={(e) => setTitleLength(e.target.value.length)}
+            />
+            <CharCounter length={titleLength} max={TITLE_MAX} />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="body">Message</Label>
-            <Textarea id="body" name="body" maxLength={1000} required placeholder="Tap to claim your reward…" />
+            <Textarea
+              id="body"
+              name="body"
+              maxLength={BODY_MAX}
+              required
+              placeholder="Tap to claim your reward…"
+              onChange={(e) => setBodyLength(e.target.value.length)}
+            />
+            <CharCounter length={bodyLength} max={BODY_MAX} />
           </div>
 
-          {preview.count != null && (
+          {!previewDismissed && preview.count != null && (
             <p className="text-sm text-muted-foreground">
               Estimated recipients with push enabled:{" "}
               <span className="font-mono font-semibold tabular-nums text-foreground">
                 {preview.count}
               </span>
+              {previewStale && (
+                <span className="ml-2 text-[var(--console-action)]">
+                  — estimate outdated, preview again
+                </span>
+              )}
             </p>
           )}
-          {preview.error && (
+          {!previewDismissed && preview.error && (
             <p className="text-sm text-destructive">{preview.error}</p>
           )}
 
@@ -156,8 +240,13 @@ export function Compose({ prefillUid }: { prefillUid?: string }) {
           )}
 
           <div className="flex gap-2">
-            <Button type="submit" variant="outline" formAction={previewDispatch}>
-              Preview audience
+            <Button
+              type="submit"
+              variant="outline"
+              formAction={previewDispatch}
+              disabled={previewPending}
+            >
+              {previewPending ? "Counting…" : "Preview audience"}
             </Button>
             <SendButton />
           </div>
