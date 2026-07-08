@@ -66,7 +66,7 @@ export async function resetLeaderboardAction(
       },
     });
 
-    revalidatePath("/console/leaderboard");
+    revalidatePath("/console/trapman/leaderboard");
     return {
       ok: true,
       summary: {
@@ -111,7 +111,7 @@ export async function removeEntryAction(
       target: uid,
       metadata: { displayName },
     });
-    revalidatePath("/console/leaderboard");
+    revalidatePath("/console/trapman/leaderboard");
     return { ok: true };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Remove failed." };

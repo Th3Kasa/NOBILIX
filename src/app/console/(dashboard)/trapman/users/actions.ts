@@ -44,8 +44,8 @@ export async function updateUserAction(
       target: uid,
       metadata: patch,
     });
-    revalidatePath(`/console/users/${uid}`);
-    revalidatePath("/console/users");
+    revalidatePath(`/console/trapman/users/${uid}`);
+    revalidatePath("/console/trapman/users");
     return { ok: true };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Update failed." };
@@ -91,7 +91,7 @@ export async function deleteUserAction(
         ...result,
       },
     });
-    revalidatePath("/console/users");
+    revalidatePath("/console/trapman/users");
     return { ok: true };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Deletion failed." };

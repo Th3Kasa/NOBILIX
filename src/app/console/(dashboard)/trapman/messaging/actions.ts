@@ -97,7 +97,7 @@ export async function sendCampaignAction(
         failure: result.failureCount,
       },
     });
-    revalidatePath("/console/messaging");
+    revalidatePath("/console/trapman/messaging");
     return {
       ok: true,
       summary: {
