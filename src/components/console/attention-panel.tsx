@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { AlertTriangle, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -6,6 +7,8 @@ interface AttentionItem {
   label: string;
   description?: string;
   severity?: "warning" | "info";
+  /** Console section this item relates to, when navigating there helps. */
+  href?: string;
 }
 
 interface AttentionPanelProps {
@@ -54,7 +57,16 @@ export function AttentionPanel({ items, className }: AttentionPanelProps) {
               />
             )}
             <div>
-              <span className="font-medium text-foreground">{item.label}</span>
+              {item.href ? (
+                <Link
+                  href={item.href}
+                  className="font-medium text-foreground underline-offset-2 hover:underline focus-visible:underline"
+                >
+                  {item.label}
+                </Link>
+              ) : (
+                <span className="font-medium text-foreground">{item.label}</span>
+              )}
               {item.description && (
                 <p className="text-xs text-muted-foreground">
                   {item.description}

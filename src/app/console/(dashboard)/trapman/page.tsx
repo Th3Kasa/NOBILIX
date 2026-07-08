@@ -17,6 +17,7 @@ import { PageHeader } from "@/components/page-header";
 import { StatCard } from "@/components/stat-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LiveStatus } from "@/components/console/live-status";
+import { AttentionPanel } from "@/components/console/attention-panel";
 import { getAdminById } from "@/lib/admins";
 import { getTrapManOverview, type TrapManOverview } from "@/lib/trapman/overview";
 import { getLiveMetrics, type LiveMetrics } from "./live-metrics";
@@ -25,6 +26,7 @@ import { getAudRates, convertToAud, formatAud, formatOriginal, type FxRates } fr
 import { getOverviewWidget, resolveOverviewLayout } from "./overview-widgets";
 import { CustomizeOverview } from "./customize-overview";
 import { ActivityChart } from "./activity-chart";
+import { getAttentionItems } from "./attention";
 
 export const dynamic = "force-dynamic";
 
@@ -106,6 +108,8 @@ export default async function TrapManOverviewPage() {
     session.status === "fulfilled" ? session.value?.user?.id : undefined;
   const admin = adminId ? await getAdminById(adminId).catch(() => null) : null;
   const { order, hidden } = resolveOverviewLayout(admin?.overviewPrefs);
+
+  const attentionItems = await getAttentionItems(m, ga4, fx);
 
   // Store revenue (embedded receipts, mixed currencies) converted to AUD.
   let storeRevenueAud: number | null = null;
@@ -383,6 +387,8 @@ export default async function TrapManOverviewPage() {
           <LiveStatus connected={m.connected} />
         </div>
       </div>
+
+      <AttentionPanel items={attentionItems} className="mb-6" />
 
       {/* Connection warning — always shown when disconnected, not a widget. */}
       {!m.connected && (
