@@ -44,7 +44,10 @@ export async function LeaderboardPreview() {
                   <tr key={entry.uid} className="leaderboard-row" data-top={rank <= 3 || undefined}>
                     <td className="leaderboard-rank">
                       {rank <= 3 ? (
-                        <span className="tm-leaderboard-medal" aria-hidden="true">{MEDALS[rank - 1]}</span>
+                        <>
+                          <span className="tm-leaderboard-medal" aria-hidden="true">{MEDALS[rank - 1]}</span>
+                          <span className="sr-only">{`Rank ${rank}`}</span>
+                        </>
                       ) : (
                         <span className="pixel-type">{rank}</span>
                       )}
