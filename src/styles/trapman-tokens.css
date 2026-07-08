@@ -1,22 +1,12 @@
-/* TrapMan design tokens — shared between the marketing site (.trapman-site,
-   loaded via (public)/trapman/layout.tsx) and the player account dashboard
-   (.player-account-shell, loaded via (player)/trapman/account/layout.tsx).
-   These two route groups don't share a layout, so the tokens live in their
-   own stylesheet imported by both — the marketing page then layers its own
-   trapman.css on top, and the player dashboard layers account.css. Without
-   this, only .trapman-site ever saw --tm-* and the player dashboard rendered
-   with every var() resolving to nothing. */
-.trapman-site,
-.player-account-shell {
-  --tm-black: #030207;
-  --tm-violet: #8c27ff;
-  --tm-magenta: #f144ff;
+/* TrapMan design tokens, scoped to the legal-pages-only surface. The
+   marketing site and player account dashboard have been removed; the
+   surviving consumer is src/app/(public)/trapman/trapman.css, which styles
+   the shared legal shell (privacy policy, terms of use, data compliance). */
+.trapman-site {
   --tm-cyan: #39e9ff;
-  --tm-yellow: #ffd436;
 
-  /* Calmer glow variant — for account/support/legal sections nested inside
-     the otherwise-loud TrapMan page, where full neon saturation would hurt
-     legibility of utility content and legal-adjacent CTAs. */
+  /* Calmer glow variant — used throughout the legal shell, where full neon
+     saturation would hurt legibility of legal-adjacent content. */
   --tm-calm-ink: #d7f6ff;
   --tm-calm-border: rgb(57 233 255 / .16);
   --tm-calm-glow: 0 0 1px rgb(57 233 255 / .3), 0 0 1.2rem rgb(57 233 255 / .08);
