@@ -78,7 +78,7 @@ export default async function LeaderboardPage() {
                     <th scope="col" className="px-3 py-3 hidden sm:table-cell">Country</th>
                     <th scope="col" className="px-3 py-3 hidden md:table-cell">Character</th>
                     <th scope="col" className="px-3 py-3 text-right">Score</th>
-                    {canWrite && <th scope="col" className="px-3 py-3 w-10" />}
+                    {canWrite && <th scope="col" className="px-3 py-3 w-14" />}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/50">

@@ -40,20 +40,34 @@ function ResetSubmitButton() {
 export function ResetCompetitionModal() {
   const [open, setOpen] = useState(false);
   const [confirm, setConfirm] = useState("");
+  const [summary, setSummary] = useState<ResetState["summary"] | null>(null);
   const router = useRouter();
 
   const [state, formAction] = useActionState<ResetState, FormData>(
     async (prev, fd) => {
       const res = await resetLeaderboardAction(prev, fd);
       if (res.ok) {
-        setOpen(false);
-        setConfirm("");
+        // Keep the modal open so the computed summary (archived count,
+        // winners) is actually seen — the modal only closes once the admin
+        // dismisses it via the "Done" button below.
+        setSummary(res.summary ?? null);
         router.refresh();
       }
       return res;
     },
     {},
   );
+
+  function handleOpen() {
+    setSummary(null);
+    setOpen(true);
+  }
+
+  function handleClose() {
+    setOpen(false);
+    setConfirm("");
+    setSummary(null);
+  }
 
   const PERIOD_OPTIONS = [
     { value: "daily", label: "Daily" },
@@ -66,14 +80,34 @@ export function ResetCompetitionModal() {
     <>
       <Button
         variant="destructive"
-        onClick={() => setOpen(true)}
+        onClick={handleOpen}
         className="gap-2"
       >
         <RotateCcw className="size-4" />
         Reset competition
       </Button>
 
-      <Modal open={open} onClose={() => setOpen(false)} title="Reset competition leaderboard">
+      <Modal open={open} onClose={handleClose} title="Reset competition leaderboard">
+        {summary ? (
+          <div className="space-y-4">
+            <div className="flex items-start gap-3 rounded-md border border-[var(--console-live-border)] bg-[var(--console-live-tint)] p-3 text-sm">
+              <Trophy className="mt-0.5 size-4 shrink-0 text-[var(--console-live)]" />
+              <div>
+                <p className="font-medium text-foreground">
+                  &ldquo;{summary.label}&rdquo; archived.
+                </p>
+                <p className="mt-0.5 text-muted-foreground">
+                  {summary.totalEntries} entr{summary.totalEntries === 1 ? "y" : "ies"} archived,{" "}
+                  {summary.winnersCount} winner{summary.winnersCount === 1 ? "" : "s"} recorded.
+                  The leaderboard is now empty for the next competition.
+                </p>
+              </div>
+            </div>
+            <Button type="button" onClick={handleClose} className="w-full">
+              Done
+            </Button>
+          </div>
+        ) : (
         <div className="space-y-4">
           <div className="flex items-start gap-3 rounded-md border border-[var(--console-action-border)] bg-[var(--console-action-tint)] p-3 text-sm text-[var(--console-action)]">
             <AlertTriangle className="mt-0.5 size-4 shrink-0" />
@@ -149,7 +183,7 @@ export function ResetCompetitionModal() {
               <Button
                 type="button"
                 variant="ghost"
-                onClick={() => setOpen(false)}
+                onClick={handleClose}
                 className="flex-1"
               >
                 Cancel
@@ -160,6 +194,7 @@ export function ResetCompetitionModal() {
             </div>
           </form>
         </div>
+        )}
       </Modal>
     </>
   );
@@ -194,10 +229,11 @@ export function RemoveEntryButton({
       <button
         type="button"
         onClick={() => setOpen(true)}
+        aria-label={`Remove ${displayName ?? uid} from leaderboard`}
         title="Remove from leaderboard"
-        className="rounded p-1 text-muted-foreground opacity-0 transition hover:text-destructive group-hover:opacity-100"
+        className="inline-flex size-11 shrink-0 items-center justify-center rounded text-muted-foreground transition hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
-        <Trash2 className="size-3.5" />
+        <Trash2 className="size-4" aria-hidden="true" />
       </button>
 
       <Modal
