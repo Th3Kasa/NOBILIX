@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
 
 const root = resolve(import.meta.dirname, "..");
@@ -31,16 +31,32 @@ test("console modules expose consistent page headers", () => {
 test("shared console components carry redesigned operational classes", () => {
   const components = [
     ["src/components/console/project-tile.tsx", /console-project-tile/],
-    ["src/components/console/metric-panel.tsx", /console-metric-panel/],
     ["src/components/console/live-status.tsx", /console-live-status/],
     ["src/components/console/attention-panel.tsx", /console-attention-panel/],
     ["src/components/stat-card.tsx", /console-stat-card/],
-    ["src/components/section-placeholder.tsx", /console-empty-state/],
   ];
 
   for (const [path, pattern] of components) {
     assert.match(read(path), pattern, `${path} missing redesigned class`);
   }
+});
+
+test("dead console components stay deleted", () => {
+  // metric-panel.tsx, nav/sidebar.tsx, and section-placeholder.tsx were
+  // verified unimported anywhere in src/ and removed, along with the
+  // orphaned .console-metric-panel CSS that only styled metric-panel.tsx.
+  for (const path of [
+    "src/components/console/metric-panel.tsx",
+    "src/components/nav/sidebar.tsx",
+    "src/components/section-placeholder.tsx",
+  ]) {
+    assert.equal(existsSync(resolve(root, path)), false, `${path} should stay deleted`);
+  }
+  assert.doesNotMatch(
+    read("src/app/globals.css"),
+    /\.console-metric-panel/,
+    "orphaned .console-metric-panel CSS should be removed",
+  );
 });
 
 test("data module pages preserve honest empty and unavailable states", () => {

@@ -348,16 +348,6 @@
   backdrop-filter: blur(14px);
 }
 
-/* Console metric panel dark glass */
-.console-metric-panel {
-  background: color-mix(in oklch, var(--console-panel) 90%, transparent) !important;
-  border-color: var(--console-line) !important;
-  backdrop-filter: blur(8px);
-}
-.console-metric-panel:hover {
-  border-color: color-mix(in oklch, var(--neon-violet) 40%, var(--console-line)) !important;
-}
-
 /* Console auth surface */
 .console-auth-shell {
   background: var(--console-bg);
