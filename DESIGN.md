@@ -57,8 +57,13 @@ subtle CRT scanline (reduced-motion safe), perspective grid mesh. Cards are neve
 
 | Tier | Surfaces | Rules |
 |---|---|---|
-| **Expressive** | `/`, `/trapman`, `/legal/*` heroes and section reveals | Entrances/scroll reveals up to ~700ms; ease-out only; stagger 30–80ms; parallax and SVG path draws allowed |
-| **Strict** | `/console/*`, `/trapman/account/*`, all controls everywhere | <300ms; feedback 100–160ms; dropdowns/dialogs 150–250ms; no decorative loops; no page-load choreography |
+| **Expressive** | `/`, `/legal/*` heroes and section reveals | Entrances/scroll reveals up to ~700ms; ease-out only; stagger 30–80ms; parallax and SVG path draws allowed |
+| **Strict** | `/console/*`, TrapMan's legal pages (`/trapman/privacy-policy`, `/trapman/terms-of-use`, `/trapman/data-compliance`), all controls everywhere | <300ms; feedback 100–160ms; dropdowns/dialogs 150–250ms; no decorative loops; no page-load choreography |
+
+> **2026-07 scope change**: the TrapMan marketing page and player account dashboard (and their
+> bespoke neon components) have been removed. TrapMan's only remaining public surface is its
+> three legal pages, styled with the calmer `--tm-calm-*` tokens documented in
+> `src/app/(public)/trapman/trapman.css` — see PRODUCT.md for the product-side rationale.
 
 Both tiers: animate **only `transform` and `opacity`**; never `ease-in`; no bounce/elastic;
 never `scale(0)` entrances (start ≥0.95); popovers origin-aware, modals center-origin;

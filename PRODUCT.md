@@ -4,29 +4,31 @@
 
 brand
 
-> Split-register project: the public surfaces (`/`, `/trapman`, `/legal/*`) are **brand**;
-> the admin console (`/console/*`) and player account (`/trapman/account`) are **product**.
-> Commands targeting console/account files must load the product register.
+> Split-register project: the public surfaces (`/`, `/legal/*`, `/trapman/{privacy-policy,
+> terms-of-use,data-compliance}`) are **brand**; the admin console (`/console/*`) is **product**.
+> Commands targeting console files must load the product register.
+>
+> **2026-07 scope change**: the TrapMan marketing landing page and the player self-service
+> account (login, dashboard, data export/deletion) have been removed. TrapMan's only public
+> surface now is its three legal pages, kept because they're linked from app stores and are a
+> legal requirement. Account/data-rights requests route to help.nobilix@outlook.com instead.
+> The admin console is unaffected and still manages the live game.
 
 ## Users
 
-- **TrapMan players** — mobile gamers arriving from the game or a store listing. They come to
-  feel the game's world, check the leaderboard, manage their account (data export, deletion),
-  or read legal terms. Casual context, often on a phone.
+- **Reviewers** — app-store and privacy reviewers verifying that the site's legal disclosures
+  (privacy, data compliance, account deletion) match reality. Accuracy is non-negotiable.
 - **Nobilix admins** — a small internal team operating the console: monitoring players,
   purchases, and analytics, sending push campaigns, managing the leaderboard. Non-technical
   operators; plain language over jargon.
-- **Reviewers** — app-store and privacy reviewers verifying that the site's legal disclosures
-  (privacy, data compliance, account deletion) match reality. Accuracy is non-negotiable.
 
 ## Product Purpose
 
 Nobilix Pty Ltd (NSW, Australia) is an independent technology studio. This site is its public
-face and operations hub: a calm studio homepage, the loud neon marketing site for TrapMan
-(a live neon pixel-art city-chase mobile game), self-service player accounts built around
-privacy compliance, and the internal admin console. Success = visitors feel the game's world
-and can get the game; players can serve themselves; admins can operate without confusion;
-reviewers find every promise true.
+face and operations hub: a calm studio homepage, TrapMan's legal disclosures (a live neon
+pixel-art city-chase mobile game, no longer marketed from this site), and the internal admin
+console. Success = the studio homepage represents Nobilix honestly; reviewers find every legal
+promise true; admins can operate the game without confusion.
 
 ## Brand Personality
 
