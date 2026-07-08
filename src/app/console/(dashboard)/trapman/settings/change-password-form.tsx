@@ -52,10 +52,10 @@ export function ChangePasswordForm() {
           name="newPassword"
           type="password"
           autoComplete="new-password"
-          minLength={8}
+          minLength={12}
           required
         />
-        <p className="text-xs text-muted-foreground">At least 8 characters.</p>
+        <p className="text-xs text-muted-foreground">At least 12 characters.</p>
       </div>
 
       <div className="space-y-1.5">
