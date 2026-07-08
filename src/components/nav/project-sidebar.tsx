@@ -20,7 +20,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { ConsoleModule } from "@/types/projects";
 
-const MODULE_META: Record<
+export const MODULE_META: Record<
   ConsoleModule,
   { label: string; icon: React.ComponentType<{ className?: string }> }
 > = {

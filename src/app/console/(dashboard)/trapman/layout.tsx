@@ -1,21 +1,7 @@
 import { getProject } from "@/config/projects";
 import { ConsoleMobileNav } from "@/components/nav/console-mobile-nav";
-import { ProjectSidebar } from "@/components/nav/project-sidebar";
+import { ProjectSidebar, MODULE_META } from "@/components/nav/project-sidebar";
 import { AutoRefresh } from "@/components/console/auto-refresh";
-
-const moduleLabels: Record<string, string> = {
-  overview: "Overview",
-  users: "Players",
-  leaderboard: "Leaderboard",
-  messaging: "Messaging",
-  analytics: "Analytics",
-  purchases: "Purchases",
-  gameplay: "Gameplay",
-  ads: "Ads",
-  exports: "Exports",
-  audit: "Audit",
-  settings: "Settings",
-};
 
 export default function TrapManLayout({
   children,
@@ -23,11 +9,14 @@ export default function TrapManLayout({
   children: React.ReactNode;
 }) {
   const project = getProject("trapman");
-  const projectNavigationItems = project.consoleModules.map((module) => ({
-    href: module === "overview" ? "/console/trapman" : `/console/trapman/${module}`,
-    label: moduleLabels[module],
-    description: `${project.name} ${moduleLabels[module]}`,
-  }));
+  const projectNavigationItems = project.consoleModules.map((module) => {
+    const label = MODULE_META[module]?.label ?? module;
+    return {
+      href: module === "overview" ? "/console/trapman" : `/console/trapman/${module}`,
+      label,
+      description: `${project.name} ${label}`,
+    };
+  });
 
   return (
     <div className="console-shell flex min-h-dvh">
