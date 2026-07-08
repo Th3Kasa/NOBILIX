@@ -9,8 +9,8 @@ import { PageHeader } from "@/components/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
-import { countryFlag, formatNumber } from "@/lib/utils";
-import { listPlayers } from "./data";
+import { countryFlag, formatNumber, cn } from "@/lib/utils";
+import { listPlayers, type SortField } from "./data";
 import { UsersFilter } from "./users-filter";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +20,16 @@ type SP = {
   country?: string;
   guest?: string;
   offset?: string;
+  sort?: string;
 };
+
+const COLUMNS: { field: SortField; label: string }[] = [
+  { field: "name", label: "Player" },
+  { field: "country", label: "Country" },
+  { field: "level", label: "Level" },
+  { field: "levelsDone", label: "Levels done" },
+  { field: "purchases", label: "Purchases" },
+];
 
 export default async function UsersPage({
   searchParams,
@@ -41,15 +50,31 @@ export default async function UsersPage({
     country,
     guest,
     offset,
+    sort: sp.sort,
   });
 
-  const buildHref = (nextOffset: number) => {
+  const buildHref = (overrides: { offset?: number; sort?: string }) => {
     const p = new URLSearchParams();
     if (sp.q) p.set("q", sp.q);
     if (sp.country) p.set("country", sp.country);
     if (sp.guest) p.set("guest", sp.guest);
-    p.set("offset", String(nextOffset));
+    const sort = overrides.sort ?? sp.sort;
+    if (sort) p.set("sort", sort);
+    p.set("offset", String(overrides.offset ?? 0));
     return `/console/trapman/users?${p.toString()}`;
+  };
+
+  const sortHref = (field: SortField) => {
+    const isActive = result.sortField === field;
+    const nextSort =
+      isActive && result.sortDirection === "asc" ? `-${field}` : field;
+    // Changing sort re-ranks the whole matching set, so restart paging.
+    return buildHref({ offset: 0, sort: nextSort });
+  };
+
+  const ariaSortFor = (field: SortField): "ascending" | "descending" | "none" => {
+    if (result.sortField !== field) return "none";
+    return result.sortDirection === "asc" ? "ascending" : "descending";
   };
 
   return (
@@ -86,14 +111,32 @@ export default async function UsersPage({
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border text-left font-mono text-xs uppercase tracking-wide text-muted-foreground">
-                    <th className="px-4 py-3 font-medium">Player</th>
-                    <th className="px-4 py-3 font-medium">Country</th>
-                    <th className="px-4 py-3 font-medium">Level</th>
-                    <th className="px-4 py-3 font-medium">Levels done</th>
-                    <th className="px-4 py-3 font-medium">Purchases</th>
-                    <th className="px-4 py-3 font-medium">Push</th>
-                    <th className="px-4 py-3 font-medium">Type</th>
-                    <th className="px-4 py-3" />
+                    {COLUMNS.map((col) => (
+                      <th
+                        key={col.field}
+                        scope="col"
+                        className="px-4 py-3 font-medium"
+                        aria-sort={ariaSortFor(col.field)}
+                      >
+                        <Link
+                          href={sortHref(col.field)}
+                          className={cn(
+                            "inline-flex min-h-11 items-center gap-1 hover:text-foreground focus-visible:text-foreground",
+                            result.sortField === col.field && "text-foreground",
+                          )}
+                        >
+                          {col.label}
+                          {result.sortField === col.field && (
+                            <span aria-hidden="true">
+                              {result.sortDirection === "asc" ? "↑" : "↓"}
+                            </span>
+                          )}
+                        </Link>
+                      </th>
+                    ))}
+                    <th scope="col" className="px-4 py-3 font-medium">Push</th>
+                    <th scope="col" className="px-4 py-3 font-medium">Type</th>
+                    <th scope="col" className="px-4 py-3" />
                   </tr>
                 </thead>
                 <tbody>
@@ -177,13 +220,15 @@ export default async function UsersPage({
 
       <div className="mt-4 flex items-center justify-between gap-4">
         <p className="text-xs text-muted-foreground">
-          Showing {result.players.length === 0 ? 0 : offset + 1}–
-          {offset + result.players.length} of {result.totalMatching} matching
+          Showing {result.players.length} of {result.totalMatching} matching
           player{result.totalMatching === 1 ? "" : "s"}
+          {result.scanCapped
+            ? ` (of the first ${formatNumber(result.sampleCap)} scanned players)`
+            : ""}
         </p>
         {result.nextOffset != null && (
           <Link
-            href={buildHref(result.nextOffset)}
+            href={buildHref({ offset: result.nextOffset })}
             className={buttonVariants({ variant: "outline" })}
           >
             Load more

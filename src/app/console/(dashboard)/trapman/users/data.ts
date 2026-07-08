@@ -29,12 +29,24 @@ export interface PlayerRow {
   pushReachable: boolean;
 }
 
+/** Sortable columns, matching the visible table headers. */
+export const SORTABLE_FIELDS = [
+  "name",
+  "country",
+  "level",
+  "levelsDone",
+  "purchases",
+] as const;
+export type SortField = (typeof SORTABLE_FIELDS)[number];
+
 export interface ListPlayersParams {
   search?: string;
   country?: string;
   guest?: "all" | "guest" | "registered";
   limit?: number;
   offset?: number;
+  /** Column to sort by, ascending unless prefixed with "-". Defaults to name. */
+  sort?: string;
 }
 
 export interface ListPlayersResult {
@@ -42,7 +54,46 @@ export interface ListPlayersResult {
   totalMatching: number;
   nextOffset: number | null;
   connected: boolean;
+  /** True when the raw scan hit MAX_SAMPLE — totalMatching may undercount
+   *  the real player base, and the UI should say so honestly. */
+  scanCapped: boolean;
+  sampleCap: number;
+  sortField: SortField;
+  sortDirection: "asc" | "desc";
   error?: string;
+}
+
+function parseSort(raw: string | undefined): { field: SortField; direction: "asc" | "desc" } {
+  const desc = raw?.startsWith("-") ?? false;
+  const field = (desc ? raw?.slice(1) : raw) as SortField | undefined;
+  return {
+    field: field && (SORTABLE_FIELDS as readonly string[]).includes(field) ? field : "name",
+    direction: desc ? "desc" : "asc",
+  };
+}
+
+function compareBy(field: SortField, a: PlayerRow, b: PlayerRow): number {
+  switch (field) {
+    case "country": {
+      if (a.country && b.country) return a.country.localeCompare(b.country);
+      if (a.country) return -1;
+      if (b.country) return 1;
+      return 0;
+    }
+    case "level":
+      return (a.currentLevel ?? -1) - (b.currentLevel ?? -1);
+    case "levelsDone":
+      return (a.completedLevels ?? -1) - (b.completedLevels ?? -1);
+    case "purchases":
+      return a.purchaseCount - b.purchaseCount;
+    case "name":
+    default: {
+      if (a.username && b.username) return a.username.localeCompare(b.username);
+      if (a.username) return -1;
+      if (b.username) return 1;
+      return a.uid.localeCompare(b.uid);
+    }
+  }
 }
 
 function countParsablePurchases(value: unknown): number {
@@ -121,6 +172,7 @@ export async function listPlayers(
   params: ListPlayersParams = {},
 ): Promise<ListPlayersResult> {
   const { search, country, guest = "all", limit = 50, offset = 0 } = params;
+  const { field: sortField, direction: sortDirection } = parseSort(params.sort);
   const scan = await getPlayerScan();
   if (!scan.connected) {
     return {
@@ -128,34 +180,49 @@ export async function listPlayers(
       totalMatching: 0,
       nextOffset: null,
       connected: false,
+      scanCapped: false,
+      sampleCap: MAX_SAMPLE,
+      sortField,
+      sortDirection,
       error: scan.error,
     };
   }
+  const scanCapped = scan.players.length >= MAX_SAMPLE;
   let players = [...scan.players];
 
   if (search?.trim()) {
-      const needle = search.trim().toLowerCase();
-      players = needle.includes("@")
-        ? players.filter((p) => p.email?.toLowerCase() === needle)
-        : players.filter((p) => p.username?.toLowerCase().startsWith(needle));
-    }
-    if (country?.trim()) {
-      const code = country.trim().toUpperCase();
-      players = players.filter((p) => p.country === code);
-    }
-    if (guest === "guest") players = players.filter((p) => p.isGuest);
-    if (guest === "registered") players = players.filter((p) => !p.isGuest);
+    const needle = search.trim().toLowerCase();
+    players = needle.includes("@")
+      ? players.filter((p) => p.email?.toLowerCase() === needle)
+      : players.filter((p) => p.username?.toLowerCase().startsWith(needle));
+  }
+  if (country?.trim()) {
+    const code = country.trim().toUpperCase();
+    players = players.filter((p) => p.country === code);
+  }
+  if (guest === "guest") players = players.filter((p) => p.isGuest);
+  if (guest === "registered") players = players.filter((p) => !p.isGuest);
 
-    players.sort((a, b) => {
-      if (a.username && b.username) return a.username.localeCompare(b.username);
-      if (a.username) return -1;
-      if (b.username) return 1;
-      return a.uid.localeCompare(b.uid);
-    });
+  players.sort((a, b) => {
+    const cmp = compareBy(sortField, a, b);
+    return sortDirection === "desc" ? -cmp : cmp;
+  });
 
   const totalMatching = players.length;
-  const page = players.slice(offset, offset + limit);
+  // Accumulating window (0..offset+limit), not a fixed [offset, offset+limit)
+  // slice — "Load more" appends the next page instead of replacing the rows
+  // already on screen.
+  const page = players.slice(0, offset + limit);
   const nextOffset = offset + limit < totalMatching ? offset + limit : null;
 
-  return { players: page, totalMatching, nextOffset, connected: true };
+  return {
+    players: page,
+    totalMatching,
+    nextOffset,
+    connected: true,
+    scanCapped,
+    sampleCap: MAX_SAMPLE,
+    sortField,
+    sortDirection,
+  };
 }
