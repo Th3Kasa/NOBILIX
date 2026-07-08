@@ -1788,6 +1788,26 @@
   z-index: 1;
 }
 
+/* ─── Loading skeletons ───────────────────────────────────────────────
+   Opacity-pulse only (no transform, no layout shift) per DESIGN.md's
+   strict console motion budget — reduced-motion just goes static instead
+   of stopping at zero, same convention as .player-account-skeleton. */
+.console-shell .console-skeleton {
+  border-radius: 0.5rem;
+  background: color-mix(in oklch, var(--console-violet) 14%, transparent);
+  animation: console-skeleton-pulse 1.4s ease-in-out infinite alternate;
+}
+@keyframes console-skeleton-pulse {
+  from { opacity: 0.4; }
+  to { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .console-shell .console-skeleton {
+    animation: none;
+    opacity: 0.7;
+  }
+}
+
 /* ─── Auth shell: secure sign-in vault framing ───────────────────────── */
 .console-auth-shell {
   position: relative;
