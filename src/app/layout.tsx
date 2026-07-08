@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Press_Start_2P, Fraunces } from "next/font/google";
 import { MotionProvider } from "@/components/motion/motion-provider";
+import { SITE_URL } from "@/lib/env";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -26,7 +27,7 @@ const fraunces = Fraunces({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://nobilix.vercel.app"),
+  metadataBase: new URL(SITE_URL),
   title: { default: "Nobilix", template: "%s · Nobilix" },
   description: "Nobilix builds distinctive games and digital products.",
 };

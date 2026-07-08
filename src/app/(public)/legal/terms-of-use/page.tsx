@@ -8,7 +8,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/legal/terms-of-use" },
 };
 
-const LAST_UPDATED = "2026-07-06";
+// Exported so sitemap.ts can use the real content date instead of "now".
+export const LAST_UPDATED = "2026-07-06";
 
 export default function NobilixTermsOfUsePage() {
   return (
@@ -26,7 +27,7 @@ export default function NobilixTermsOfUsePage() {
           do not agree to these Terms, do not access or use the Services.
         </p>
         <p>
-          These Terms apply to nobilix.com, the Nobilix developer console, and
+          These Terms apply to nobilix.vercel.app, the Nobilix developer console, and
           any other digital properties operated by Nobilix Pty Ltd. The TrapMan
           mobile game is governed by the separate{" "}
           <a href="/trapman/terms-of-use">TrapMan Terms of Use</a>.
@@ -46,7 +47,7 @@ export default function NobilixTermsOfUsePage() {
       <section id="permitted-use">
         <h2>Permitted Use</h2>
         <p>
-          You may access and browse nobilix.com for lawful personal or
+          You may access and browse nobilix.vercel.app for lawful personal or
           informational purposes. You must not:
         </p>
         <ul>
@@ -60,7 +61,7 @@ export default function NobilixTermsOfUsePage() {
           </li>
           <li>
             Use automated tools (scrapers, bots, crawlers) to extract content
-            from nobilix.com without our prior written consent
+            from nobilix.vercel.app without our prior written consent
           </li>
           <li>
             Reproduce, distribute, or create derivative works from Nobilix
@@ -93,7 +94,7 @@ export default function NobilixTermsOfUsePage() {
       <section id="intellectual-property">
         <h2>Intellectual Property</h2>
         <p>
-          All content on nobilix.com, including but not limited to text,
+          All content on nobilix.vercel.app, including but not limited to text,
           graphics, logos, images, video, music, software, and the overall
           appearance and layout of the website, is owned by or licensed to
           Nobilix Pty Ltd and is protected by Australian and international

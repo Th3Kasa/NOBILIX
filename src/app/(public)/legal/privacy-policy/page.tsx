@@ -8,7 +8,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/legal/privacy-policy" },
 };
 
-const LAST_UPDATED = "2026-07-06";
+// Exported so sitemap.ts can use the real content date instead of "now".
+export const LAST_UPDATED = "2026-07-06";
 
 export default function NobilixPrivacyPolicyPage() {
   return (
@@ -23,7 +24,7 @@ export default function NobilixPrivacyPolicyPage() {
           Nobilix Pty Ltd (ABN pending) (<strong>“Nobilix”</strong>,{" "}
           <strong>“we”</strong>, <strong>“us”</strong>, <strong>“our”</strong>)
           is an independent technology studio incorporated in New South Wales,
-          Australia. We operate the nobilix.com website, the TrapMan mobile
+          Australia. We operate the nobilix.vercel.app website, the TrapMan mobile
           game, and associated developer tools.
         </p>
         <p>
@@ -47,7 +48,7 @@ export default function NobilixPrivacyPolicyPage() {
         </p>
         <h3>Website visitors</h3>
         <p>
-          When you browse nobilix.com, no personally identifiable information
+          When you browse nobilix.vercel.app, no personally identifiable information
           is collected beyond standard server logs (IP address, browser type,
           page visited, timestamp). Server logs are retained for up to 90 days
           for security and debugging purposes and are not used for marketing.
@@ -97,7 +98,7 @@ export default function NobilixPrivacyPolicyPage() {
         </ul>
         <p>
           We do not sell, rent, or trade personal information with third
-          parties. We do not use personal information collected on nobilix.com
+          parties. We do not use personal information collected on nobilix.vercel.app
           for targeted advertising.
         </p>
       </section>
@@ -217,7 +218,7 @@ export default function NobilixPrivacyPolicyPage() {
       <section id="cookies">
         <h2>Cookies and Tracking</h2>
         <p>
-          The nobilix.com website uses only technically necessary cookies
+          The nobilix.vercel.app website uses only technically necessary cookies
           required for the website to function (for example, session state for
           authenticated users). We do not use tracking cookies, advertising
           cookies, or third-party analytics that identify individual visitors on
@@ -228,7 +229,7 @@ export default function NobilixPrivacyPolicyPage() {
       <section id="children">
         <h2>Children&apos;s Privacy</h2>
         <p>
-          The nobilix.com website and developer console are intended for adults
+          The nobilix.vercel.app website and developer console are intended for adults
           and verified Nobilix staff only. We do not knowingly collect personal
           information from children under 13 on this website.
         </p>

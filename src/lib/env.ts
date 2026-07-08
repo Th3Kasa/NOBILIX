@@ -95,3 +95,15 @@ export const env: Env = new Proxy({} as Env, {
     return loadEnv()[prop as keyof Env];
   },
 });
+
+/**
+ * Canonical site origin (no trailing slash), single source of truth for
+ * metadata, the sitemap, and robots.txt. Read directly from `process.env`
+ * rather than through the `env` Proxy above: this value is needed by public,
+ * unauthenticated routes (root layout, sitemap, robots) and must not force
+ * the full secret-bearing schema (AUTH_SECRET, Firebase credentials, etc.) to
+ * validate just to render a public page.
+ */
+export const SITE_URL = (
+  process.env.NEXT_PUBLIC_SITE_URL || "https://nobilix.vercel.app"
+).replace(/\/+$/, "");
