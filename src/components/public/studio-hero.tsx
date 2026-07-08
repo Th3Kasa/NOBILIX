@@ -29,8 +29,8 @@ export function StudioHero() {
             company name.
           </p>
           <div className="studio-hero__actions" aria-label="Primary actions">
-            <Link className="nobilix-button nobilix-button--primary magnetic-hover" href="/#projects">
-              View projects
+            <Link className="nobilix-button nobilix-button--primary magnetic-hover" href="/#contact">
+              Get in touch
             </Link>
           </div>
         </Reveal>

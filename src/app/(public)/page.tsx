@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/motion/reveal";
-import { ProjectShowcase } from "@/components/public/project-showcase";
 import { StudioHero } from "@/components/public/studio-hero";
 import { StudioPrinciples } from "@/components/public/studio-principles";
 
@@ -38,7 +37,6 @@ export default function NobilixHomePage() {
         </Reveal>
       </section>
       <StudioPrinciples />
-      <ProjectShowcase />
       <section
         id="contact"
         className="nobilix-contact-section"

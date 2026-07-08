@@ -10,11 +10,9 @@ test("Nobilix homepage exposes company brand landmarks and generated studio medi
   const page = read("src/app/(public)/page.tsx");
   const hero = read("src/components/public/studio-hero.tsx");
   const principles = read("src/components/public/studio-principles.tsx");
-  const showcase = read("src/components/public/project-showcase.tsx");
 
   assert.match(page, /<StudioHero\s*\/>/);
   assert.match(page, /<StudioPrinciples\s*\/>/);
-  assert.match(page, /<ProjectShowcase\s*\/>/);
   assert.match(hero, /aria-labelledby="company-title"/);
   assert.match(hero, /id="company-title"/);
   assert.match(hero, /studio-hero\.webp/);
@@ -23,9 +21,6 @@ test("Nobilix homepage exposes company brand landmarks and generated studio medi
   assert.match(principles, /id="principles"/);
   assert.match(principles, /aria-labelledby="principles-title"/);
   assert.match(principles, /A studio brand built like/);
-  assert.match(showcase, /id="projects"/);
-  assert.match(showcase, /aria-labelledby="projects-title"/);
-  assert.match(showcase, /project-transition\.webp/);
 });
 
 test("public header offers responsive company navigation", () => {
@@ -34,7 +29,6 @@ test("public header offers responsive company navigation", () => {
   assert.match(header, /MobileNavigation/);
   assert.match(header, /items=\{mobileNavigationItems\}/);
   assert.match(header, /Studio/);
-  assert.match(header, /Projects/);
   assert.match(header, /Company legal/);
   assert.match(header, /aria-label="Nobilix home"/);
 });
@@ -85,20 +79,6 @@ test("Console is only linked from the footer and studio header across every publ
   }
 });
 
-test("portfolio remains scalable without inventing future projects", () => {
-  const projectCard = read("src/components/public/project-card.tsx");
-  const showcase = read("src/components/public/project-showcase.tsx");
-
-  assert.match(projectCard, /ProjectDefinition/);
-  assert.match(projectCard, /project\.status/);
-  assert.match(projectCard, /project\.description/);
-  assert.match(showcase, /PROJECTS\.trapman/);
-  assert.match(showcase, /main project/i);
-  assert.match(showcase, /More are being built/);
-  // No fake placeholder cards — prose may still SAY "placeholders".
-  assert.doesNotMatch(showcase, /coming soon|fake/i);
-});
-
 test("company legal directory separates company and TrapMan legal destinations", () => {
   const legal = read("src/app/(public)/legal/page.tsx");
 
@@ -139,7 +119,6 @@ test("Task 3 component files exist", () => {
   for (const path of [
     "src/components/public/studio-hero.tsx",
     "src/components/public/studio-principles.tsx",
-    "src/components/public/project-showcase.tsx",
   ]) {
     assert.equal(existsSync(resolve(root, path)), true, `${path} must exist`);
   }

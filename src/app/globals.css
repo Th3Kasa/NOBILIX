@@ -539,7 +539,6 @@
 .studio-hero h1,
 .nobilix-studio-section h2,
 .nobilix-contact-section h2,
-.project-showcase h2,
 .section-kicker h2,
 .public-not-found h1,
 .legal-directory h1 {
@@ -557,7 +556,6 @@
 }
 .studio-hero h1 em,
 .nobilix-studio-section h2 em,
-.project-showcase h2 em,
 .section-kicker h2 em {
   font-style: italic;
   color: var(--company-accent);
@@ -570,8 +568,7 @@
   line-height: 1.7;
 }
 .studio-hero__actions,
-.public-not-found__actions,
-.project-card__actions {
+.public-not-found__actions {
   display: flex;
   flex-wrap: wrap;
   gap: .75rem;
@@ -579,7 +576,6 @@
 }
 .nobilix-button,
 .nobilix-text-link,
-.project-card a,
 .legal-directory a,
 .public-not-found a {
   min-height: 44px;
@@ -592,18 +588,15 @@
 }
 .nobilix-button:hover,
 .nobilix-text-link:hover,
-.project-card a:hover,
 .legal-directory a:hover,
 .public-not-found a:hover { transform: translateY(-1px); }
 .nobilix-button--primary,
-.project-card a:first-child,
 .public-not-found a:first-child {
   background: var(--company-accent);
   color: var(--company-accent-contrast);
   padding-inline: 1.25rem;
 }
 .nobilix-button--secondary,
-.project-card a,
 .legal-directory a,
 .public-not-found a {
   border: 1px solid var(--surface-border);
@@ -621,7 +614,6 @@
 }
 .studio-hero__media img,
 .studio-hero__media video,
-.project-showcase__media img,
 .studio-principles__plate img {
   display: block;
   width: 100%;
@@ -646,7 +638,6 @@
 
 /* ─── Shared section rhythm ──────────────────────────────────────── */
 .studio-principles,
-.project-showcase,
 .nobilix-studio-section,
 .nobilix-contact-section,
 .legal-directory,
@@ -661,7 +652,6 @@
 .section-kicker h2,
 .nobilix-studio-section h2,
 .nobilix-contact-section h2,
-.project-showcase h2,
 .legal-directory h1,
 .public-not-found h1 {
   margin-top: .8rem;
@@ -717,7 +707,6 @@
   color: var(--company-hairline);
 }
 .studio-principle p,
-.project-card > p:first-of-type,
 .legal-directory article > p:first-child {
   grid-column: 2;
   font-size: .72rem;
@@ -737,7 +726,6 @@
   color: var(--company-ink);
 }
 .studio-principle__copy,
-.project-showcase p,
 .nobilix-studio-section p,
 .nobilix-contact-section p,
 .legal-directory p,
@@ -753,19 +741,6 @@
 .nobilix-contact-section p,
 .public-not-found p { grid-column: auto; }
 
-/* ─── Project showcase — spotlight the main project ──────────────── */
-.project-showcase {
-  display: grid;
-  grid-template-columns: minmax(16rem, .74fr) minmax(0, 1fr);
-  gap: clamp(2rem, 6vw, 5rem);
-  align-items: center;
-}
-.project-showcase__media {
-  border-radius: var(--radius-editorial);
-  overflow: hidden;
-  border: 1px solid var(--company-hairline);
-}
-.project-showcase__copy { max-width: 50rem; }
 .nobilix-text-link {
   margin-top: 1.25rem;
   color: var(--company-accent);
@@ -804,29 +779,6 @@
   display: grid;
   align-content: center;
 }
-.project-card {
-  margin-top: 2rem;
-  max-width: 42rem;
-  padding: clamp(1.5rem, 4vw, 2.25rem);
-  border: 1px solid var(--company-hairline);
-  border-radius: var(--radius-editorial);
-  background: var(--surface-panel);
-}
-.project-card img {
-  border-radius: var(--radius-editorial);
-  background: var(--surface-muted);
-  padding: .75rem;
-}
-.project-card h3 {
-  margin-top: .8rem;
-  font-family: var(--font-display), serif;
-  font-weight: 500;
-  font-size: clamp(1.8rem, 3.4vw, 2.8rem);
-  line-height: .98;
-  letter-spacing: -.02em;
-  color: var(--company-ink);
-}
-
 /* ─── Contact section — quiet closing spread with the contact plate ── */
 .nobilix-contact-section {
   display: grid;
@@ -980,10 +932,6 @@
     max-width: none;
   }
 
-  .project-showcase { grid-template-columns: 1fr; }
-  /* Put image after copy on mobile */
-  .project-showcase__media { order: 2; }
-
   .nobilix-contact-section { grid-template-columns: 1fr; }
   .nobilix-contact-section__media { order: -1; }
 
@@ -1005,8 +953,7 @@
 @media (min-width: 1440px) {
   .studio-principles,
   .nobilix-studio-section,
-  .nobilix-contact-section,
-  .project-showcase {
+  .nobilix-contact-section {
     max-width: 100rem;
     margin-inline: auto;
   }
@@ -1367,7 +1314,6 @@
 .public-shell .studio-hero h1,
 .public-shell .nobilix-studio-section h2,
 .public-shell .nobilix-contact-section h2,
-.public-shell .project-showcase h2,
 .public-shell .section-kicker h2,
 .public-shell .public-not-found h1,
 .public-shell .legal-directory h1 {
@@ -1375,7 +1321,6 @@
 }
 .public-shell .studio-hero h1 em,
 .public-shell .nobilix-studio-section h2 em,
-.public-shell .project-showcase h2 em,
 .public-shell .section-kicker h2 em {
   color: var(--neon-cyan);
   font-style: normal;
@@ -1388,7 +1333,6 @@
    clear AA (~5:1) without changing the violet used everywhere else
    (buttons, glows, borders). */
 .public-shell .studio-principle p,
-.public-shell .project-card > p:first-of-type,
 .public-shell .legal-directory article > p:first-child,
 .public-shell .nobilix-legal-toc-heading {
   color: color-mix(in oklch, var(--neon-violet) 80%, var(--paper) 20%);
@@ -1396,19 +1340,16 @@
 
 /* Buttons: primary uses violet with glow; secondary is a glass hairline */
 .public-shell .nobilix-button--primary,
-.public-shell .project-card a:first-child,
 .public-shell .public-not-found a:first-child {
   background: var(--neon-violet);
   color: var(--paper);
   box-shadow: var(--glow-violet);
 }
 .public-shell .nobilix-button--primary:hover,
-.public-shell .project-card a:first-child:hover,
 .public-shell .public-not-found a:first-child:hover {
   box-shadow: var(--glow-magenta);
 }
 .public-shell .nobilix-button--secondary,
-.public-shell .project-card a,
 .public-shell .legal-directory a,
 .public-shell .public-not-found a {
   border-color: var(--company-hairline);
@@ -1430,7 +1371,6 @@
 }
 
 /* Plates/panels: glass surface instead of flat white cards */
-.public-shell .project-card,
 .public-shell .legal-directory article,
 .public-shell .nobilix-legal-toc {
   background: color-mix(in oklch, var(--ink-800) 82%, transparent);
@@ -1463,24 +1403,9 @@
 .magnetic-hover:hover {
   transform: translateY(-2px) scale(1.008);
 }
-.public-shell .project-card.magnetic-hover:hover,
 .public-shell .legal-directory article.magnetic-hover:hover {
   border-color: color-mix(in oklch, var(--neon-violet) 45%, var(--company-hairline));
   box-shadow: 0 1.5rem 3rem -1.5rem color-mix(in oklch, var(--neon-violet) 35%, transparent);
-}
-
-/* Project card status dot */
-.project-card__meta {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-}
-.project-card__status-dot {
-  width: 0.4rem;
-  height: 0.4rem;
-  border-radius: 50%;
-  background: var(--status-success);
-  box-shadow: 0 0 6px var(--status-success);
 }
 
 /* Footer telemetry line + column headings */

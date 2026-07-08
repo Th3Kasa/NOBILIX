@@ -3,7 +3,6 @@ import { MobileNavigation } from "@/components/nav/mobile-navigation";
 
 const navigationItems = [
   { href: "/#studio", label: "Studio", description: "Company brand" },
-  { href: "/#projects", label: "Projects", description: "Current portfolio" },
   { href: "/legal", label: "Company legal", description: "Policies and notices" },
 ];
 
