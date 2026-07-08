@@ -73,12 +73,12 @@ export default async function LeaderboardPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-border text-left font-mono text-xs uppercase tracking-wide text-muted-foreground">
-                    <th className="px-5 py-3 w-14">#</th>
-                    <th className="px-3 py-3">Player</th>
-                    <th className="px-3 py-3 hidden sm:table-cell">Country</th>
-                    <th className="px-3 py-3 hidden md:table-cell">Character</th>
-                    <th className="px-3 py-3 text-right">Score</th>
-                    {canWrite && <th className="px-3 py-3 w-10" />}
+                    <th scope="col" className="px-5 py-3 w-14">#</th>
+                    <th scope="col" className="px-3 py-3">Player</th>
+                    <th scope="col" className="px-3 py-3 hidden sm:table-cell">Country</th>
+                    <th scope="col" className="px-3 py-3 hidden md:table-cell">Character</th>
+                    <th scope="col" className="px-3 py-3 text-right">Score</th>
+                    {canWrite && <th scope="col" className="px-3 py-3 w-10" />}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-border/50">
