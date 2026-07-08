@@ -38,7 +38,7 @@ export const COMPLIANCE_SECTIONS = {
 
   deletionRights: {
     heading: "Your Data Deletion Rights",
-    body: `You may delete your TrapMan account at /trapman/delete-account. On deletion:
+    body: `To delete your TrapMan account, contact help.nobilix@outlook.com. On deletion:
 
     - Your user profile (username, email, country, competition data) is deleted from Firestore.
     - Your progress record (player_progress/{uid}) is deleted.

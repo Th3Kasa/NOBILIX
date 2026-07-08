@@ -78,10 +78,10 @@ export const PRIVACY_SECTIONS = {
     heading: "Your Rights",
     intro: "You have the right to:",
     rights: [
-      "Access the personal data we hold about you (via the account portal at /trapman/account)",
-      "Download your data in a portable format (via the export function in your account)",
+      "Access the personal data we hold about you (contact help.nobilix@outlook.com)",
+      "Request a copy of your data in a portable format (contact help.nobilix@outlook.com)",
       "Correct inaccurate data (by updating your profile or contacting support)",
-      "Delete your account and associated personal data (see /trapman/delete-account)",
+      "Delete your account and associated personal data (contact help.nobilix@outlook.com)",
       "Lodge a complaint with a relevant data protection authority",
     ],
     outro: "To exercise any of these rights, contact help.nobilix@outlook.com.",
