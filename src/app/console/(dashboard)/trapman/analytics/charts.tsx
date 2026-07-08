@@ -13,6 +13,7 @@ import {
   YAxis,
 } from "recharts";
 import { countryFlag } from "@/lib/utils";
+import { ChartTooltip } from "@/components/console/chart-tooltip";
 import type { CountrySlice, LevelBucket } from "./data";
 
 const PIE_COLORS = [
@@ -25,29 +26,6 @@ const PIE_COLORS = [
   "#5c7cff",
   "#ff9f5c",
 ];
-
-function ChartTooltip({
-  active,
-  payload,
-  label,
-}: {
-  active?: boolean;
-  label?: string;
-  payload?: { value?: number; name?: string }[];
-}) {
-  if (!active || !payload?.length) return null;
-  return (
-    <div className="console-glass rounded-md border border-border px-3 py-2 font-mono text-xs shadow-lg">
-      {label && <p className="mb-1 text-muted-foreground">{label}</p>}
-      {payload.map((entry, i) => (
-        <p key={i} className="font-semibold tabular-nums text-foreground">
-          {entry.name ? `${entry.name}: ` : ""}
-          {entry.value?.toLocaleString()}
-        </p>
-      ))}
-    </div>
-  );
-}
 
 export function CountryDistributionChart({
   countries,

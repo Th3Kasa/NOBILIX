@@ -68,7 +68,8 @@ test("data module pages preserve honest empty and unavailable states", () => {
   const exports_ = read("src/app/console/(dashboard)/trapman/exports/page.tsx");
 
   assert.match(overview, /unavailable/);
-  assert.match(overview, /connect the game&apos;s database first/);
+  assert.match(overview, /Not connected to the game&apos;s database/);
+  assert.match(overview, /Daily activity needs Google Analytics/);
   assert.match(ads, /unavailableReason/);
   assert.match(ads, /No ad analytics available yet/);
   // Gameplay is a live-data module now — keeps honest connection-error and

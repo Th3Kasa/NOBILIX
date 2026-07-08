@@ -9,7 +9,7 @@ import type { OverviewPrefs } from "@/types";
  * page and the client Customize panel alike.
  */
 
-export type OverviewWidgetKind = "stat" | "table" | "note";
+export type OverviewWidgetKind = "stat" | "table" | "chart" | "note";
 
 export interface OverviewWidgetDef {
   id: string;
@@ -35,6 +35,7 @@ export const OVERVIEW_WIDGETS: OverviewWidgetDef[] = [
   { id: "top-level", name: "Highest level reached", section: "Store & engagement", kind: "stat" },
   { id: "latest-scores", name: "Latest scores coming in", section: "Activity", kind: "table" },
   { id: "revenue-note", name: "Note about the two revenue numbers", section: "Notes", kind: "note" },
+  { id: "activity-30d", name: "Daily active players (last 30 days)", section: "Activity", kind: "chart" },
 ];
 
 export const OVERVIEW_WIDGET_IDS = OVERVIEW_WIDGETS.map((w) => w.id);

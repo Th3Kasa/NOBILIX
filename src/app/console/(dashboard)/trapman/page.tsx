@@ -24,6 +24,7 @@ import { getGa4Snapshot, type Ga4Snapshot } from "./ga4-data";
 import { getAudRates, convertToAud, formatAud, formatOriginal, type FxRates } from "./fx";
 import { getOverviewWidget, resolveOverviewLayout } from "./overview-widgets";
 import { CustomizeOverview } from "./customize-overview";
+import { ActivityChart } from "./activity-chart";
 
 export const dynamic = "force-dynamic";
 
@@ -69,6 +70,7 @@ const FALLBACK_GA4: Ga4Snapshot = {
   avgSessionSeconds: 0,
   engagedSessions: 0,
   countries: [],
+  dailyActivity: [],
   error: "Panel failed to load",
 };
 
@@ -161,6 +163,7 @@ export default async function TrapManOverviewPage() {
         value={ga4.activeUsers7d}
         icon={Activity}
         hint={`${ga4.activeUsers28d} in the last 28 days`}
+        delta={ga4.activeUsers7dDelta}
       />
     ) : null,
     "ga4-revenue-30d": ga4.connected ? (
@@ -178,6 +181,7 @@ export default async function TrapManOverviewPage() {
             ? `${formatOriginal(ga4.totalRevenue, "USD")} USD · converted at the live exchange rate`
             : "In US dollars — exchange rate unavailable"
         }
+        delta={ga4.revenue30dDelta}
       />
     ) : null,
     "ga4-avg-session": ga4.connected ? (
@@ -190,6 +194,7 @@ export default async function TrapManOverviewPage() {
             : null
         }
         icon={Gauge}
+        delta={ga4.avgSessionDelta}
       />
     ) : null,
     "ga4-engaged-sessions": ga4.connected ? (
@@ -198,6 +203,7 @@ export default async function TrapManOverviewPage() {
         label="Meaningful play sessions (last 30 days)"
         value={ga4.engagedSessions}
         icon={UserCheck}
+        delta={ga4.engagedSessionsDelta}
       />
     ) : null,
     "store-purchases": live.connected ? (
@@ -309,6 +315,30 @@ export default async function TrapManOverviewPage() {
           different sources, so they will rarely match exactly.
         </p>
       ) : null,
+    "activity-30d": (
+      <Card key="activity-30d" className="console-glass mb-6">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Activity
+              className="size-4 text-[var(--console-live)] drop-shadow-[0_0_4px_var(--console-live)]"
+              aria-hidden="true"
+            />
+            Daily active players (last 30 days)
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {ga4.connected && ga4.dailyActivity.length > 0 ? (
+            <ActivityChart data={ga4.dailyActivity} />
+          ) : (
+            <p className="flex h-40 items-center justify-center text-center text-sm text-muted-foreground">
+              {ga4.connected
+                ? "Google Analytics hasn't reported any daily activity yet."
+                : `Daily activity needs Google Analytics${ga4.error ? ` — ${ga4.error}` : " — it isn't connected yet."}`}
+            </p>
+          )}
+        </CardContent>
+      </Card>
+    ),
   };
 
   // Walk the admin's order, batching consecutive stat cards into the
@@ -373,15 +403,6 @@ export default async function TrapManOverviewPage() {
       )}
 
       {sections}
-
-      {/* Chart region — honest empty state when no data, not a widget. */}
-      {!m.connected && (
-        <Card className="mb-6">
-          <CardContent className="flex min-h-40 items-center justify-center p-6 text-sm text-muted-foreground">
-            Activity chart unavailable — connect the game&apos;s database first.
-          </CardContent>
-        </Card>
-      )}
     </>
   );
 }

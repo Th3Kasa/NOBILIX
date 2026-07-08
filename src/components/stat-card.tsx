@@ -1,12 +1,49 @@
+import { ArrowDown, ArrowUp, Minus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn, formatNumber } from "@/lib/utils";
 import type { LucideIcon } from "lucide-react";
+
+/**
+ * A period-over-period comparison. Only ever produced from real history —
+ * today that means GA4-sourced widgets, since GA4 is the only data source
+ * the console has more than a live snapshot of. Firestore-only stat cards
+ * never receive one (no history exists to compare against).
+ */
+export interface StatDelta {
+  pct: number;
+  direction: "up" | "down" | "flat";
+  /** Trailing phrase, e.g. "vs previous 7 days". */
+  label: string;
+}
+
+function DeltaIndicator({ delta }: { delta: StatDelta }) {
+  const Icon = delta.direction === "up" ? ArrowUp : delta.direction === "down" ? ArrowDown : Minus;
+  const colorClass =
+    delta.direction === "up"
+      ? "text-[var(--console-live)]"
+      : delta.direction === "down"
+        ? "text-[var(--console-action)]"
+        : "text-muted-foreground";
+
+  return (
+    <p
+      className={cn("flex items-center gap-1 font-mono text-xs tabular-nums", colorClass)}
+      aria-label={`${delta.direction} ${delta.pct}% ${delta.label}`}
+    >
+      <Icon className="size-3" aria-hidden="true" />
+      <span aria-hidden="true">
+        {delta.pct}% {delta.label}
+      </span>
+    </p>
+  );
+}
 
 export function StatCard({
   label,
   value,
   icon: Icon,
   hint,
+  delta,
   format = "number",
   className,
 }: {
@@ -14,6 +51,7 @@ export function StatCard({
   value: number | string | null;
   icon?: LucideIcon;
   hint?: string;
+  delta?: StatDelta;
   format?: "number" | "raw";
   className?: string;
 }) {
@@ -38,6 +76,7 @@ export function StatCard({
             {display}
           </p>
           {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
+          {delta && <DeltaIndicator delta={delta} />}
         </div>
         {Icon && (
           <div className="flex size-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
