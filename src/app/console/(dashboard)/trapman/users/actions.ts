@@ -16,8 +16,7 @@ const updateSchema = z.object({
   displayName: z.string().max(120).optional(),
   country: z.string().max(2).optional(),
   character: z.string().max(80).optional(),
-  level: z.coerce.number().int().min(0).max(1_000_000).optional(),
-  highScore: z.coerce.number().int().min(0).optional(),
+  currentLevel: z.coerce.number().int().min(0).max(1_000_000).optional(),
 });
 
 export async function updateUserAction(

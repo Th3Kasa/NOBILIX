@@ -15,8 +15,7 @@ const EDITABLE_FIELDS = [
   "displayName",
   "country",
   "character",
-  "level",
-  "highScore",
+  "currentLevel",
 ] as const;
 export type EditableField = (typeof EDITABLE_FIELDS)[number];
 

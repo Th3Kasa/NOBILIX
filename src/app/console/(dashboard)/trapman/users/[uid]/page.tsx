@@ -167,7 +167,7 @@ export default async function UserDetailPage({
               displayName: user.displayName ?? "",
               country: user.country ?? "",
               character: user.character ?? "",
-              level: user.level ?? 0,
+              currentLevel: currentLevel ?? user.level ?? 0,
               highScore: user.highScore ?? 0,
             }}
           />

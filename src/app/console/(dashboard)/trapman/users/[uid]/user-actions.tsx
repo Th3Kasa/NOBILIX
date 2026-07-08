@@ -19,7 +19,7 @@ interface Initial {
   displayName: string;
   country: string;
   character: string;
-  level: number;
+  currentLevel: number;
   highScore: number;
 }
 
@@ -150,17 +150,26 @@ export function UserActions({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="level">Level</Label>
-              <Input id="level" name="level" type="number" defaultValue={initial.level} />
+              <Label htmlFor="currentLevel">Current level</Label>
+              <Input
+                id="currentLevel"
+                name="currentLevel"
+                type="number"
+                defaultValue={initial.currentLevel}
+              />
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="highScore">High score</Label>
               <Input
                 id="highScore"
-                name="highScore"
                 type="number"
-                defaultValue={initial.highScore}
+                value={initial.highScore}
+                disabled
+                aria-readonly="true"
               />
+              <p className="text-xs text-muted-foreground">
+                Read-only — set by gameplay, not editable here.
+              </p>
             </div>
           </div>
           {editState.error && (
