@@ -1,9 +1,10 @@
 "use client";
 
-import { LogOut } from "lucide-react";
+import { LogOut, Search } from "lucide-react";
 import { logout } from "@/app/console/(dashboard)/actions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { openCommandPalette } from "@/components/console/command-palette";
 import type { AdminRole } from "@/types";
 
 export function Topbar({
@@ -38,6 +39,16 @@ export function Topbar({
         )}
       </span>
       <div className="ml-auto flex items-center gap-3">
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          aria-label="Open command palette"
+          title="Command palette (Ctrl/Cmd+K)"
+          onClick={openCommandPalette}
+        >
+          <Search className="size-4" aria-hidden="true" />
+        </Button>
         <div className="hidden text-right sm:block" aria-label="Signed in administrator">
           <p className="text-sm font-medium leading-tight">{name}</p>
           <p className="text-xs text-muted-foreground leading-tight">{email}</p>

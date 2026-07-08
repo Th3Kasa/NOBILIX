@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { PlatformSidebar } from "@/components/nav/platform-sidebar";
 import { Topbar } from "@/components/nav/topbar";
 import { ConsoleMobileNav } from "@/components/nav/console-mobile-nav";
+import { CommandPalette } from "@/components/console/command-palette";
 
 // Belt-and-braces with robots.ts: the operator console must never be indexed.
 export const metadata: Metadata = {
@@ -38,6 +39,7 @@ export default async function DashboardLayout({
         />
         <div className="flex-1 overflow-y-auto p-4 md:p-6">{children}</div>
       </div>
+      <CommandPalette />
     </div>
   );
 }
