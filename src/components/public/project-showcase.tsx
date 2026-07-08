@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { Reveal } from "@/components/motion/reveal";
 import { PROJECTS } from "@/config/projects";
 import { ProjectCard } from "@/components/public/project-card";
@@ -32,9 +31,6 @@ export function ProjectShowcase() {
           them.
         </p>
         <ProjectCard project={mainProject} />
-        <Link className="nobilix-text-link magnetic-hover" href={mainProject.publicPath}>
-          See what&apos;s inside TrapMan →
-        </Link>
       </Reveal>
     </section>
   );

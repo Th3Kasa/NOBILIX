@@ -15,7 +15,7 @@ export function NotFoundContent() {
       </p>
       <div className="public-not-found__actions">
         <Link className="magnetic-hover" href="/">Return to Nobilix</Link>
-        <Link className="magnetic-hover" href="/trapman">View TrapMan</Link>
+        <Link className="magnetic-hover" href="/legal">TrapMan policies</Link>
         <Link className="magnetic-hover" href="/#contact">Contact Nobilix</Link>
       </div>
     </section>

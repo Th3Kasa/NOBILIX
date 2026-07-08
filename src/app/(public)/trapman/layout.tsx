@@ -3,10 +3,7 @@ import "@/styles/trapman-tokens.css";
 import "./trapman.css";
 
 export const metadata: Metadata = {
-  title: "TrapMan",
-  description: "Run the neon city, climb the leaderboard, and own the night.",
-  alternates: { canonical: "/trapman" },
-  openGraph: { title: "TrapMan by Nobilix", url: "/trapman", type: "website" },
+  title: { template: "%s · TrapMan Legal", default: "TrapMan Legal" },
 };
 
 export default function TrapManLayout({ children }: { children: React.ReactNode }) {

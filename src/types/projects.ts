@@ -20,17 +20,10 @@ export interface ProjectDefinition {
   status: "live" | "development" | "planned";
   description: string;
   logoPath: string;
-  publicPath: string;
-  accountPath: string | null;
-  storeLinks: {
-    googlePlay: string | null;
-    appStore: string | null;
-  };
   legal: {
     privacy: string;
     terms: string;
     compliance: string;
-    deletion: string;
   };
   consoleModules: readonly ConsoleModule[];
   collections: {

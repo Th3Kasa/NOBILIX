@@ -6,11 +6,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const paths = [
     "/",
     "/legal",
-    trapman.publicPath,
+    "/legal/privacy-policy",
+    "/legal/terms-of-use",
     trapman.legal.privacy,
     trapman.legal.terms,
     trapman.legal.compliance,
-    trapman.legal.deletion,
   ];
   return paths.map((path) => ({
     url: new URL(path, "https://nobilix.vercel.app").toString(),

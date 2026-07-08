@@ -33,7 +33,6 @@ export default function LegalDirectoryPage() {
           <Link href={project.legal.privacy}>Privacy Policy</Link>
           <Link href={project.legal.terms}>Terms of Use</Link>
           <Link href={project.legal.compliance}>Data &amp; Compliance</Link>
-          <Link href={project.legal.deletion}>Delete Account</Link>
         </article>
       </div>
     </section>

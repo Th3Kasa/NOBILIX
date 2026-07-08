@@ -8,7 +8,6 @@ const TRAPMAN_LEGAL_PAGES: LegalTocItem[] = [
   { href: "/trapman/privacy-policy", label: "Privacy Policy" },
   { href: "/trapman/terms-of-use", label: "Terms of Use" },
   { href: "/trapman/data-compliance", label: "Data & Compliance" },
-  { href: "/trapman/delete-account", label: "Delete Account" },
 ];
 
 const TOC_ITEMS: LegalTocItem[] = [
@@ -41,7 +40,7 @@ export function LegalShell({ title, lastUpdated, currentPath, children }: LegalS
       <nav className="legal-breadcrumb" aria-label="Breadcrumb">
         <ol>
           <li><Link href="/">Nobilix</Link></li>
-          <li><Link href="/trapman">TrapMan</Link></li>
+          <li><Link href="/legal">TrapMan</Link></li>
           <li aria-current="page">{title}</li>
         </ol>
       </nav>
@@ -58,7 +57,7 @@ export function LegalShell({ title, lastUpdated, currentPath, children }: LegalS
             priority
           />
         </div>
-        <Link href="/trapman" className="legal-logo-link">
+        <Link href="/legal" className="legal-logo-link">
           <Image
             src="/assets/trapman-logo.png"
             alt="TrapMan by Nobilix"

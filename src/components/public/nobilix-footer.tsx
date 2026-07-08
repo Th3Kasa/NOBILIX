@@ -22,10 +22,8 @@ export function NobilixFooter() {
       </nav>
       <nav aria-label="Project links">
         <p className="public-footer__heading">TrapMan</p>
-        <Link href={trapman.publicPath}>Play TrapMan</Link>
         <Link href={trapman.legal.privacy}>Privacy</Link>
         <Link href={trapman.legal.terms}>Terms</Link>
-        <Link href={trapman.legal.deletion}>Delete account</Link>
       </nav>
     </footer>
   );

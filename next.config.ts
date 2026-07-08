@@ -52,7 +52,6 @@ const nextConfig: NextConfig = {
       { source: "/privacy-policy", destination: "/trapman/privacy-policy", permanent: true },
       { source: "/terms-of-use", destination: "/trapman/terms-of-use", permanent: true },
       { source: "/data-compliance", destination: "/trapman/data-compliance", permanent: true },
-      { source: "/delete-account", destination: "/trapman/delete-account", permanent: true },
       // Legacy console redirects — non-permanent during migration to /console/trapman/*
       { source: "/console/users/:path*", destination: "/console/trapman/users/:path*", permanent: false },
       { source: "/console/leaderboard/:path*", destination: "/console/trapman/leaderboard/:path*", permanent: false },
