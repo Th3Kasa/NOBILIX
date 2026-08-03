@@ -298,6 +298,123 @@ h2.legal-toc-heading {
 }
 .legal-deletion-note { font-size: .8em; opacity: .7; }
 
+/* ── Account deletion request (/trapman/delete-account) ───────────
+   The deletion flow is a guided email rather than a signed-in action, so
+   the steps and the prepared message carry the whole interaction. Numbered
+   markers are drawn with a counter so each step reads as a discrete task
+   instead of a bullet in a legal list. */
+.delete-steps {
+  counter-reset: delete-step;
+  list-style: none;
+  padding: 0;
+  margin: 1.35rem 0 0;
+  display: grid;
+  gap: .9rem;
+}
+.delete-steps li {
+  counter-increment: delete-step;
+  position: relative;
+  padding-left: 2.9rem;
+}
+.delete-steps li::before {
+  content: counter(delete-step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1.95rem;
+  height: 1.95rem;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--tm-calm-border);
+  background: rgb(57 233 255 / .08);
+  color: var(--tm-cyan);
+  font-family: var(--font-mono), monospace;
+  font-size: .82rem;
+}
+
+.delete-request {
+  margin: 1.6rem 0;
+  border: 1px solid var(--tm-calm-border);
+  border-radius: 1rem;
+  background: rgb(3 2 7 / .5);
+}
+.delete-request__meta {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: .45rem 1.1rem;
+  align-items: baseline;
+  padding: 1.05rem 1.15rem;
+  border-bottom: 1px solid var(--tm-calm-border);
+  font-size: .88rem;
+  overflow-wrap: anywhere;
+}
+.delete-request__label {
+  font-family: var(--font-mono), monospace;
+  font-size: .68rem;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--tm-cyan);
+}
+/* The template stays selectable text so the flow still works when both the
+   mail-app hand-off and the clipboard API are unavailable. */
+.delete-request__body {
+  margin: 0;
+  padding: 1.15rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-family: var(--font-mono), monospace;
+  font-size: .85rem;
+  line-height: 1.75;
+  color: var(--tm-calm-ink);
+}
+.delete-request__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  padding: 0 1.15rem;
+}
+.delete-request__btn {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding-inline: 1.15rem;
+  border-radius: 999px;
+  border: 1px solid var(--tm-calm-border);
+  background: transparent;
+  color: var(--tm-calm-ink);
+  font: inherit;
+  font-size: .9rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 140ms ease-out, border-color 140ms ease-out, color 140ms ease-out;
+}
+.delete-request__btn:hover {
+  border-color: rgb(57 233 255 / .6);
+  color: #fff;
+}
+.delete-request__btn:focus-visible {
+  outline: 2px solid var(--tm-cyan);
+  outline-offset: 2px;
+}
+.delete-request__btn--primary {
+  border-color: rgb(57 233 255 / .45);
+  background: rgb(57 233 255 / .14);
+  color: #fff;
+}
+.delete-request__btn--primary:hover { background: rgb(57 233 255 / .22); }
+/* Fallback line for browsers with no mail app registered, where the primary
+   button can appear to do nothing. Quieter than the button it backs up. */
+.delete-request__alt {
+  margin: 0;
+  padding: .8rem 1.15rem 1.15rem;
+  font-size: .84rem;
+  line-height: 1.65;
+  color: rgb(215 246 255 / .72);
+}
+.delete-request__alt a { color: var(--tm-cyan); }
+
 @media (max-width: 820px) {
   .legal-body,
   .legal-header {

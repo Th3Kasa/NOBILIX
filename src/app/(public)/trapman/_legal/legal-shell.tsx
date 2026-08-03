@@ -8,6 +8,7 @@ const TRAPMAN_LEGAL_PAGES: LegalTocItem[] = [
   { href: "/trapman/privacy-policy", label: "Privacy Policy" },
   { href: "/trapman/terms-of-use", label: "Terms of Use" },
   { href: "/trapman/data-compliance", label: "Data & Compliance" },
+  { href: "/trapman/delete-account", label: "Delete Account" },
 ];
 
 const TOC_ITEMS: LegalTocItem[] = [

@@ -81,7 +81,7 @@ export const PRIVACY_SECTIONS = {
       "Access the personal data we hold about you (contact help.nobilix@outlook.com)",
       "Request a copy of your data in a portable format (contact help.nobilix@outlook.com)",
       "Correct inaccurate data (by updating your profile or contacting support)",
-      "Delete your account and associated personal data (contact help.nobilix@outlook.com)",
+      "Delete your account and associated personal data (see /trapman/delete-account)",
       "Lodge a complaint with a relevant data protection authority",
     ],
     outro: "To exercise any of these rights, contact help.nobilix@outlook.com.",

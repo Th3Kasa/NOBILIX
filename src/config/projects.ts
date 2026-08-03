@@ -12,6 +12,7 @@ export const PROJECTS = {
       privacy: "/trapman/privacy-policy",
       terms: "/trapman/terms-of-use",
       compliance: "/trapman/data-compliance",
+      deletion: "/trapman/delete-account",
     },
     consoleModules: [
       "overview",

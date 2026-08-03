@@ -72,7 +72,7 @@ export const TERMS_SECTIONS = {
   termination: {
     heading: "Termination",
     body: `Nobilix may suspend or terminate your account at any time for breach of these
-    terms. You may delete your account at any time by contacting help.nobilix@outlook.com. On
+    terms. You may delete your account at any time — see /trapman/delete-account. On
     termination, your licence to use TrapMan ends immediately.`,
   },
 

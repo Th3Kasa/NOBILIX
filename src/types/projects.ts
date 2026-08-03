@@ -24,6 +24,9 @@ export interface ProjectDefinition {
     privacy: string;
     terms: string;
     compliance: string;
+    /** Public account-deletion instructions. App stores require this URL to
+     *  be reachable without signing in. */
+    deletion: string;
   };
   consoleModules: readonly ConsoleModule[];
   collections: {
