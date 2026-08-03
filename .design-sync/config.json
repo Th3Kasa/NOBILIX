@@ -1,0 +1,12 @@
+{
+  "pkg": "nobilix-admin",
+  "globalName": "Nobilix",
+  "shape": "package",
+  "srcDir": "src/components",
+  "tsconfig": "tsconfig.json",
+  "buildCmd": "npm run build && node .design-sync/prep-css.mjs",
+  "cssEntry": ".design-sync/.cache/compiled/app.css",
+  "extraFonts": [".design-sync/.cache/compiled/app.css"],
+  "extraEntries": ["./.design-sync/shims/ds-provider.tsx"],
+  "provider": { "component": "DSProvider" }
+}

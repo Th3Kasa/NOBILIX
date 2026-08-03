@@ -16,6 +16,9 @@ const eslintConfig = defineConfig([
     ".worktrees/**",
     ".claude/**",
     ".Codex/**",
+    // design-sync: vendored converter scripts and generated bundle output.
+    ".ds-sync/**",
+    "ds-bundle/**",
   ]),
 ]);
 
