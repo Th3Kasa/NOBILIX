@@ -168,15 +168,17 @@ export default async function PurchasesPage() {
                 <div>
                   <p className="font-medium text-[var(--console-action)]">
                     {data.unacknowledgedRecords} Google Play purchase
-                    {data.unacknowledgedRecords === 1 ? " has" : "s have"} not
-                    been acknowledged
+                    {data.unacknowledgedRecords === 1 ? "" : "s"} worth checking
                   </p>
                   <p className="text-muted-foreground">
-                    Google automatically refunds and revokes a purchase that the
-                    app leaves unacknowledged for three days. The player keeps
-                    what they bought and the money is returned. This is fixed in
-                    the game client, which must acknowledge each purchase after
-                    granting the item.
+                    {data.unacknowledgedRecords === 1 ? "Its" : "Their"} stored
+                    receipt says <code className="font-mono text-xs">acknowledged: false</code>.
+                    That is normal on its own — the receipt is captured at the
+                    moment of purchase, before the app acknowledges. But Google
+                    refunds and revokes any purchase left unacknowledged for
+                    three days, so if the game is not acknowledging, this money
+                    is already gone. Confirm the current state in Play Console
+                    under Order management, or via the Play Developer API.
                   </p>
                 </div>
               </CardContent>
