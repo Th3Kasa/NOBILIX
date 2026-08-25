@@ -95,16 +95,39 @@ interface ReportResult {
   rows?: ReportRow[];
 }
 
+/**
+ * The GA4 Data API rejects a batch carrying more than 5 report requests
+ * ("Batch requests are limited to 5 requests"), and one oversized batch fails
+ * in full — which takes every GA4 number in the console down at once. Chunk
+ * the requests and concatenate the responses so callers can pass as many
+ * reports as they like and still get them back in the order they asked for.
+ */
+const MAX_REPORTS_PER_BATCH = 5;
+
 async function batchRunReports(
   requests: Record<string, unknown>[],
 ): Promise<ReportResult[]> {
   const client = getJwtClient();
-  const res = await client.request<{ reports?: ReportResult[] }>({
-    url: `https://analyticsdata.googleapis.com/v1beta/properties/${ga4PropertyId()}:batchRunReports`,
-    method: "POST",
-    data: { requests },
-  });
-  return res.data.reports ?? [];
+  const url = `https://analyticsdata.googleapis.com/v1beta/properties/${ga4PropertyId()}:batchRunReports`;
+
+  const batches: Record<string, unknown>[][] = [];
+  for (let i = 0; i < requests.length; i += MAX_REPORTS_PER_BATCH) {
+    batches.push(requests.slice(i, i + MAX_REPORTS_PER_BATCH));
+  }
+
+  // Promise.all preserves input order, so flattening rebuilds the original
+  // request order that the destructuring at the call site depends on.
+  const responses = await Promise.all(
+    batches.map((batch) =>
+      client.request<{ reports?: ReportResult[] }>({
+        url,
+        method: "POST",
+        data: { requests: batch },
+      }),
+    ),
+  );
+
+  return responses.flatMap((res) => res.data.reports ?? []);
 }
 
 const num = (row: ReportRow | undefined, index: number): number =>
