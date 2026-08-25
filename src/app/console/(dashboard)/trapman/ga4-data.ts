@@ -216,16 +216,19 @@ async function fetchGa4Snapshot(): Promise<Ga4Snapshot> {
         metrics: [{ name: "activeUsers" }],
         orderBys: [{ dimension: { dimensionName: "date" } }],
       },
-      // Period-over-period: this week vs the 7 days before it. Two entries
-      // in one dateRanges array is the standard GA4 Data API comparison
-      // pattern; the "dateRange" dimension is what splits the response into
-      // one row per period (values default to date_range_0/date_range_1).
+      // Period-over-period: this week vs the 7 days before it. Two entries in
+      // one dateRanges array is the standard GA4 Data API comparison pattern.
+      // The API appends the date-range identifier (date_range_0 /
+      // date_range_1) to each row automatically — it must NOT be declared as a
+      // dimension, or the request is rejected with "Field dateRange is not a
+      // dimension" and, because these go out in one batchRunReports call, the
+      // whole batch fails and every GA4 number in the console goes dark.
+      // findByDateRange() reads the auto-appended value.
       {
         dateRanges: [
           { startDate: "7daysAgo", endDate: "today" },
           { startDate: "14daysAgo", endDate: "8daysAgo" },
         ],
-        dimensions: [{ name: "dateRange" }],
         metrics: [{ name: "active7DayUsers" }],
       },
       // Same comparison pattern for the 30-day commerce/engagement metrics.
@@ -234,7 +237,6 @@ async function fetchGa4Snapshot(): Promise<Ga4Snapshot> {
           { startDate: "30daysAgo", endDate: "today" },
           { startDate: "60daysAgo", endDate: "31daysAgo" },
         ],
-        dimensions: [{ name: "dateRange" }],
         metrics: [
           { name: "totalRevenue" },
           { name: "averageSessionDuration" },
