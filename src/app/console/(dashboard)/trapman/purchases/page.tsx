@@ -1,22 +1,58 @@
 import {
   AlertTriangle,
+  FlaskConical,
   Receipt,
   ShoppingCart,
   Smartphone,
   Users,
 } from "lucide-react";
 import { format } from "date-fns";
+import { auth } from "@/auth";
 import { PageHeader } from "@/components/page-header";
 import { StatCard } from "@/components/stat-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { getTestAccountUids } from "@/lib/trapman/test-accounts";
 import { getPurchasesData } from "./data";
+import {
+  TestAccountControls,
+  type BuyerSummary,
+} from "./test-account-controls";
 import { getAudRates, convertToAud, formatAud, formatOriginal } from "../fx";
 
 export const dynamic = "force-dynamic";
 
 export default async function PurchasesPage() {
-  const [data, fx] = await Promise.all([getPurchasesData(), getAudRates()]);
+  const [data, fx, testUids, session] = await Promise.all([
+    getPurchasesData(),
+    getAudRates(),
+    getTestAccountUids(),
+    auth(),
+  ]);
+  const canWrite = session?.user?.role !== "viewer";
+
+  // One row per buyer across every record, including excluded ones — the point
+  // of this list is to decide which buyers are internal testing.
+  const buyerMap = new Map<string, BuyerSummary>();
+  for (const p of data.allPurchases) {
+    const existing = buyerMap.get(p.buyerUid);
+    if (existing) {
+      existing.purchaseCount += 1;
+      existing.editorOnly = existing.editorOnly && p.isEditorPurchase;
+      existing.name ??= p.buyerName;
+    } else {
+      buyerMap.set(p.buyerUid, {
+        uid: p.buyerUid,
+        name: p.buyerName,
+        purchaseCount: 1,
+        isTestAccount: testUids.has(p.buyerUid),
+        editorOnly: p.isEditorPurchase,
+      });
+    }
+  }
+  const buyers = [...buyerMap.values()].sort(
+    (a, b) => b.purchaseCount - a.purchaseCount,
+  );
 
   /** AUD display with honest original-currency fallback when FX is down. */
   const aud = (amount: number, currency: string): string => {
@@ -158,33 +194,6 @@ export default async function PurchasesPage() {
             </Card>
           )}
 
-          {data.unacknowledgedRecords > 0 && (
-            <Card className="console-empty-state mb-6 border-[var(--console-action-border)] bg-[var(--console-action-tint)]">
-              <CardContent className="relative flex items-start gap-3 p-4 text-sm">
-                <AlertTriangle
-                  className="mt-0.5 size-4 shrink-0 text-[var(--console-action)]"
-                  aria-hidden="true"
-                />
-                <div>
-                  <p className="font-medium text-[var(--console-action)]">
-                    {data.unacknowledgedRecords} Google Play purchase
-                    {data.unacknowledgedRecords === 1 ? "" : "s"} worth checking
-                  </p>
-                  <p className="text-muted-foreground">
-                    {data.unacknowledgedRecords === 1 ? "Its" : "Their"} stored
-                    receipt says <code className="font-mono text-xs">acknowledged: false</code>.
-                    That is normal on its own — the receipt is captured at the
-                    moment of purchase, before the app acknowledges. But Google
-                    refunds and revokes any purchase left unacknowledged for
-                    three days, so if the game is not acknowledging, this money
-                    is already gone. Confirm the current state in Play Console
-                    under Order management, or via the Play Developer API.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
           <div className="console-page-grid mb-6">
             {/* Product breakdown */}
             <Card className="console-glass console-grid-span-6">
@@ -249,7 +258,9 @@ export default async function PurchasesPage() {
                     </span>
                   </div>
                 ))}
-                {(excludedCount > 0 || data.unparsedRecords > 0) && (
+                {(excludedCount > 0 ||
+                  data.unparsedRecords > 0 ||
+                  data.unacknowledgedRecords > 0) && (
                   <div className="mt-2 space-y-2 border-t border-border/60 pt-3 text-xs text-muted-foreground">
                     {data.editorRecords > 0 && (
                       <p>
@@ -274,11 +285,44 @@ export default async function PurchasesPage() {
                         from every figure above.
                       </p>
                     )}
+                    {data.unacknowledgedRecords > 0 && (
+                      <p>
+                        {data.unacknowledgedRecords} Google Play receipt
+                        {data.unacknowledgedRecords === 1 ? " was" : "s were"}{" "}
+                        stored before acknowledgement. That is normal — receipts
+                        are captured at purchase time — but Google revokes a
+                        purchase left unacknowledged for three days, so confirm
+                        in Play Console if a sale ever looks missing.
+                      </p>
+                    )}
                   </div>
                 )}
               </CardContent>
             </Card>
           </div>
+
+          {/* Test-account register */}
+          {canWrite && buyers.length > 0 && (
+            <Card className="console-glass mb-6">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <FlaskConical
+                    className="size-4 text-[var(--console-violet)]"
+                    aria-hidden="true"
+                  />
+                  Buyers
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <p className="mb-2 text-sm text-muted-foreground">
+                  Marking a buyer as a test account removes their purchases from
+                  every revenue figure. Nothing is deleted from the game&apos;s
+                  data and the change can be undone at any time.
+                </p>
+                <TestAccountControls buyers={buyers} />
+              </CardContent>
+            </Card>
+          )}
 
           {/* Recent purchases */}
           <Card className="console-glass">
