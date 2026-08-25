@@ -2,6 +2,7 @@ import "server-only";
 import { unstable_cache } from "next/cache";
 import { getDb } from "@/lib/firebase/firestore";
 import { GAME } from "@/lib/firebase/collections";
+import { parsePurchaseMap } from "@/lib/trapman/purchases";
 
 /**
  * Players listing built on the CONFIRMED live schema.
@@ -96,20 +97,15 @@ function compareBy(field: SortField, a: PlayerRow, b: PlayerRow): number {
   }
 }
 
-function countParsablePurchases(value: unknown): number {
-  if (typeof value !== "object" || value === null) return 0;
-  let count = 0;
-  for (const record of Object.values(value as Record<string, unknown>)) {
-    if (
-      record &&
-      typeof record === "object" &&
-      typeof (record as Record<string, unknown>).productId === "string" &&
-      typeof (record as Record<string, unknown>).price === "number"
-    ) {
-      count += 1;
-    }
-  }
-  return count;
+/**
+ * Counts a player's purchases through the shared parser, so this column can
+ * never disagree with the Purchases page or the Overview cards. Includes test
+ * and Editor purchases deliberately — this is a per-player record count, not a
+ * revenue figure, and hiding a tester's purchases here would make the row
+ * confusing when investigating that exact account.
+ */
+function countPurchases(uid: string, value: unknown): number {
+  return parsePurchaseMap(uid, null, value).purchases.length;
 }
 
 interface PlayerScan {
@@ -141,7 +137,7 @@ async function fetchPlayerScan(): Promise<PlayerScan> {
         completedLevels: Array.isArray(d.completedLevels)
           ? d.completedLevels.length
           : null,
-        purchaseCount: countParsablePurchases(d.purchases),
+        purchaseCount: countPurchases(doc.id, d.purchases),
         pushReachable: typeof d.fcmToken === "string" && d.fcmToken.length > 0,
       };
     });

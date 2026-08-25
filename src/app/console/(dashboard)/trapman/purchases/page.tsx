@@ -26,21 +26,29 @@ export default async function PurchasesPage() {
       : formatOriginal(amount, currency);
   };
 
-  // Total revenue across all currencies, converted to AUD.
+  // Total revenue across all currencies, converted to AUD. Previously this was
+  // all-or-nothing: a single currency the FX service doesn't carry (IDR, VND,
+  // NGN, PKR… all live store currencies) discarded the entire total and the
+  // card silently fell back to showing one currency's subtotal under an "AUD"
+  // label. Now we convert everything convertible and disclose the remainder.
   let totalRevenueAud: number | null = null;
+  const unconvertedCurrencies: string[] = [];
   if (fx.connected && data.revenueByCurrency.length > 0) {
     let total = 0;
-    let allConverted = true;
+    let convertedAny = false;
     for (const { currency, total: amount } of data.revenueByCurrency) {
       const converted = convertToAud(amount, currency, fx);
       if (converted == null) {
-        allConverted = false;
-        break;
+        unconvertedCurrencies.push(currency);
+        continue;
       }
       total += converted;
+      convertedAny = true;
     }
-    if (allConverted) totalRevenueAud = total;
+    if (convertedAny) totalRevenueAud = total;
   }
+
+  const excludedCount = data.testAccountRecords + data.editorRecords;
 
   return (
     <>
@@ -64,7 +72,7 @@ export default async function PurchasesPage() {
             </div>
           </CardContent>
         </Card>
-      ) : data.totalCount === 0 ? (
+      ) : data.allPurchases.length === 0 && data.unparsedRecords === 0 ? (
         <div className="console-empty-state console-glass rounded-xl border border-dashed border-border">
           <div className="relative flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
             <div className="flex size-10 items-center justify-center rounded-lg bg-[var(--console-violet-tint)] text-[var(--console-violet)]">
@@ -123,6 +131,57 @@ export default async function PurchasesPage() {
               hint="AUD"
             />
           </div>
+
+          {unconvertedCurrencies.length > 0 && (
+            <Card className="console-empty-state mb-6 border-[var(--console-action-border)] bg-[var(--console-action-tint)]">
+              <CardContent className="relative flex items-start gap-3 p-4 text-sm">
+                <AlertTriangle
+                  className="mt-0.5 size-4 shrink-0 text-[var(--console-action)]"
+                  aria-hidden="true"
+                />
+                <div>
+                  <p className="font-medium text-[var(--console-action)]">
+                    The AUD total excludes{" "}
+                    {unconvertedCurrencies.length === 1
+                      ? "one currency"
+                      : `${unconvertedCurrencies.length} currencies`}
+                  </p>
+                  <p className="text-muted-foreground">
+                    No exchange rate is available for{" "}
+                    {unconvertedCurrencies.join(", ")}. Revenue in{" "}
+                    {unconvertedCurrencies.length === 1 ? "it" : "those"} is
+                    listed under &ldquo;Revenue by product&rdquo; but is not
+                    included in the converted total above.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {data.unacknowledgedRecords > 0 && (
+            <Card className="console-empty-state mb-6 border-[var(--console-action-border)] bg-[var(--console-action-tint)]">
+              <CardContent className="relative flex items-start gap-3 p-4 text-sm">
+                <AlertTriangle
+                  className="mt-0.5 size-4 shrink-0 text-[var(--console-action)]"
+                  aria-hidden="true"
+                />
+                <div>
+                  <p className="font-medium text-[var(--console-action)]">
+                    {data.unacknowledgedRecords} Google Play purchase
+                    {data.unacknowledgedRecords === 1 ? " has" : "s have"} not
+                    been acknowledged
+                  </p>
+                  <p className="text-muted-foreground">
+                    Google automatically refunds and revokes a purchase that the
+                    app leaves unacknowledged for three days. The player keeps
+                    what they bought and the money is returned. This is fixed in
+                    the game client, which must acknowledge each purchase after
+                    granting the item.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           <div className="console-page-grid mb-6">
             {/* Product breakdown */}
@@ -188,12 +247,32 @@ export default async function PurchasesPage() {
                     </span>
                   </div>
                 ))}
-                {data.unparsedRecords > 0 && (
-                  <p className="mt-2 border-t border-border/60 pt-3 text-xs text-muted-foreground">
-                    {data.unparsedRecords} raw store-receipt record
-                    {data.unparsedRecords === 1 ? "" : "s"} in an unrecognised
-                    shape were counted but not included in revenue figures.
-                  </p>
+                {(excludedCount > 0 || data.unparsedRecords > 0) && (
+                  <div className="mt-2 space-y-2 border-t border-border/60 pt-3 text-xs text-muted-foreground">
+                    {data.editorRecords > 0 && (
+                      <p>
+                        {data.editorRecords} purchase
+                        {data.editorRecords === 1 ? "" : "s"} made in the Unity
+                        Editor {data.editorRecords === 1 ? "is" : "are"} excluded
+                        — they never reached a store.
+                      </p>
+                    )}
+                    {data.testAccountRecords > 0 && (
+                      <p>
+                        {data.testAccountRecords} purchase
+                        {data.testAccountRecords === 1 ? "" : "s"} from accounts
+                        marked as internal testers are excluded from revenue.
+                      </p>
+                    )}
+                    {data.unparsedRecords > 0 && (
+                      <p>
+                        {data.unparsedRecords} record
+                        {data.unparsedRecords === 1 ? "" : "s"} could not be read
+                        and {data.unparsedRecords === 1 ? "is" : "are"} excluded
+                        from every figure above.
+                      </p>
+                    )}
+                  </div>
                 )}
               </CardContent>
             </Card>

@@ -27,4 +27,5 @@ export const CRM = {
   metrics: "_crm_metrics", // _crm_metrics/{yyyy-mm-dd}
   passkeys: "_admin_passkeys", // _admin_passkeys/{credentialId-base64url}
   loginTickets: "_admin_login_tickets", // _admin_login_tickets/{sha256(ticket) hex}
+  testAccounts: "_crm_test_accounts", // _crm_test_accounts/{uid} — internal testers excluded from revenue
 } as const;

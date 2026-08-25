@@ -2,6 +2,8 @@ import "server-only";
 import { unstable_cache } from "next/cache";
 import { getDb } from "@/lib/firebase/firestore";
 import { GAME } from "@/lib/firebase/collections";
+import { parsePurchaseMap } from "@/lib/trapman/purchases";
+import { getTestAccountUids } from "@/lib/trapman/test-accounts";
 
 /**
  * Supplemental live metrics for the TrapMan Mission Control overview.
@@ -35,26 +37,17 @@ export interface LiveMetrics {
   error?: string;
 }
 
-function isParsablePurchase(value: unknown): boolean {
-  if (typeof value !== "object" || value === null) return false;
-  const v = value as Record<string, unknown>;
-  return (
-    typeof v.productId === "string" &&
-    typeof v.price === "number" &&
-    typeof v.currency === "string"
-  );
-}
-
 async function fetchLiveMetrics(): Promise<LiveMetrics> {
   try {
     const db = getDb();
-    const [usersSnap, boardSnap] = await Promise.all([
+    const [usersSnap, boardSnap, testUids] = await Promise.all([
       db.collection(GAME.users).limit(MAX_SAMPLE).get(),
       db
         .collection(GAME.leaderboard)
         .orderBy("timestamp", "desc")
         .limit(8)
         .get(),
+      getTestAccountUids(),
     ]);
 
     let pushReachable = 0;
@@ -80,16 +73,16 @@ async function fetchLiveMetrics(): Promise<LiveMetrics> {
         completedSamples += 1;
       }
 
-      if (typeof data.purchases === "object" && data.purchases !== null) {
-        for (const record of Object.values(data.purchases as Record<string, unknown>)) {
-          if (isParsablePurchase(record)) {
-            const r = record as { price: number; currency: string };
-            purchaseCount += 1;
-            buyers.add(doc.id);
-            const cur = r.currency.toUpperCase();
-            revenue.set(cur, (revenue.get(cur) ?? 0) + r.price);
-          }
-        }
+      // Shared parser: handles both the Apple (flat) and Google (nested)
+      // shapes, so this figure cannot drift from the Purchases page.
+      const { purchases } = parsePurchaseMap(doc.id, null, data.purchases);
+      for (const p of purchases) {
+        // Editor sessions never reached a store, and registered testers are
+        // the studio's own activity — neither is revenue.
+        if (p.isEditorPurchase || testUids.has(p.buyerUid)) continue;
+        purchaseCount += 1;
+        buyers.add(doc.id);
+        revenue.set(p.currency, (revenue.get(p.currency) ?? 0) + p.price);
       }
     }
 

@@ -2,33 +2,31 @@ import "server-only";
 import { unstable_cache } from "next/cache";
 import { getDb } from "@/lib/firebase/firestore";
 import { GAME } from "@/lib/firebase/collections";
+import {
+  buyerNameFrom,
+  parsePurchaseMap,
+  type NormalizedPurchase,
+} from "@/lib/trapman/purchases";
+import { getTestAccountUids } from "@/lib/trapman/test-accounts";
 
 /**
  * Purchases data-access for the TrapMan console.
  *
- * Engineering schema review confirmed that live purchase records are stored
- * EMBEDDED on player documents at `users/{uid}.purchases` as a map of
- * `purchaseId → { productId, price, currency, platform, receipt, timestamp }`.
- * (The standalone `purchases` collection no longer exists in the live
- * database.) This module aggregates those embedded records.
+ * Purchase records live embedded on player documents at `users/{uid}.purchases`
+ * (the standalone `purchases` collection is empty in the live database). The
+ * game writes two different shapes depending on the store — both are handled by
+ * the shared parser in `@/lib/trapman/purchases`, which every console surface
+ * now uses so the Overview, Purchases and Players pages cannot disagree.
  *
- * Some documents carry raw store-receipt blobs in a different shape (keyed by
- * store purchase tokens). Those are counted honestly as `unparsedRecords`
- * rather than being guessed at or silently dropped.
+ * Revenue here counts only *countable* purchases: internal test accounts and
+ * Unity Editor purchases are separated out rather than summed, so the headline
+ * figure is not inflated by the studio's own testing.
  */
 
 const MAX_SAMPLE = 1000;
 
-export interface PurchaseRecord {
-  purchaseId: string;
-  productId: string;
-  price: number;
-  currency: string;
-  platform: string;
-  timestamp: number;
-  buyerUid: string;
-  buyerName: string | null;
-}
+/** Re-exported so pages keep a single import site for the record shape. */
+export type PurchaseRecord = NormalizedPurchase;
 
 export interface ProductBreakdown {
   productId: string;
@@ -40,81 +38,95 @@ export interface ProductBreakdown {
 export interface PurchasesData {
   connected: boolean;
   sampleSize: number;
+  /** True when the scan hit the cap and totals may be incomplete. */
+  scanCapped: boolean;
+  /** Countable purchases only — excludes test accounts and Editor purchases. */
   purchases: PurchaseRecord[];
+  /** Everything read, including excluded records, for the forensics view. */
+  allPurchases: PurchaseRecord[];
   totalCount: number;
   buyerCount: number;
   revenueByCurrency: { currency: string; total: number; count: number }[];
   products: ProductBreakdown[];
   platforms: { platform: string; count: number }[];
   unparsedRecords: number;
+  /** Excluded because the buyer is a registered internal test account. */
+  testAccountRecords: number;
+  /** Excluded because the purchase came from a Unity Editor session. */
+  editorRecords: number;
+  /**
+   * Google Play purchases still unacknowledged. Google automatically refunds
+   * and revokes these after three days, so a non-zero count is a real revenue
+   * risk that belongs in front of an operator.
+   */
+  unacknowledgedRecords: number;
   error?: string;
 }
 
-function isParsablePurchase(value: unknown): value is {
-  productId: string;
-  price: number;
-  currency: string;
-  platform: string;
-  timestamp: number;
-} {
-  if (typeof value !== "object" || value === null) return false;
-  const v = value as Record<string, unknown>;
-  return (
-    typeof v.productId === "string" &&
-    typeof v.price === "number" &&
-    typeof v.currency === "string" &&
-    typeof v.platform === "string" &&
-    typeof v.timestamp === "number"
-  );
+function emptyData(error?: string): PurchasesData {
+  return {
+    connected: false,
+    sampleSize: 0,
+    scanCapped: false,
+    purchases: [],
+    allPurchases: [],
+    totalCount: 0,
+    buyerCount: 0,
+    revenueByCurrency: [],
+    products: [],
+    platforms: [],
+    unparsedRecords: 0,
+    testAccountRecords: 0,
+    editorRecords: 0,
+    unacknowledgedRecords: 0,
+    error,
+  };
 }
 
 async function fetchPurchasesData(): Promise<PurchasesData> {
   try {
     const db = getDb();
-    const snap = await db.collection(GAME.users).limit(MAX_SAMPLE).get();
+    const [snap, testUids] = await Promise.all([
+      db.collection(GAME.users).limit(MAX_SAMPLE).get(),
+      getTestAccountUids(),
+    ]);
 
-    const purchases: PurchaseRecord[] = [];
-    const buyers = new Set<string>();
+    const all: PurchaseRecord[] = [];
     let unparsedRecords = 0;
 
     for (const doc of snap.docs) {
       const data = doc.data();
-      const embedded = data.purchases;
-      if (typeof embedded !== "object" || embedded === null) continue;
-
-      const buyerName =
-        typeof data.username === "string" && data.username.trim()
-          ? data.username.trim()
-          : null;
-
-      for (const [purchaseId, record] of Object.entries(
-        embedded as Record<string, unknown>,
-      )) {
-        if (isParsablePurchase(record)) {
-          purchases.push({
-            purchaseId,
-            productId: record.productId,
-            price: record.price,
-            currency: record.currency.toUpperCase(),
-            platform: record.platform,
-            timestamp: record.timestamp,
-            buyerUid: doc.id,
-            buyerName,
-          });
-          buyers.add(doc.id);
-        } else {
-          unparsedRecords += 1;
-        }
-      }
+      const { purchases, unparsed } = parsePurchaseMap(
+        doc.id,
+        buyerNameFrom(data),
+        data.purchases,
+      );
+      all.push(...purchases);
+      unparsedRecords += unparsed.length;
     }
 
-    purchases.sort((a, b) => b.timestamp - a.timestamp);
+    all.sort((a, b) => b.timestamp - a.timestamp);
+
+    const isExcluded = (p: PurchaseRecord) =>
+      p.isEditorPurchase || testUids.has(p.buyerUid);
+
+    const countable = all.filter((p) => !isExcluded(p));
+    const editorRecords = all.filter((p) => p.isEditorPurchase).length;
+    const testAccountRecords = all.filter(
+      (p) => !p.isEditorPurchase && testUids.has(p.buyerUid),
+    ).length;
+    const unacknowledgedRecords = countable.filter(
+      (p) => p.acknowledged === false,
+    ).length;
 
     const revenueMap = new Map<string, { total: number; count: number }>();
     const productMap = new Map<string, ProductBreakdown>();
     const platformMap = new Map<string, number>();
+    const buyers = new Set<string>();
 
-    for (const p of purchases) {
+    for (const p of countable) {
+      buyers.add(p.buyerUid);
+
       const rev = revenueMap.get(p.currency) ?? { total: 0, count: 0 };
       rev.total += p.price;
       rev.count += 1;
@@ -123,7 +135,12 @@ async function fetchPurchasesData(): Promise<PurchasesData> {
       const productKey = `${p.productId}::${p.currency}`;
       const product =
         productMap.get(productKey) ??
-        ({ productId: p.productId, count: 0, revenue: 0, currency: p.currency } satisfies ProductBreakdown);
+        ({
+          productId: p.productId,
+          count: 0,
+          revenue: 0,
+          currency: p.currency,
+        } satisfies ProductBreakdown);
       product.count += 1;
       product.revenue += p.price;
       productMap.set(productKey, product);
@@ -134,39 +151,33 @@ async function fetchPurchasesData(): Promise<PurchasesData> {
     return {
       connected: true,
       sampleSize: snap.size,
-      purchases,
-      totalCount: purchases.length,
+      scanCapped: snap.size >= MAX_SAMPLE,
+      purchases: countable,
+      allPurchases: all,
+      totalCount: countable.length,
       buyerCount: buyers.size,
       revenueByCurrency: Array.from(revenueMap.entries())
         .map(([currency, { total, count }]) => ({ currency, total, count }))
         .sort((a, b) => b.total - a.total),
-      products: Array.from(productMap.values()).sort((a, b) => b.revenue - a.revenue),
+      products: Array.from(productMap.values()).sort(
+        (a, b) => b.revenue - a.revenue,
+      ),
       platforms: Array.from(platformMap.entries())
         .map(([platform, count]) => ({ platform, count }))
         .sort((a, b) => b.count - a.count),
       unparsedRecords,
+      testAccountRecords,
+      editorRecords,
+      unacknowledgedRecords,
     };
   } catch (err) {
-    return {
-      connected: false,
-      sampleSize: 0,
-      purchases: [],
-      totalCount: 0,
-      buyerCount: 0,
-      revenueByCurrency: [],
-      products: [],
-      platforms: [],
-      unparsedRecords: 0,
-      error: err instanceof Error ? err.message : "Unknown error",
-    };
+    return emptyData(err instanceof Error ? err.message : "Unknown error");
   }
 }
 
 /**
- * 30s shared cache: one 1,000-doc scan serves every admin for the whole
- * auto-refresh window instead of a scan per request. (unstable_cache is
- * deprecated in favour of "use cache", which needs the app-wide
- * cacheComponents migration — out of scope here.)
+ * 30s shared cache: one scan serves every admin for the whole auto-refresh
+ * window instead of a scan per request.
  */
 export const getPurchasesData = unstable_cache(
   fetchPurchasesData,
