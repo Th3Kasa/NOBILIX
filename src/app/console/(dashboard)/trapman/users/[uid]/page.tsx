@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { countryFlag, formatNumber } from "@/lib/utils";
+import { classifyPlayerEmail } from "@/lib/trapman/player-email";
 import { UserActions } from "./user-actions";
 
 export const dynamic = "force-dynamic";
@@ -32,6 +33,7 @@ export default async function UserDetailPage({
   if (!user) notFound();
 
   const canWrite = session?.user?.role !== "viewer";
+  const emailIdentity = classifyPlayerEmail(user.email);
   const ts = (v: unknown) =>
     typeof v === "number" ? format(new Date(v), "PPpp") : "—";
 
@@ -90,7 +92,19 @@ export default async function UserDetailPage({
               value={<span className="font-mono text-xs">{user.uid}</span>}
             />
             <Field label="Display name" value={user.displayName ?? "—"} />
-            <Field label="Email" value={user.email ?? "—"} />
+            <Field
+              label={emailIdentity.label}
+              value={
+                <span className="flex flex-col gap-0.5">
+                  <span>{emailIdentity.address ?? "—"}</span>
+                  {emailIdentity.kind !== "real" && (
+                    <span className="text-xs text-muted-foreground">
+                      {emailIdentity.note}
+                    </span>
+                  )}
+                </span>
+              }
+            />
             <Field
               label="Country"
               value={

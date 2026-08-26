@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { countryFlag, formatNumber, cn } from "@/lib/utils";
+import { classifyPlayerEmail } from "@/lib/trapman/player-email";
 import { listPlayers, type SortField } from "./data";
 import { UsersFilter } from "./users-filter";
 
@@ -154,7 +155,22 @@ export default async function UsersPage({
                           )}
                         </div>
                         <div className="font-mono text-xs text-muted-foreground">
-                          {p.email ?? p.uid}
+                          {(() => {
+                            const id = classifyPlayerEmail(p.email);
+                            // Apple's Hide My Email alias is a real, deliverable
+                            // address — label it so it doesn't read as junk data.
+                            if (id.kind === "apple-relay") {
+                              return (
+                                <span title={id.note}>
+                                  {id.address}{" "}
+                                  <span className="not-italic">
+                                    · Apple private relay
+                                  </span>
+                                </span>
+                              );
+                            }
+                            return id.address ?? p.uid;
+                          })()}
                         </div>
                       </td>
                       <td className="px-4 py-3">
