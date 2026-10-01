@@ -7,6 +7,7 @@ import type {
   CompetitionPeriod,
   CompetitionRecord,
 } from "@/types";
+import { WINNER_PLACES } from "@/lib/trapman/winners";
 
 /**
  * Leaderboard reads and moderation.
@@ -273,7 +274,8 @@ export interface ResetOptions {
 }
 
 /**
- * Archive the top-10 winners, then wipe the boards the operator selected.
+ * Archive the top WINNER_PLACES winners, then wipe the boards the operator
+ * selected.
  *
  * Winners are always captured from the all-time board before anything is
  * deleted, so the archive is written even for an event-only reset.
@@ -290,9 +292,9 @@ export async function archiveAndReset(
   // Capture winners before clearing anything.
   const topSnap = await col
     .orderBy("score", "desc")
-    .limit(10)
+    .limit(WINNER_PLACES)
     .get()
-    .catch(() => col.orderBy("highScore", "desc").limit(10).get());
+    .catch(() => col.orderBy("highScore", "desc").limit(WINNER_PLACES).get());
 
   const countSnap = await col.count().get();
   const totalEntries = countSnap.data().count;

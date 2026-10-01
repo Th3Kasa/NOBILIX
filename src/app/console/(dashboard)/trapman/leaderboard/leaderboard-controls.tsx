@@ -29,6 +29,7 @@ import {
 } from "./actions";
 import type { CompetitionRecord } from "@/types";
 import type { EventBoard } from "@/lib/leaderboard";
+import { WINNER_PLACES } from "@/lib/trapman/winners";
 
 // ─── Reset competition button + modal ────────────────────────────────────────
 
@@ -136,7 +137,7 @@ export function ResetCompetitionModal({
             <div>
               <p className="font-medium">This action is irreversible.</p>
               <p className="mt-0.5 opacity-80">
-                The top 10 winners are archived first, then every entry on the
+                The top {WINNER_PLACES} winners are archived first, then every entry on the
                 boards you tick below is permanently deleted so the next
                 competition period starts fresh.
               </p>
@@ -528,7 +529,7 @@ export function CompetitionHistory({
                     Reset by {comp.resetBy} · {new Date(comp.resetAt).toLocaleString()}
                   </p>
                   <ol className="space-y-1.5">
-                    {comp.winners.map((w, i) => (
+                    {comp.winners.slice(0, WINNER_PLACES).map((w, i) => (
                       <li
                         key={w.uid}
                         className="flex items-center gap-3 text-sm"

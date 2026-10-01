@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import {
   winnerRows,
   repeatWinners,
+  WINNER_PLACES,
   prizeKey,
   isPrizeStatus,
 } from "../src/lib/trapman/winners.ts";
@@ -23,13 +24,20 @@ const history = [
   comp("c2", "Week 2", 2_000, [["b", "Bobby", 950], ["a", "Alice", 940], ["e", null, 100]]),
 ];
 
+test("only the top 3 win — older archives that saved 10 places show just their top 3", () => {
+  assert.equal(WINNER_PLACES, 3);
+  const rows = winnerRows(history, {});
+  assert.ok(rows.every((r) => r.place <= 3));
+  assert.ok(!rows.some((r) => r.uid === "d"), "Dan finished 4th in Week 1");
+});
+
 test("winners are listed newest competition first, 1st place first", () => {
   const rows = winnerRows(history, {});
   assert.deepEqual(
     rows.map((r) => [r.competition, r.place, r.uid]),
     [
       ["Week 2", 1, "b"], ["Week 2", 2, "a"], ["Week 2", 3, "e"],
-      ["Week 1", 1, "a"], ["Week 1", 2, "b"], ["Week 1", 3, "c"], ["Week 1", 4, "d"],
+      ["Week 1", 1, "a"], ["Week 1", 2, "b"], ["Week 1", 3, "c"],
     ],
   );
 });
@@ -47,7 +55,7 @@ test("the same player winning twice gets a separate prize record per competition
 });
 
 test("repeat winners rank by 1st places, then top-3 finishes, using the latest name", () => {
-  const leaders = repeatWinners(winnerRows(history, {}), 3);
+  const leaders = repeatWinners(winnerRows(history, {}));
   assert.deepEqual(
     leaders.map((l) => [l.uid, l.displayName, l.firsts, l.podiums]),
     [
@@ -57,7 +65,6 @@ test("repeat winners rank by 1st places, then top-3 finishes, using the latest n
       ["c", "Cara", 0, 1],
     ],
   );
-  assert.ok(!leaders.some((l) => l.uid === "d"), "4th place is not a podium");
 });
 
 test("only known prize statuses are accepted", () => {

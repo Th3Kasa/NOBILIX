@@ -7,6 +7,9 @@ import type { CompetitionPeriod, CompetitionRecord } from "@/types";
  * Pure so the ordering and the win counting are tested.
  */
 
+/** Places that win a prize, and the most a reset archives. */
+export const WINNER_PLACES = 3;
+
 export type PrizeStatus = "pending" | "contacted" | "sent";
 
 export const PRIZE_STATUSES: { value: PrizeStatus; label: string }[] = [
@@ -38,7 +41,10 @@ export interface WinnerRow {
   status: PrizeStatus;
 }
 
-/** Newest competition first; within a competition, 1st place first. */
+/**
+ * Newest competition first; within a competition, 1st place first. Only the
+ * top WINNER_PLACES are listed — archives made before that limit hold 10.
+ */
 export function winnerRows(
   history: CompetitionRecord[],
   statuses: Record<string, PrizeStatus>,
@@ -46,7 +52,7 @@ export function winnerRows(
   return [...history]
     .sort((a, b) => b.resetAt - a.resetAt)
     .flatMap((comp) =>
-      comp.winners.map((w, i) => {
+      comp.winners.slice(0, WINNER_PLACES).map((w, i) => {
         const key = prizeKey(comp.id, w.uid);
         return {
           key,
@@ -75,7 +81,10 @@ export interface RepeatWinner {
 }
 
 /** Players ranked by how often they finished in the top `maxPlace`. */
-export function repeatWinners(rows: WinnerRow[], maxPlace = 3): RepeatWinner[] {
+export function repeatWinners(
+  rows: WinnerRow[],
+  maxPlace = WINNER_PLACES,
+): RepeatWinner[] {
   const byPlayer = new Map<string, RepeatWinner>();
   // Rows are newest first, so the first name seen is the most recent one.
   for (const r of rows) {

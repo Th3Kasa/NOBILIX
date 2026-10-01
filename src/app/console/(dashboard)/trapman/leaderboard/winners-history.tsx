@@ -3,10 +3,10 @@
 import { useMemo, useState, useTransition } from "react";
 import { AlertCircle, Medal } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import {
   PRIZE_STATUSES,
+  WINNER_PLACES,
   repeatWinners,
   type PrizeStatus,
   type WinnerRow,
@@ -18,8 +18,6 @@ import { EmailWinnerButton } from "./email-winner";
  * Everyone who has placed in a past competition, newest first, with where
  * their prize is up to — so no winner is forgotten and nobody is paid twice.
  */
-
-const PODIUM = 3;
 
 const STATUS_STYLE: Record<PrizeStatus, string> = {
   pending: "border-[var(--console-action-border)] text-[var(--console-action)]",
@@ -44,27 +42,17 @@ export function WinnersHistory({
   emails?: Record<string, string>;
   canWrite: boolean;
 }) {
-  const [podiumOnly, setPodiumOnly] = useState(true);
   // Optimistic overrides, so a change shows instantly while it saves.
   const [statuses, setStatuses] = useState<Record<string, PrizeStatus>>({});
   const [error, setError] = useState<string | null>(null);
   const [, startTransition] = useTransition();
 
-  const visible = useMemo(
-    () => (podiumOnly ? rows.filter((r) => r.place <= PODIUM) : rows),
-    [rows, podiumOnly],
-  );
-  const leaders = useMemo(
-    () => repeatWinners(rows, PODIUM).slice(0, 5),
-    [rows],
-  );
+  const leaders = useMemo(() => repeatWinners(rows).slice(0, 5), [rows]);
 
   if (rows.length === 0) return null;
 
   const statusOf = (r: WinnerRow) => statuses[r.key] ?? r.status;
-  const outstanding = rows.filter(
-    (r) => r.place <= PODIUM && statusOf(r) !== "sent",
-  ).length;
+  const outstanding = rows.filter((r) => statusOf(r) !== "sent").length;
 
   function update(r: WinnerRow, status: PrizeStatus) {
     const previous = statusOf(r);
@@ -87,17 +75,12 @@ export function WinnersHistory({
         <h2 className="font-semibold">Winners history</h2>
         {outstanding > 0 && (
           <Badge variant="outline" className={STATUS_STYLE.pending}>
-            {outstanding} top-{PODIUM} prize{outstanding === 1 ? "" : "s"} not sent
+            {outstanding} prize{outstanding === 1 ? "" : "s"} not sent
           </Badge>
         )}
-        <label className="ml-auto flex items-center gap-2 text-xs text-muted-foreground">
-          <Switch
-            checked={podiumOnly}
-            onCheckedChange={setPodiumOnly}
-            aria-label="Show top 3 only"
-          />
-          Top {PODIUM} only
-        </label>
+        <span className="ml-auto text-xs text-muted-foreground">
+          Top {WINNER_PLACES} of each competition
+        </span>
       </div>
 
       {leaders.length > 0 && (
@@ -109,7 +92,7 @@ export function WinnersHistory({
                 {l.displayName ?? `${l.uid.slice(0, 8)}…`}
               </span>{" "}
               {l.firsts > 0 && `${l.firsts}× 1st · `}
-              {l.podiums} top-{PODIUM}
+              {l.podiums} top-{WINNER_PLACES}
             </span>
           ))}
         </div>
@@ -136,7 +119,7 @@ export function WinnersHistory({
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {visible.map((r) => {
+            {rows.map((r) => {
               const status = statusOf(r);
               return (
                 <tr key={r.key} className="hover:bg-accent/30">
