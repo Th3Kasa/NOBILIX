@@ -11,6 +11,7 @@ import {
   AlertCircle,
   ChevronDown,
   ChevronUp,
+  Pencil,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,10 +22,13 @@ import { cn } from "@/lib/utils";
 import {
   resetLeaderboardAction,
   removeEntryAction,
+  editScoreAction,
   type ResetState,
   type RemoveState,
+  type EditScoreState,
 } from "./actions";
 import type { CompetitionRecord } from "@/types";
+import type { EventBoard } from "@/lib/leaderboard";
 
 // ─── Reset competition button + modal ────────────────────────────────────────
 
@@ -37,7 +41,13 @@ function ResetSubmitButton() {
   );
 }
 
-export function ResetCompetitionModal() {
+export function ResetCompetitionModal({
+  mainBoardCount,
+  eventBoards,
+}: {
+  mainBoardCount: number;
+  eventBoards: EventBoard[];
+}) {
   const [open, setOpen] = useState(false);
   const [confirm, setConfirm] = useState("");
   const [summary, setSummary] = useState<ResetState["summary"] | null>(null);
@@ -97,10 +107,22 @@ export function ResetCompetitionModal() {
                   &ldquo;{summary.label}&rdquo; archived.
                 </p>
                 <p className="mt-0.5 text-muted-foreground">
-                  {summary.totalEntries} entr{summary.totalEntries === 1 ? "y" : "ies"} archived,{" "}
-                  {summary.winnersCount} winner{summary.winnersCount === 1 ? "" : "s"} recorded.
-                  The leaderboard is now empty for the next competition.
+                  {summary.winnersCount} winner
+                  {summary.winnersCount === 1 ? "" : "s"} recorded from{" "}
+                  {summary.totalEntries} entr
+                  {summary.totalEntries === 1 ? "y" : "ies"}.
                 </p>
+                <ul className="mt-1.5 space-y-0.5 text-muted-foreground">
+                  {summary.clearedMainBoard && (
+                    <li>Overall leaderboard cleared.</li>
+                  )}
+                  {summary.clearedEventBoards.map((b) => (
+                    <li key={b.eventId}>
+                      Event board &ldquo;{b.eventId}&rdquo; cleared —{" "}
+                      {b.deleted} entr{b.deleted === 1 ? "y" : "ies"} removed.
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
             <Button type="button" onClick={handleClose} className="w-full">
@@ -114,14 +136,76 @@ export function ResetCompetitionModal() {
             <div>
               <p className="font-medium">This action is irreversible.</p>
               <p className="mt-0.5 opacity-80">
-                The top 10 winners will be archived, then every entry on the
-                leaderboard is permanently deleted so the next competition
-                period starts fresh.
+                The top 10 winners are archived first, then every entry on the
+                boards you tick below is permanently deleted so the next
+                competition period starts fresh.
               </p>
             </div>
           </div>
 
           <form action={formAction} className="space-y-4">
+            {/* The game keeps a separate board per timed event. Resetting only
+                the overall board used to leave those untouched — and invisible
+                — so a "reset" competition kept showing the old standings. */}
+            <div className="space-y-1.5">
+              <Label>Which leaderboards to reset</Label>
+              <div className="space-y-2 rounded-md border border-border p-3">
+                <label className="flex cursor-pointer items-start gap-2.5 text-sm">
+                  <input
+                    type="checkbox"
+                    name="includeMainBoard"
+                    defaultChecked
+                    className="mt-0.5 size-4 cursor-pointer accent-[var(--console-violet)]"
+                  />
+                  <span>
+                    <span className="font-medium">Overall leaderboard</span>
+                    <span className="block text-xs text-muted-foreground">
+                      {mainBoardCount.toLocaleString()} entr
+                      {mainBoardCount === 1 ? "y" : "ies"}
+                    </span>
+                  </span>
+                </label>
+
+                {eventBoards.length === 0 ? (
+                  <p className="text-xs text-muted-foreground">
+                    No per-event boards exist right now.
+                  </p>
+                ) : (
+                  eventBoards.map((board) => (
+                    <label
+                      key={board.eventId}
+                      className="flex cursor-pointer items-start gap-2.5 text-sm"
+                    >
+                      <input
+                        type="checkbox"
+                        name="eventIds"
+                        value={board.eventId}
+                        defaultChecked={board.isCurrent}
+                        className="mt-0.5 size-4 cursor-pointer accent-[var(--console-violet)]"
+                      />
+                      <span>
+                        <span className="font-medium">
+                          {board.eventName ?? board.eventId}
+                        </span>
+                        {board.isCurrent && (
+                          <Badge
+                            variant="success"
+                            className="ml-2 font-mono text-[10px] uppercase"
+                          >
+                            Current event
+                          </Badge>
+                        )}
+                        <span className="block text-xs text-muted-foreground">
+                          Event board · {board.entryCount.toLocaleString()} entr
+                          {board.entryCount === 1 ? "y" : "ies"}
+                        </span>
+                      </span>
+                    </label>
+                  ))
+                )}
+              </div>
+            </div>
+
             <div className="space-y-1.5">
               <Label>Competition period</Label>
               <div className="grid grid-cols-4 gap-2">
@@ -277,6 +361,102 @@ export function RemoveEntryButton({
             </div>
           </form>
         </div>
+      </Modal>
+    </>
+  );
+}
+
+// ─── Edit score button + modal ───────────────────────────────────────────────
+
+export function EditScoreButton({
+  uid,
+  displayName,
+  score,
+}: {
+  uid: string;
+  displayName?: string | null;
+  score: number;
+}) {
+  const [open, setOpen] = useState(false);
+  const router = useRouter();
+
+  const [state, formAction, pending] = useActionState<EditScoreState, FormData>(
+    async (prev, fd) => {
+      const res = await editScoreAction(prev, fd);
+      if (res.ok) {
+        setOpen(false);
+        router.refresh();
+      }
+      return res;
+    },
+    {},
+  );
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-label={`Edit score for ${displayName ?? uid}`}
+        title="Edit score"
+        className="inline-flex size-11 shrink-0 items-center justify-center rounded text-muted-foreground transition hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <Pencil className="size-4" aria-hidden="true" />
+      </button>
+
+      <Modal open={open} onClose={() => setOpen(false)} title="Edit score">
+        <form action={formAction} className="space-y-4">
+          <input type="hidden" name="uid" value={uid} />
+          <input type="hidden" name="displayName" value={displayName ?? uid} />
+
+          <p className="text-sm text-muted-foreground">
+            <span className="font-medium text-foreground">
+              {displayName ?? uid}
+            </span>{" "}
+            currently has{" "}
+            <span className="font-mono tabular-nums text-foreground">
+              {score.toLocaleString()}
+            </span>
+            . The new score shows on the board like any other — players see
+            no notice.
+          </p>
+
+          <div className="space-y-1.5">
+            <Label htmlFor={`score-${uid}`}>New score</Label>
+            <Input
+              id={`score-${uid}`}
+              name="score"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              step={1}
+              required
+              defaultValue={score}
+              autoFocus
+            />
+          </div>
+
+          {state.error && (
+            <div className="flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+              <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+              <span>{state.error}</span>
+            </div>
+          )}
+
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setOpen(false)}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={pending} className="flex-1">
+              {pending ? "Saving…" : "Save score"}
+            </Button>
+          </div>
+        </form>
       </Modal>
     </>
   );

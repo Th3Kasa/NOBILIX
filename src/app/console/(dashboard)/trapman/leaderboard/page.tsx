@@ -1,22 +1,27 @@
 import { auth } from "@/auth";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
-import { formatNumber, countryFlag, cn } from "@/lib/utils";
-import { listLeaderboard, getCompetitionHistory } from "@/lib/leaderboard";
+import { formatNumber } from "@/lib/utils";
+import {
+  listLeaderboard,
+  listEventBoards,
+  getCompetitionHistory,
+} from "@/lib/leaderboard";
 import {
   ResetCompetitionModal,
-  RemoveEntryButton,
   CompetitionHistory,
 } from "./leaderboard-controls";
+import { LeaderboardTable } from "./leaderboard-table";
 
 export const dynamic = "force-dynamic";
 
 export default async function LeaderboardPage() {
-  const [session, { entries, totalCount, connected, error }, history] =
+  const [session, { entries, totalCount, connected, error }, history, eventBoards] =
     await Promise.all([
       auth(),
       listLeaderboard(100, 0),
       getCompetitionHistory(20),
+      listEventBoards(),
     ]);
 
   const canWrite = session?.user?.role !== "viewer";
@@ -31,8 +36,11 @@ export default async function LeaderboardPage() {
             : "Leaderboard · Firebase unreachable"
         }
         action={
-          canWrite && connected && entries.length > 0 ? (
-            <ResetCompetitionModal />
+          canWrite && connected ? (
+            <ResetCompetitionModal
+              mainBoardCount={totalCount}
+              eventBoards={eventBoards}
+            />
           ) : undefined
         }
       />
@@ -48,12 +56,59 @@ export default async function LeaderboardPage() {
       )}
 
       <div className="space-y-6">
-        {/* Current leaderboard */}
+        {/* Per-event boards. The game scores timed events on their own boards,
+            and until now the console could not see them at all. */}
+        {connected && eventBoards.length > 0 && (
+          <div className="console-glass rounded-lg border border-border bg-card">
+            <div className="flex items-center gap-2 border-b border-border px-5 py-4">
+              <h2 className="font-semibold">Event boards</h2>
+              <span className="ml-auto text-xs text-muted-foreground">
+                Scored separately from the overall board
+              </span>
+            </div>
+            <ul className="divide-y divide-border/60">
+              {eventBoards.map((board) => (
+                <li
+                  key={board.eventId}
+                  className="flex flex-wrap items-center gap-3 px-5 py-3 text-sm"
+                >
+                  <span className="font-medium">
+                    {board.eventName ?? board.eventId}
+                  </span>
+                  {board.isCurrent && (
+                    <Badge
+                      variant="success"
+                      className="font-mono uppercase tracking-wide"
+                    >
+                      Current event
+                    </Badge>
+                  )}
+                  <span className="font-mono text-xs text-muted-foreground">
+                    {board.eventId}
+                  </span>
+                  <span className="ml-auto font-mono text-sm tabular-nums">
+                    {formatNumber(board.entryCount)} entr
+                    {board.entryCount === 1 ? "y" : "ies"}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <p className="border-t border-border/60 px-5 py-3 text-xs text-muted-foreground">
+              &ldquo;Reset competition&rdquo; can clear these too — pick which
+              boards to wipe in the reset dialog.
+            </p>
+          </div>
+        )}
+
+        {/* Current standings */}
         <div className="console-glass rounded-lg border border-border bg-card">
           <div className="flex items-center gap-2 border-b border-border px-5 py-4">
             <h2 className="font-semibold">Current standings</h2>
             {connected && (
-              <Badge variant="success" className="ml-auto font-mono uppercase tracking-wide">
+              <Badge
+                variant="success"
+                className="ml-auto font-mono uppercase tracking-wide"
+              >
                 <span className="mr-1 size-1.5 rounded-full bg-current drop-shadow-[0_0_3px_currentColor]" />
                 Live
               </Badge>
@@ -69,81 +124,14 @@ export default async function LeaderboardPage() {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border text-left font-mono text-xs uppercase tracking-wide text-muted-foreground">
-                    <th scope="col" className="px-5 py-3 w-14">#</th>
-                    <th scope="col" className="px-3 py-3">Player</th>
-                    <th scope="col" className="px-3 py-3 hidden sm:table-cell">Country</th>
-                    <th scope="col" className="px-3 py-3 hidden md:table-cell">Character</th>
-                    <th scope="col" className="px-3 py-3 text-right">Score</th>
-                    {canWrite && <th scope="col" className="px-3 py-3 w-14" />}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/50">
-                  {entries.map((entry) => (
-                    <tr
-                      key={entry.uid}
-                      className="group transition-colors hover:bg-accent/30"
-                    >
-                      <td className="px-5 py-3">
-                        <span
-                          className={cn(
-                            "font-mono tabular-nums",
-                            entry.rank === 1
-                              ? "text-yellow-500 font-bold drop-shadow-[0_0_5px_var(--neon-yellow)]"
-                              : entry.rank === 2
-                                ? "text-slate-400 font-bold"
-                                : entry.rank === 3
-                                  ? "text-orange-400 font-bold"
-                                  : "text-muted-foreground",
-                          )}
-                        >
-                          {entry.rank}
-                        </span>
-                      </td>
-                      <td className="px-3 py-3">
-                        <div className="font-medium">
-                          {entry.displayName ?? (
-                            <span className="text-muted-foreground font-mono text-xs">
-                              {entry.uid.slice(0, 8)}…
-                            </span>
-                          )}
-                        </div>
-                        <div className="font-mono text-xs text-muted-foreground">
-                          {entry.uid.slice(0, 12)}…
-                        </div>
-                      </td>
-                      <td className="px-3 py-3 hidden sm:table-cell text-muted-foreground">
-                        {entry.country ? (
-                          <span>
-                            {countryFlag(entry.country)}{" "}
-                            <span className="text-xs">{entry.country}</span>
-                          </span>
-                        ) : (
-                          <span className="text-xs">—</span>
-                        )}
-                      </td>
-                      <td className="px-3 py-3 hidden md:table-cell text-muted-foreground text-xs">
-                        {entry.character ?? "—"}
-                      </td>
-                      <td className="px-3 py-3 text-right font-mono font-semibold tabular-nums">
-                        {entry.score.toLocaleString()}
-                      </td>
-                      {canWrite && (
-                        <td className="px-3 py-3 text-right">
-                          <RemoveEntryButton
-                            uid={entry.uid}
-                            displayName={entry.displayName}
-                          />
-                        </td>
-                      )}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <LeaderboardTable entries={entries} canWrite={canWrite} />
+          )}
+
+          {connected && totalCount > entries.length && (
+            <p className="border-t border-border/60 px-5 py-3 text-xs text-muted-foreground">
+              Showing the top {entries.length} of {formatNumber(totalCount)}{" "}
+              entries.
+            </p>
           )}
         </div>
 
