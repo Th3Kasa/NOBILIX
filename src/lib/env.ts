@@ -52,6 +52,15 @@ const schema = z.object({
   APPSTORE_VENDOR_NUMBER: z.string().optional(),
   APPSTORE_PRIVATE_KEY_B64: z.string().optional(),
 
+  // --- Google Play: downloads, sales and earnings ---
+  // The account's reports bucket from Play Console → Download reports (the
+  // Cloud Storage URI, with or without gs:// and a folder). Read with the same
+  // service account as purchase verification, which needs "View app
+  // information and download bulk reports" and "View financial data".
+  PLAY_REPORTS_BUCKET: z.string().optional(),
+  // Defaults to com.cultshotta.trapman.
+  PLAY_PACKAGE_NAME: z.string().optional(),
+
   // --- Google Analytics 4 (console TrapMan overview) ---
   // GA4 property ID for the Analytics Data API. Optional — falls back to the
   // TrapMan property's known ID when unset.

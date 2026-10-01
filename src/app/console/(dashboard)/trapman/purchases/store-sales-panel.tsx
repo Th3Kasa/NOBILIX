@@ -1,190 +1,349 @@
+import type { ReactNode } from "react";
 import { Info, Store } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { countryFlag } from "@/lib/utils";
 import { productLabel } from "@/lib/trapman/labels";
 import type { AppleSalesData } from "@/lib/trapman/app-store-connect";
+import type { PlaySalesData } from "@/lib/trapman/play-reports";
+import type { StoreSalesSummary } from "@/lib/trapman/store-reports";
+import { convertToAud, formatAud, formatOriginal, type FxRates } from "../fx";
 
 /**
- * Apple's own account of iOS sales, shown next to the console's Firestore-
+ * Each store's own account of what sold, next to the console's Firestore-
  * derived figures.
  *
- * These two numbers answer subtly different questions and are meant to be
- * compared, not merged. The figures above this panel are what the *game*
- * recorded; this panel is what Apple actually billed for — already net of
- * refunds, and with sandbox and TestFlight purchases never included. When they
- * disagree, the gap is the interesting part: it means the game is dropping
- * purchases, or recording ones that never completed.
+ * The figures elsewhere on this page are what the *game* recorded; these are
+ * what Apple and Google actually billed — test purchases never included,
+ * refunds already accounted for. When the two disagree, trust these for money
+ * and the game's records for who bought.
  */
-export function StoreSalesPanel({ apple }: { apple: AppleSalesData }) {
-  if (!apple.configured) {
-    return (
-      <Card className="console-glass mb-6">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-base">
-            <Store
-              className="size-4 text-[var(--console-violet)]"
-              aria-hidden="true"
-            />
-            Sales direct from the App Store
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="pt-0 text-sm">
-          <div className="rounded-md border border-border bg-muted/30 p-3">
-            <p className="font-medium">Not connected yet</p>
-            <p className="mt-1 text-muted-foreground">
-              Apple can report exactly how many iPhone sales there really were,
-              net of refunds and with test purchases already excluded — which is
-              the only way to get trustworthy iOS numbers, since the game
-              doesn&apos;t save a usable receipt. It needs an App Store Connect
-              API key with the Sales role, plus your vendor number.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
+
+/** Sum per-currency amounts in AUD, listing any currency without a rate. */
+function toAud(
+  amounts: { currency: string; total: number }[],
+  fx: FxRates,
+): { aud: number; unconverted: string[] } {
+  let aud = 0;
+  const unconverted: string[] = [];
+  for (const { currency, total } of amounts) {
+    const converted = fx.connected ? convertToAud(total, currency, fx) : null;
+    if (converted === null) unconverted.push(formatOriginal(total, currency));
+    else aud += converted;
   }
+  return { aud, unconverted };
+}
 
-  const s = apple.summary;
-
+function Money({
+  amounts,
+  fx,
+}: {
+  amounts: { currency: string; total: number }[];
+  fx: FxRates;
+}) {
+  if (amounts.length === 0) return <>—</>;
+  const { aud, unconverted } = toAud(amounts, fx);
   return (
-    <Card className="console-glass mb-6">
+    <>
+      {formatAud(aud)}
+      {unconverted.length > 0 && (
+        <span className="block text-xs text-muted-foreground">
+          + {unconverted.join(" + ")}
+        </span>
+      )}
+    </>
+  );
+}
+
+function Tile({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div>
+      <p className="text-xs uppercase tracking-wide text-muted-foreground">
+        {label}
+      </p>
+      <p className="font-mono text-2xl tabular-nums">{children}</p>
+    </div>
+  );
+}
+
+function StoreCard({
+  title,
+  badge,
+  children,
+  note,
+}: {
+  title: string;
+  badge?: string | null;
+  children: ReactNode;
+  note: string;
+}) {
+  return (
+    <Card className="console-glass">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-base">
           <Store
             className="size-4 text-[var(--console-violet)]"
             aria-hidden="true"
           />
-          Sales direct from the App Store
-          {apple.latestReportDate && (
+          {title}
+          {badge && (
             <Badge variant="secondary" className="ml-auto font-mono text-[10px]">
-              through {apple.latestReportDate}
+              {badge}
             </Badge>
           )}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4 pt-0 text-sm">
-        {apple.error && (
-          <div className="rounded-md border border-[var(--console-action-border)] bg-[var(--console-action-tint)] p-3">
-            <p className="font-medium text-[var(--console-action)]">
-              Apple couldn&apos;t be fully read
-            </p>
-            <p className="mt-1 text-muted-foreground">{apple.error}</p>
-          </div>
-        )}
-
-        {!s || (s.appUnits === 0 && s.iapUnits === 0) ? (
-          <p className="text-muted-foreground">
-            Apple has published no iOS sales for this period.
-          </p>
-        ) : (
-          <>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              <div>
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                  App downloads
-                </p>
-                <p className="font-mono text-2xl tabular-nums">
-                  {s.appUnits.toLocaleString()}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                  In-app purchases
-                </p>
-                <p className="font-mono text-2xl tabular-nums">
-                  {s.iapUnits.toLocaleString()}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                  Your earnings
-                </p>
-                <p className="font-mono text-2xl tabular-nums">
-                  {s.proceedsByCurrency.length === 0
-                    ? "—"
-                    : s.proceedsByCurrency
-                        .map(
-                          (p) =>
-                            `${p.total.toFixed(2)} ${p.currency}`,
-                        )
-                        .join(" · ")}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-wide text-muted-foreground">
-                  Refunded
-                </p>
-                <p className="font-mono text-2xl tabular-nums">
-                  {s.refundedUnits.toLocaleString()}
-                </p>
-              </div>
-            </div>
-
-            {s.products.length > 0 && (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
-                      <th scope="col" className="py-2 pr-4 font-medium">Product</th>
-                      <th scope="col" className="py-2 pr-4 font-medium">Units</th>
-                      <th scope="col" className="py-2 font-medium">Earnings</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {s.products.map((p) => (
-                      <tr
-                        key={`${p.sku}-${p.currency}`}
-                        className="border-b border-border/60 last:border-0"
-                      >
-                        <td className="py-2 pr-4">
-                          <span className="font-medium">
-                            {productLabel(p.sku)}
-                          </span>
-                          <Badge
-                            variant="outline"
-                            className="ml-2 text-[10px] uppercase"
-                          >
-                            {p.kind === "iap" ? "In-app" : "App"}
-                          </Badge>
-                        </td>
-                        <td className="py-2 pr-4 font-mono tabular-nums">
-                          {p.units.toLocaleString()}
-                        </td>
-                        <td className="py-2 font-mono tabular-nums">
-                          {p.proceeds.toFixed(2)} {p.currency}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {s.countries.length > 0 && (
-              <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
-                {s.countries.slice(0, 10).map((c) => (
-                  <span key={c.countryCode}>
-                    {countryFlag(c.countryCode)} {c.countryCode}{" "}
-                    <span className="font-mono tabular-nums">{c.units}</span>
-                  </span>
-                ))}
-              </div>
-            )}
-          </>
-        )}
-
+        {children}
         <p className="flex items-start gap-1.5 border-t border-border/60 pt-3 text-xs text-muted-foreground">
           <Info className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
-          <span>
-            Apple publishes each day&apos;s report about a day later, so this
-            lags the figures above — but it excludes sandbox and TestFlight
-            purchases and is already net of refunds. Where the two disagree,
-            trust this one for money and the list above for who bought.
-          </span>
+          <span>{note}</span>
         </p>
       </CardContent>
     </Card>
   );
 }
 
+function Notice({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div className="rounded-md border border-[var(--console-action-border)] bg-[var(--console-action-tint)] p-3">
+      <p className="font-medium text-[var(--console-action)]">{title}</p>
+      <p className="mt-1 text-muted-foreground">{children}</p>
+    </div>
+  );
+}
+
+function NotConnected({ children }: { children: ReactNode }) {
+  return (
+    <div className="rounded-md border border-border bg-muted/30 p-3">
+      <p className="font-medium">Not connected yet</p>
+      <p className="mt-1 text-muted-foreground">{children}</p>
+    </div>
+  );
+}
+
+function ProductsTable({
+  summary,
+  fx,
+  moneyLabel,
+}: {
+  summary: StoreSalesSummary;
+  fx: FxRates;
+  moneyLabel: string;
+}) {
+  if (summary.products.length === 0) return null;
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
+            <th scope="col" className="py-2 pr-4 font-medium">Product</th>
+            <th scope="col" className="py-2 pr-4 font-medium">Units</th>
+            <th scope="col" className="py-2 font-medium">{moneyLabel}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {summary.products.map((p) => {
+            const aud = fx.connected ? convertToAud(p.proceeds, p.currency, fx) : null;
+            return (
+              <tr
+                key={`${p.sku}-${p.currency}`}
+                className="border-b border-border/60 last:border-0"
+              >
+                <td className="py-2 pr-4">
+                  <span className="font-medium">{productLabel(p.sku)}</span>
+                  <Badge variant="outline" className="ml-2 text-[10px] uppercase">
+                    {p.kind === "iap" ? "In-app" : "App"}
+                  </Badge>
+                </td>
+                <td className="py-2 pr-4 font-mono tabular-nums">
+                  {p.units.toLocaleString()}
+                </td>
+                <td className="py-2 font-mono tabular-nums">
+                  {aud !== null ? formatAud(aud) : formatOriginal(p.proceeds, p.currency)}
+                  {aud !== null && p.currency !== "AUD" && (
+                    <span className="ml-2 text-xs text-muted-foreground">
+                      {formatOriginal(p.proceeds, p.currency)}
+                    </span>
+                  )}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function Countries({ summary }: { summary: StoreSalesSummary }) {
+  if (summary.countries.length === 0) return null;
+  return (
+    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+      {summary.countries.slice(0, 10).map((c) => (
+        <span key={c.countryCode}>
+          {countryFlag(c.countryCode)} {c.countryCode}{" "}
+          <span className="font-mono tabular-nums">{c.units}</span>
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function monthLabel(yyyymm: string): string {
+  const d = new Date(Date.UTC(Number(yyyymm.slice(0, 4)), Number(yyyymm.slice(4)) - 1, 1));
+  return d.toLocaleDateString("en-AU", { month: "long", year: "numeric", timeZone: "UTC" });
+}
+
+function ApplePanel({ apple, fx }: { apple: AppleSalesData; fx: FxRates }) {
+  const s = apple.summary;
+  return (
+    <StoreCard
+      title="App Store (iPhone)"
+      badge={apple.latestReportDate ? `through ${apple.latestReportDate}` : null}
+      note="Last 30 days, from Apple's daily sales reports (about a day behind). Earnings are after Apple's commission and already net of refunds; sandbox and TestFlight purchases are never included."
+    >
+      {!apple.configured ? (
+        <NotConnected>
+          Needs an App Store Connect API key with the Sales role (Issuer ID,
+          Key ID and the .p8 key) plus the vendor number.
+        </NotConnected>
+      ) : (
+        <>
+          {apple.error && <Notice title="Apple couldn't be fully read">{apple.error}</Notice>}
+          {!s || (s.appUnits === 0 && s.iapUnits === 0 && s.refundedUnits === 0) ? (
+            <p className="text-muted-foreground">
+              Apple has published no iPhone sales or downloads for this period.
+            </p>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                <Tile label="Downloads">{s.appUnits.toLocaleString()}</Tile>
+                <Tile label="In-app purchases">{s.iapUnits.toLocaleString()}</Tile>
+                <Tile label="Your earnings">
+                  <Money amounts={s.proceedsByCurrency} fx={fx} />
+                </Tile>
+                <Tile label="Refunded">{s.refundedUnits.toLocaleString()}</Tile>
+              </div>
+              <ProductsTable summary={s} fx={fx} moneyLabel="Earnings" />
+              <Countries summary={s} />
+            </>
+          )}
+        </>
+      )}
+    </StoreCard>
+  );
+}
+
+function PlayPanel({ play, fx }: { play: PlaySalesData; fx: FxRates }) {
+  const s = play.sales;
+  const latest = [play.latestSaleDate, play.installs?.latestDate]
+    .filter((d): d is string => !!d)
+    .sort()
+    .at(-1);
+  return (
+    <StoreCard
+      title="Google Play (Android)"
+      badge={latest ? `through ${latest}` : null}
+      note="Downloads and sales cover the last 30 days and run 2–7 days behind. Sales are what buyers paid, before Google's fee and tax; payouts are what Google actually pays, published once each month closes."
+    >
+      {!play.configured ? (
+        <NotConnected>
+          Needs the Play reports bucket (PLAY_REPORTS_BUCKET) and the
+          console&apos;s service account invited in Play Console with access to
+          bulk reports and financial data.
+        </NotConnected>
+      ) : (
+        <>
+          {play.error && <Notice title="Google Play couldn't be fully read">{play.error}</Notice>}
+          {play.unreadableFiles.length > 0 && (
+            <Notice title="Some report files weren't recognised">
+              Google may have changed their layout:{" "}
+              {play.unreadableFiles.join(", ")}
+            </Notice>
+          )}
+          {play.connected && (
+            <>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                <Tile label="New installs">
+                  {play.installs ? play.installs.newUsers.toLocaleString() : "—"}
+                </Tile>
+                <Tile label="In-app purchases">
+                  {s ? s.iapUnits.toLocaleString() : "0"}
+                </Tile>
+                <Tile label="Sales (before fees)">
+                  {s ? <Money amounts={s.proceedsByCurrency} fx={fx} /> : formatAud(0)}
+                </Tile>
+                <Tile label="Refunded">{s ? s.refundedUnits.toLocaleString() : "0"}</Tile>
+              </div>
+
+              {play.installs && (
+                <p className="text-xs text-muted-foreground">
+                  {play.installs.uninstalls.toLocaleString()} uninstalls in the
+                  same period
+                  {play.installs.activeDevices
+                    ? ` · installed on ${play.installs.activeDevices.toLocaleString()} devices as of ${play.installs.latestDate}`
+                    : ""}
+                  .
+                </p>
+              )}
+
+              {s && s.appUnits > 0 && (
+                <p className="text-xs text-muted-foreground">
+                  Includes {s.appUnits.toLocaleString()} paid download
+                  {s.appUnits === 1 ? "" : "s"}.
+                </p>
+              )}
+
+              {s && <ProductsTable summary={s} fx={fx} moneyLabel="Sales" />}
+              {s && <Countries summary={s} />}
+
+              {play.earnings.length > 0 && (
+                <div className="space-y-1 rounded-md border border-border p-3">
+                  <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                    Paid out by Google (after fee and tax)
+                  </p>
+                  {play.earnings.map((e) => {
+                    const net = convertToAud(e.net, e.currency, fx);
+                    return (
+                      <p key={e.month} className="flex justify-between gap-4">
+                        <span>{monthLabel(e.month)}</span>
+                        <span className="font-mono tabular-nums">
+                          {net !== null ? formatAud(net) : formatOriginal(e.net, e.currency)}
+                        </span>
+                      </p>
+                    );
+                  })}
+                </div>
+              )}
+
+              {play.backfilling && !play.error && (
+                <p className="text-xs text-muted-foreground">
+                  Still loading older report files — the rest arrive on the
+                  next refresh.
+                </p>
+              )}
+            </>
+          )}
+        </>
+      )}
+    </StoreCard>
+  );
+}
+
+export function StoreSalesPanel({
+  apple,
+  play,
+  fx,
+}: {
+  apple: AppleSalesData;
+  play: PlaySalesData;
+  fx: FxRates;
+}) {
+  return (
+    <div className="mb-6 grid gap-4 xl:grid-cols-2">
+      <ApplePanel apple={apple} fx={fx} />
+      <PlayPanel play={play} fx={fx} />
+    </div>
+  );
+}

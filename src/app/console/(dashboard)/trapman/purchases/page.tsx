@@ -17,6 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getTestAccountUids } from "@/lib/trapman/test-accounts";
 import { getAppleSales } from "@/lib/trapman/app-store-connect";
+import { getPlaySales } from "@/lib/trapman/play-reports";
 import { productLabel, platformLabel } from "@/lib/trapman/labels";
 import type { PurchaseVerdict } from "@/lib/trapman/play-verify";
 import { getPurchasesData, summarise, type ExclusionReason } from "./data";
@@ -86,13 +87,14 @@ export default async function PurchasesPage({
 }: {
   searchParams: Promise<{ range?: string; from?: string; to?: string }>;
 }) {
-  const [data, fx, testUids, session, range, apple] = await Promise.all([
+  const [data, fx, testUids, session, range, apple, play] = await Promise.all([
     getPurchasesData(),
     getAudRates(),
     getTestAccountUids(),
     auth(),
     searchParams.then(resolveRangeNow),
     getAppleSales(30),
+    getPlaySales(),
   ]);
   const canWrite = session?.user?.role !== "viewer";
 
@@ -160,6 +162,12 @@ export default async function PurchasesPage({
         title="Purchases"
         description="Real sales only — test, promo and refunded purchases are identified and kept out of the totals."
       />
+
+      {/* The stores' own numbers lead the page: they are what was actually
+          billed, and they do not depend on the game having saved anything.
+          Kept separate from the totals below, which follow the range picker
+          rather than each store's 30-day reporting window. */}
+      <StoreSalesPanel apple={apple} play={play} fx={fx} />
 
       {!data.connected ? (
         <Card className="console-empty-state border-[var(--console-action-border)] bg-[var(--console-action-tint)]">
@@ -250,13 +258,6 @@ export default async function PurchasesPage({
               }
             />
           </div>
-
-          {/* Apple's own numbers, for comparison against the figures above.
-              Deliberately a separate panel rather than merged into the totals:
-              it covers a fixed 30-day window on Apple's reporting cadence, not
-              the range picked above, and conflating the two would produce a
-              number that is neither. */}
-          <StoreSalesPanel apple={apple} />
 
           {/* How much of the headline figure is proven, and what is blocking
               the rest. This is the difference between a number and a number
