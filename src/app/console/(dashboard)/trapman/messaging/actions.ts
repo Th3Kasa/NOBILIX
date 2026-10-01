@@ -1,11 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { z } from "zod";
 import { requireWriteAccess } from "@/lib/authz";
 import { sendCampaign, previewAudience } from "@/lib/campaigns";
 import { recordAudit } from "@/lib/audit";
-import type { CampaignAudience, CampaignFailure } from "@/types";
+import type { CampaignFailure } from "@/types";
+import { composeSchema, buildAudience } from "./form";
 
 export interface SendState {
   ok?: boolean;
@@ -32,42 +32,16 @@ export interface PreviewState {
   error?: string;
 }
 
-const baseSchema = z.object({
-  title: z.string().min(1, "Title is required").max(120),
-  body: z.string().min(1, "Message is required").max(1000),
-  audienceType: z.enum(["single", "segment", "broadcast"]),
-  uid: z.string().optional(),
-  country: z.string().max(2).optional(),
-  minLevel: z.coerce.number().int().min(0).optional(),
-  maxLevel: z.coerce.number().int().min(0).optional(),
-  lastActiveDays: z.coerce.number().int().min(0).optional(),
-});
-
-function buildAudience(d: z.infer<typeof baseSchema>): CampaignAudience | null {
-  if (d.audienceType === "single") {
-    if (!d.uid) return null;
-    return { type: "single", uid: d.uid };
-  }
-  if (d.audienceType === "broadcast") return { type: "broadcast" };
-  return {
-    type: "segment",
-    filters: {
-      country: d.country || undefined,
-      minLevel: d.minLevel,
-      maxLevel: d.maxLevel,
-      lastActiveDays: d.lastActiveDays,
-    },
-  };
-}
-
 export async function previewAction(
   _prev: PreviewState,
   formData: FormData,
 ): Promise<PreviewState> {
   try {
     await requireWriteAccess();
-    const parsed = baseSchema.safeParse(Object.fromEntries(formData));
-    if (!parsed.success) return { error: "Check the form fields." };
+    const parsed = composeSchema.safeParse(Object.fromEntries(formData));
+    if (!parsed.success) {
+      return { error: parsed.error.issues[0]?.message ?? "Check the form fields." };
+    }
     const audience = buildAudience(parsed.data);
     if (!audience) return { error: "Select a valid audience." };
     return await previewAudience(audience);
@@ -87,7 +61,7 @@ export async function sendCampaignAction(
     return { error: e instanceof Error ? e.message : "Unauthorized" };
   }
 
-  const parsed = baseSchema.safeParse(Object.fromEntries(formData));
+  const parsed = composeSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) {
     return { error: parsed.error.issues[0]?.message ?? "Invalid form." };
   }
