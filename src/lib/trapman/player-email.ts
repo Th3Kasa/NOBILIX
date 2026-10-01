@@ -5,8 +5,9 @@
  * `@privaterelay.appleid.com` alias. Apple never discloses the underlying
  * address to the developer and provides no API to resolve it — that is the
  * whole point of the feature, and attempting to correlate it back to a real
- * identity is against Apple's developer terms. The alias is still deliverable:
- * mail sent to it forwards to the player's real inbox.
+ * identity is against Apple's developer terms. The alias is deliverable, but
+ * Apple forwards only mail from sender addresses/domains the developer has
+ * registered for "Sign in with Apple for Email Communication".
  *
  * Guests have no email at all, which is the case that actually blocks contact.
  */
@@ -47,7 +48,7 @@ export function classifyPlayerEmail(
       kind: "apple-relay",
       address,
       label: "Apple private relay",
-      note: "The player chose Hide My Email. Apple does not disclose the real address to developers, but mail sent to this alias is forwarded to them.",
+      note: "The player chose Hide My Email. Apple does not disclose the real address to developers. Mail to this alias is forwarded only from senders registered in Apple Developer → Certificates, Identifiers & Profiles → Services → Sign in with Apple for Email Communication; anything else bounces.",
       contactable: true,
     };
   }

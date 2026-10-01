@@ -52,6 +52,53 @@ function mapUser(
 // would have thrown FAILED_PRECONDITION on first use — Firestore has no
 // composite indexes declared for them. Removed rather than indexed.
 
+/**
+ * Email addresses for a set of players, keyed by uid.
+ *
+ * The game's profile document is checked first; the Firebase Auth record is
+ * the fallback, since a player who signed in with Apple or Google can have an
+ * address there that the game never copied onto their profile. Players with
+ * neither (guests, seeded entries) are simply absent from the result.
+ * Never throws — a lookup failure only hides the email buttons.
+ */
+export async function getPlayerEmails(
+  uids: string[],
+): Promise<Record<string, string>> {
+  const unique = [...new Set(uids.filter(Boolean))];
+  const emails: Record<string, string> = {};
+  if (unique.length === 0) return emails;
+
+  try {
+    const db = getDb();
+    for (let i = 0; i < unique.length; i += 100) {
+      const docs = await db.getAll(
+        ...unique.slice(i, i + 100).map((uid) => db.collection(GAME.users).doc(uid)),
+      );
+      for (const doc of docs) {
+        const email = doc.data()?.email;
+        if (typeof email === "string" && email.trim()) emails[doc.id] = email.trim();
+      }
+    }
+  } catch (err) {
+    console.error("[users] email lookup (profiles) failed", err);
+  }
+
+  const missing = unique.filter((uid) => !emails[uid]);
+  try {
+    // getUsers accepts at most 100 identifiers per call.
+    for (let i = 0; i < missing.length; i += 100) {
+      const { users } = await getAuthAdmin().getUsers(
+        missing.slice(i, i + 100).map((uid) => ({ uid })),
+      );
+      for (const u of users) if (u.email) emails[u.uid] = u.email;
+    }
+  } catch (err) {
+    console.error("[users] email lookup (auth) failed", err);
+  }
+
+  return emails;
+}
+
 export async function getUser(uid: string): Promise<GameUser | null> {
   const doc = await getDb().collection(GAME.users).doc(uid).get();
   if (!doc.exists) return null;

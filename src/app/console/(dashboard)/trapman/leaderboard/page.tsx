@@ -7,6 +7,7 @@ import {
   listEventBoards,
   getCompetitionHistory,
 } from "@/lib/leaderboard";
+import { getPlayerEmails } from "@/lib/users";
 import {
   ResetCompetitionModal,
   CompetitionHistory,
@@ -25,6 +26,14 @@ export default async function LeaderboardPage() {
     ]);
 
   const canWrite = session?.user?.role !== "viewer";
+
+  // Emails are only fetched for people who can act on them.
+  const emails = canWrite
+    ? await getPlayerEmails([
+        ...entries.map((e) => e.uid),
+        ...history.flatMap((c) => c.winners.map((w) => w.uid)),
+      ])
+    : undefined;
 
   return (
     <>
@@ -124,7 +133,7 @@ export default async function LeaderboardPage() {
               </p>
             </div>
           ) : (
-            <LeaderboardTable entries={entries} canWrite={canWrite} />
+            <LeaderboardTable entries={entries} canWrite={canWrite} emails={emails} />
           )}
 
           {connected && totalCount > entries.length && (
@@ -136,7 +145,7 @@ export default async function LeaderboardPage() {
         </div>
 
         {/* Past competition archive */}
-        <CompetitionHistory history={history} />
+        <CompetitionHistory history={history} emails={emails} />
       </div>
     </>
   );

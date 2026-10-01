@@ -29,6 +29,7 @@ import {
 } from "./actions";
 import type { CompetitionRecord } from "@/types";
 import type { EventBoard } from "@/lib/leaderboard";
+import { EmailWinnerButton } from "./email-winner";
 
 // ─── Reset competition button + modal ────────────────────────────────────────
 
@@ -473,8 +474,11 @@ function periodBadgeVariant(p: string) {
 
 export function CompetitionHistory({
   history,
+  emails,
 }: {
   history: CompetitionRecord[];
+  /** Winner emails by uid; omit to hide the email buttons (read-only viewers). */
+  emails?: Record<string, string>;
 }) {
   const [expanded, setExpanded] = useState<string | null>(null);
 
@@ -558,6 +562,16 @@ export function CompetitionHistory({
                         <span className="font-mono text-xs font-semibold tabular-nums">
                           {w.score.toLocaleString()}
                         </span>
+                        {emails && (
+                          <EmailWinnerButton
+                            uid={w.uid}
+                            email={emails[w.uid]}
+                            displayName={w.displayName}
+                            rank={i + 1}
+                            score={w.score}
+                            competition={comp.label}
+                          />
+                        )}
                       </li>
                     ))}
                   </ol>

@@ -10,6 +10,7 @@ import { Modal } from "@/components/ui/modal";
 import { countryFlag, cn } from "@/lib/utils";
 import { removeEntriesAction, type RemoveState } from "./actions";
 import { EditScoreButton, RemoveEntryButton } from "./leaderboard-controls";
+import { EmailWinnerButton } from "./email-winner";
 import type { LeaderboardEntry } from "@/types";
 
 /**
@@ -40,9 +41,12 @@ function DeleteSelectedButton({ count }: { count: number }) {
 export function LeaderboardTable({
   entries,
   canWrite,
+  emails = {},
 }: {
   entries: LeaderboardEntry[];
   canWrite: boolean;
+  /** Player emails by uid, for the prize-email button. */
+  emails?: Record<string, string>;
 }) {
   const router = useRouter();
   const [query, setQuery] = useState("");
@@ -183,7 +187,7 @@ export function LeaderboardTable({
               <th scope="col" className="hidden px-3 py-3 sm:table-cell">Country</th>
               <th scope="col" className="hidden px-3 py-3 md:table-cell">Character</th>
               <th scope="col" className="px-3 py-3 text-right">Score</th>
-              {canWrite && <th scope="col" className="w-24 px-3 py-3" />}
+              {canWrite && <th scope="col" className="w-36 px-3 py-3" />}
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
@@ -265,6 +269,13 @@ export function LeaderboardTable({
                     {canWrite && (
                       <td className="px-3 py-3">
                         <div className="flex justify-end">
+                          <EmailWinnerButton
+                            uid={entry.uid}
+                            email={emails[entry.uid]}
+                            displayName={entry.displayName}
+                            rank={entry.rank}
+                            score={entry.score}
+                          />
                           <EditScoreButton
                             uid={entry.uid}
                             displayName={entry.displayName}
