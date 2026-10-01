@@ -3,6 +3,7 @@ import { PageHeader } from "@/components/page-header";
 import { StatCard } from "@/components/stat-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getAdsData } from "@/lib/trapman/ads";
+import { eventLabel, eventHint } from "@/lib/trapman/labels";
 import { getGa4Snapshot } from "../ga4-data";
 
 export const dynamic = "force-dynamic";
@@ -37,21 +38,42 @@ export default async function AdsPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
                 <BarChart3 className="size-4 text-[var(--console-violet)]" aria-hidden="true" />
-                All events (last 30 days, Google Analytics)
+                What players did (last 30 days, Google Analytics)
               </CardTitle>
             </CardHeader>
             <CardContent className="pt-0">
-              <div className="divide-y divide-border">
-                {ga4.events.slice(0, 12).map((event) => (
-                  <div
-                    key={event.eventName}
-                    className="flex items-center justify-between py-2 font-mono text-sm"
-                  >
-                    <span className="text-muted-foreground">{event.eventName}</span>
-                    <span className="tabular-nums">{event.count.toLocaleString()}</span>
-                  </div>
-                ))}
-              </div>
+              {/* Google Analytics names events for machines (`user_engagement`,
+                  `session_end`). The plain-English name leads and the raw name
+                  stays underneath, so this page is readable at a glance and
+                  still cross-checkable against GA4 itself. */}
+              <ul className="divide-y divide-border">
+                {ga4.events.slice(0, 12).map((event) => {
+                  const hint = eventHint(event.eventName);
+                  return (
+                    <li
+                      key={event.eventName}
+                      className="flex items-start justify-between gap-4 py-2.5"
+                    >
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium">
+                          {eventLabel(event.eventName)}
+                        </p>
+                        <p className="font-mono text-[11px] text-muted-foreground">
+                          {event.eventName}
+                        </p>
+                        {hint && (
+                          <p className="mt-0.5 text-xs text-muted-foreground">
+                            {hint}
+                          </p>
+                        )}
+                      </div>
+                      <span className="shrink-0 font-mono text-sm tabular-nums">
+                        {event.count.toLocaleString()}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
             </CardContent>
           </Card>
         </>

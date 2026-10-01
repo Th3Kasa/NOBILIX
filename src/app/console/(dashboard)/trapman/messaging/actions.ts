@@ -5,12 +5,31 @@ import { z } from "zod";
 import { requireWriteAccess } from "@/lib/authz";
 import { sendCampaign, previewAudience } from "@/lib/campaigns";
 import { recordAudit } from "@/lib/audit";
-import type { CampaignAudience } from "@/types";
+import type { CampaignAudience, CampaignFailure } from "@/types";
 
 export interface SendState {
   ok?: boolean;
   error?: string;
-  summary?: { recipients: number; success: number; failure: number };
+  summary?: {
+    recipients: number;
+    success: number;
+    failure: number;
+    matched: number;
+    unreachable: number;
+    failures: CampaignFailure[];
+  };
+}
+
+export interface PreviewState {
+  /** Devices that would actually be sent to. */
+  count?: number;
+  /** Players matching the audience, reachable or not. */
+  matched?: number;
+  /** Matched players with no device token. */
+  unreachable?: number;
+  /** Matched players sharing a device with another matched player. */
+  sharedDevices?: number;
+  error?: string;
 }
 
 const baseSchema = z.object({
@@ -19,7 +38,6 @@ const baseSchema = z.object({
   audienceType: z.enum(["single", "segment", "broadcast"]),
   uid: z.string().optional(),
   country: z.string().max(2).optional(),
-  character: z.string().max(80).optional(),
   minLevel: z.coerce.number().int().min(0).optional(),
   maxLevel: z.coerce.number().int().min(0).optional(),
   lastActiveDays: z.coerce.number().int().min(0).optional(),
@@ -35,7 +53,6 @@ function buildAudience(d: z.infer<typeof baseSchema>): CampaignAudience | null {
     type: "segment",
     filters: {
       country: d.country || undefined,
-      character: d.character || undefined,
       minLevel: d.minLevel,
       maxLevel: d.maxLevel,
       lastActiveDays: d.lastActiveDays,
@@ -44,17 +61,16 @@ function buildAudience(d: z.infer<typeof baseSchema>): CampaignAudience | null {
 }
 
 export async function previewAction(
-  _prev: { count?: number; error?: string },
+  _prev: PreviewState,
   formData: FormData,
-): Promise<{ count?: number; error?: string }> {
+): Promise<PreviewState> {
   try {
     await requireWriteAccess();
     const parsed = baseSchema.safeParse(Object.fromEntries(formData));
     if (!parsed.success) return { error: "Check the form fields." };
     const audience = buildAudience(parsed.data);
     if (!audience) return { error: "Select a valid audience." };
-    const count = await previewAudience(audience);
-    return { count };
+    return await previewAudience(audience);
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Preview failed." };
   }
@@ -95,6 +111,11 @@ export async function sendCampaignAction(
         recipients: result.recipientCount,
         success: result.successCount,
         failure: result.failureCount,
+        matched: result.matchedPlayers,
+        unreachable: result.unreachablePlayers,
+        // Codes only: the audit log records what happened, and the readable
+        // explanations already live on the campaign record.
+        failureCodes: result.failures.map((f) => `${f.code}×${f.count}`),
       },
     });
     revalidatePath("/console/trapman/messaging");
@@ -104,6 +125,9 @@ export async function sendCampaignAction(
         recipients: result.recipientCount,
         success: result.successCount,
         failure: result.failureCount,
+        matched: result.matchedPlayers,
+        unreachable: result.unreachablePlayers,
+        failures: result.failures,
       },
     };
   } catch (e) {

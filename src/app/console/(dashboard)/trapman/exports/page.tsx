@@ -81,7 +81,7 @@ export default async function ExportsPage() {
           </CardContent>
         </Card>
 
-        {purchases.connected && purchases.totalCount > 0 ? (
+        {purchases.connected && purchases.records.length > 0 ? (
           <Card className="console-glass flex flex-col">
             <CardHeader>
               <div className="flex items-start justify-between gap-2">
@@ -99,9 +99,10 @@ export default async function ExportsPage() {
             </CardHeader>
             <CardContent className="flex flex-1 flex-col justify-between gap-4 pt-0">
               <p className="text-sm text-muted-foreground">
-                {purchases.totalCount.toLocaleString()} live purchase record
-                {purchases.totalCount === 1 ? "" : "s"} — product, price,
-                currency, platform, buyer, and timestamp.
+                {purchases.records.length.toLocaleString()} live purchase record
+                {purchases.records.length === 1 ? "" : "s"} — product, price,
+                currency, platform, buyer, timestamp, and whether each one
+                counted as a real sale.
               </p>
               <a
                 href="/api/console-exports/purchases"

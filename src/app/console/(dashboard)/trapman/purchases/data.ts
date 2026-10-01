@@ -8,6 +8,12 @@ import {
   type NormalizedPurchase,
 } from "@/lib/trapman/purchases";
 import { getTestAccountUids } from "@/lib/trapman/test-accounts";
+import {
+  verifyPlayPurchases,
+  APPLE_UNVERIFIABLE_REASON,
+  type Verification,
+} from "@/lib/trapman/play-verify";
+import { classify, type PurchaseRecord } from "@/lib/trapman/purchase-accounting";
 
 /**
  * Purchases data-access for the TrapMan console.
@@ -15,51 +21,48 @@ import { getTestAccountUids } from "@/lib/trapman/test-accounts";
  * Purchase records live embedded on player documents at `users/{uid}.purchases`
  * (the standalone `purchases` collection is empty in the live database). The
  * game writes two different shapes depending on the store — both are handled by
- * the shared parser in `@/lib/trapman/purchases`, which every console surface
- * now uses so the Overview, Purchases and Players pages cannot disagree.
+ * the shared parser in `@/lib/trapman/purchases`.
  *
- * Revenue here counts only *countable* purchases: internal test accounts and
- * Unity Editor purchases are separated out rather than summed, so the headline
- * figure is not inflated by the studio's own testing.
+ * A stored purchase record is a claim, not proof of a sale. Three different
+ * things look identical in Firestore: a real payment, a Google licence tester
+ * tapping "buy" for free, and a purchase Google later refunded. This module
+ * therefore asks Google Play to adjudicate every Android purchase (see
+ * `play-verify`) and classifies each record into exactly one bucket, so the
+ * headline "real sales" figure is defensible rather than a hopeful sum.
+ *
+ * Reading is kept apart from counting: the arithmetic lives in
+ * `@/lib/trapman/purchase-accounting`, which has no database or framework
+ * imports and can be tested directly.
  */
 
 const MAX_SAMPLE = 1000;
 
-/** Re-exported so pages keep a single import site for the record shape. */
-export type PurchaseRecord = NormalizedPurchase;
-
-export interface ProductBreakdown {
-  productId: string;
-  count: number;
-  revenue: number;
-  currency: string;
-}
+// Re-exported so pages keep a single import site for the purchase shape.
+export type {
+  PurchaseRecord,
+  PurchasesSummary,
+  ProductBreakdown,
+  ExclusionReason,
+  ExclusionCounts,
+} from "@/lib/trapman/purchase-accounting";
+export { summarise } from "@/lib/trapman/purchase-accounting";
 
 export interface PurchasesData {
   connected: boolean;
   sampleSize: number;
   /** True when the scan hit the cap and totals may be incomplete. */
   scanCapped: boolean;
-  /** Countable purchases only — excludes test accounts and Editor purchases. */
-  purchases: PurchaseRecord[];
-  /** Everything read, including excluded records, for the forensics view. */
-  allPurchases: PurchaseRecord[];
-  totalCount: number;
-  buyerCount: number;
-  revenueByCurrency: { currency: string; total: number; count: number }[];
-  products: ProductBreakdown[];
-  platforms: { platform: string; count: number }[];
+  /** Every readable record, classified. Aggregate with `summarise()`. */
+  records: PurchaseRecord[];
   unparsedRecords: number;
-  /** Excluded because the buyer is a registered internal test account. */
-  testAccountRecords: number;
-  /** Excluded because the purchase came from a Unity Editor session. */
-  editorRecords: number;
-  /**
-   * Google Play purchases still unacknowledged. Google automatically refunds
-   * and revokes these after three days, so a non-zero count is a real revenue
-   * risk that belongs in front of an operator.
-   */
-  unacknowledgedRecords: number;
+  /** True when credentials for the Play Developer API are present. */
+  verificationConfigured: boolean;
+  /** Set when every Play lookup failed the same way — show it once. */
+  verificationBlockedReason: string | null;
+  /** True when more purchases needed checking than one pass allows. */
+  verificationCapped: boolean;
+  /** iOS purchases, which carry no receipt and so can never be verified. */
+  appleUnverifiableCount: number;
   error?: string;
 }
 
@@ -68,18 +71,29 @@ function emptyData(error?: string): PurchasesData {
     connected: false,
     sampleSize: 0,
     scanCapped: false,
-    purchases: [],
-    allPurchases: [],
-    totalCount: 0,
-    buyerCount: 0,
-    revenueByCurrency: [],
-    products: [],
-    platforms: [],
+    records: [],
     unparsedRecords: 0,
-    testAccountRecords: 0,
-    editorRecords: 0,
-    unacknowledgedRecords: 0,
+    verificationConfigured: false,
+    verificationBlockedReason: null,
+    verificationCapped: false,
+    appleUnverifiableCount: 0,
     error,
+  };
+}
+
+/** The verdict for a purchase the store was never asked about, and why. */
+function notChecked(purchase: NormalizedPurchase): Verification {
+  return {
+    verdict: "unverified",
+    source: "none",
+    reason: purchase.isVerifiable
+      ? "Not checked with Google Play."
+      : purchase.platform === "ios"
+        ? APPLE_UNVERIFIABLE_REASON
+        : "This record carries no store receipt to check.",
+    acknowledged: purchase.acknowledged,
+    regionCode: null,
+    checkedAt: 0,
   };
 }
 
@@ -91,7 +105,7 @@ async function fetchPurchasesData(): Promise<PurchasesData> {
       getTestAccountUids(),
     ]);
 
-    const all: PurchaseRecord[] = [];
+    const parsed: NormalizedPurchase[] = [];
     let unparsedRecords = 0;
 
     for (const doc of snap.docs) {
@@ -101,74 +115,50 @@ async function fetchPurchasesData(): Promise<PurchasesData> {
         buyerNameFrom(data),
         data.purchases,
       );
-      all.push(...purchases);
+      parsed.push(...purchases);
       unparsedRecords += unparsed.length;
     }
 
-    all.sort((a, b) => b.timestamp - a.timestamp);
+    parsed.sort((a, b) => b.timestamp - a.timestamp);
 
-    const isExcluded = (p: PurchaseRecord) =>
-      p.isEditorPurchase || testUids.has(p.buyerUid);
+    // Only ask the store about purchases that could still count. Editor
+    // purchases and known testers are already settled, and spending quota to
+    // confirm what an operator has already excluded would be waste.
+    const worthVerifying = parsed.filter(
+      (p) => !p.isEditorPurchase && !testUids.has(p.buyerUid),
+    );
+    const pass = await verifyPlayPurchases(
+      worthVerifying.map((p) => ({
+        packageName: p.packageName,
+        productId: p.productId,
+        purchaseToken: p.purchaseToken,
+        platform: p.platform,
+      })),
+    );
 
-    const countable = all.filter((p) => !isExcluded(p));
-    const editorRecords = all.filter((p) => p.isEditorPurchase).length;
-    const testAccountRecords = all.filter(
-      (p) => !p.isEditorPurchase && testUids.has(p.buyerUid),
-    ).length;
-    const unacknowledgedRecords = countable.filter(
-      (p) => p.acknowledged === false,
-    ).length;
-
-    const revenueMap = new Map<string, { total: number; count: number }>();
-    const productMap = new Map<string, ProductBreakdown>();
-    const platformMap = new Map<string, number>();
-    const buyers = new Set<string>();
-
-    for (const p of countable) {
-      buyers.add(p.buyerUid);
-
-      const rev = revenueMap.get(p.currency) ?? { total: 0, count: 0 };
-      rev.total += p.price;
-      rev.count += 1;
-      revenueMap.set(p.currency, rev);
-
-      const productKey = `${p.productId}::${p.currency}`;
-      const product =
-        productMap.get(productKey) ??
-        ({
-          productId: p.productId,
-          count: 0,
-          revenue: 0,
-          currency: p.currency,
-        } satisfies ProductBreakdown);
-      product.count += 1;
-      product.revenue += p.price;
-      productMap.set(productKey, product);
-
-      platformMap.set(p.platform, (platformMap.get(p.platform) ?? 0) + 1);
-    }
+    const records: PurchaseRecord[] = parsed.map((p) => {
+      const verification =
+        (p.purchaseToken ? pass.byToken.get(p.purchaseToken) : undefined) ??
+        notChecked(p);
+      return {
+        ...p,
+        verification,
+        exclusion: classify(p, verification, testUids),
+      };
+    });
 
     return {
       connected: true,
       sampleSize: snap.size,
       scanCapped: snap.size >= MAX_SAMPLE,
-      purchases: countable,
-      allPurchases: all,
-      totalCount: countable.length,
-      buyerCount: buyers.size,
-      revenueByCurrency: Array.from(revenueMap.entries())
-        .map(([currency, { total, count }]) => ({ currency, total, count }))
-        .sort((a, b) => b.total - a.total),
-      products: Array.from(productMap.values()).sort(
-        (a, b) => b.revenue - a.revenue,
-      ),
-      platforms: Array.from(platformMap.entries())
-        .map(([platform, count]) => ({ platform, count }))
-        .sort((a, b) => b.count - a.count),
+      records,
       unparsedRecords,
-      testAccountRecords,
-      editorRecords,
-      unacknowledgedRecords,
+      verificationConfigured: pass.configured,
+      verificationBlockedReason: pass.blockingReason,
+      verificationCapped: pass.capped,
+      appleUnverifiableCount: records.filter(
+        (p) => p.platform === "ios" && !p.isVerifiable,
+      ).length,
     };
   } catch (err) {
     return emptyData(err instanceof Error ? err.message : "Unknown error");
@@ -177,7 +167,8 @@ async function fetchPurchasesData(): Promise<PurchasesData> {
 
 /**
  * 30s shared cache: one scan serves every admin for the whole auto-refresh
- * window instead of a scan per request.
+ * window instead of a scan per request. Store verdicts have their own, much
+ * longer cache in Firestore, so this does not re-hit the Play API.
  */
 export const getPurchasesData = unstable_cache(
   fetchPurchasesData,

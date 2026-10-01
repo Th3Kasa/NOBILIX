@@ -100,6 +100,28 @@ test("recovers order id, token and acknowledgement from a Google receipt", () =>
   assert.equal(p.purchaseId, "GPA.3332-0270-4211-98618");
 });
 
+test("a Google receipt yields the package name needed to verify it", () => {
+  const { purchases } = parsePurchaseMap("uid2", "Kasa", {
+    ldfbchlcgfolckfmddbphjip: GOOGLE_NESTED,
+  });
+  assert.equal(purchases[0].packageName, "com.cultshotta.trapman");
+  // packageName + purchaseToken is exactly what the Play Developer API needs.
+  assert.equal(purchases[0].isVerifiable, true);
+});
+
+test("an Apple purchase is not verifiable — the game stores no receipt", () => {
+  // The live database holds `receipt: ""` for every iOS purchase, so there is
+  // nothing to present to Apple. Test purchases on iPhone therefore cannot be
+  // detected automatically and must be excluded by flagging the buyer.
+  const { purchases } = parsePurchaseMap("uid1", "Aba300", {
+    "00cb8ebd-4551": { ...APPLE_FLAT, receipt: "" },
+  });
+  assert.equal(purchases.length, 1, "an empty receipt must not drop the record");
+  assert.equal(purchases[0].packageName, null);
+  assert.equal(purchases[0].isVerifiable, false);
+  assert.equal(purchases[0].platform, "ios");
+});
+
 test("flags Unity Editor purchases, which never touched a store", () => {
   const { purchases } = parsePurchaseMap("uid3", "Guest", { k: EDITOR_FLAT });
   assert.equal(purchases[0].isEditorPurchase, true);

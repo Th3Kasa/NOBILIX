@@ -48,6 +48,17 @@ export interface NormalizedPurchase {
   /** Google Play purchase token, when recoverable. */
   purchaseToken: string | null;
   /**
+   * Play Console package name from the Google receipt. Needed to ask the Play
+   * Developer API about the purchase, and absent for Apple.
+   */
+  packageName: string | null;
+  /**
+   * True when the record carries enough for the store to confirm it. Google
+   * receipts do; TrapMan writes an empty `receipt` for iOS, so Apple purchases
+   * never do — which is why iOS totals cannot be automatically de-tested.
+   */
+  isVerifiable: boolean;
+  /**
    * Google Play only. An unacknowledged purchase is automatically refunded and
    * revoked by Google after three days, so `false` here is worth surfacing.
    */
@@ -105,9 +116,15 @@ export function normalisePlatform(raw: string): PurchasePlatform {
 function readReceiptMeta(receipt: unknown): {
   storeOrderId: string | null;
   purchaseToken: string | null;
+  packageName: string | null;
   acknowledged: boolean | null;
 } {
-  const empty = { storeOrderId: null, purchaseToken: null, acknowledged: null };
+  const empty = {
+    storeOrderId: null,
+    purchaseToken: null,
+    packageName: null,
+    acknowledged: null,
+  };
   if (typeof receipt !== "string") return empty;
   try {
     const envelope = JSON.parse(receipt) as Record<string, unknown>;
@@ -117,6 +134,8 @@ function readReceiptMeta(receipt: unknown): {
       storeOrderId: typeof inner.orderId === "string" ? inner.orderId : null,
       purchaseToken:
         typeof inner.purchaseToken === "string" ? inner.purchaseToken : null,
+      packageName:
+        typeof inner.packageName === "string" ? inner.packageName : null,
       acknowledged:
         typeof inner.acknowledged === "boolean" ? inner.acknowledged : null,
     };
@@ -145,8 +164,10 @@ function buildPurchase(
     buyerName,
     storeOrderId: meta.storeOrderId,
     purchaseToken: meta.purchaseToken,
+    packageName: meta.packageName,
     acknowledged: meta.acknowledged,
     isEditorPurchase: normalisePlatform(rawPlatform) === "editor",
+    isVerifiable: Boolean(meta.packageName && meta.purchaseToken),
   };
 }
 

@@ -13,6 +13,14 @@
 export const GAME = {
   users: "users", // users/{uid}
   leaderboard: "leaderboard",
+  /**
+   * eventLeaderboards/{eventId}/{playersSubcollection}/{uid} — one board per
+   * timed event, separate from the all-time `leaderboard`. The {eventId}
+   * documents themselves do not exist; they are implicit parents that only
+   * hold subcollections, so they are discovered with listDocuments().
+   */
+  eventLeaderboards: "eventLeaderboards",
+  config: "config", // config/currentEvent — which event the game is running
   purchases: "purchases", // purchases/{autoId} — filtered by uid field
   progress: "player_progress", // player_progress/{uid}
 } as const;
@@ -28,4 +36,6 @@ export const CRM = {
   passkeys: "_admin_passkeys", // _admin_passkeys/{credentialId-base64url}
   loginTickets: "_admin_login_tickets", // _admin_login_tickets/{sha256(ticket) hex}
   testAccounts: "_crm_test_accounts", // _crm_test_accounts/{uid} — internal testers excluded from revenue
+  purchaseVerifications: "_crm_purchase_verifications", // _crm_purchase_verifications/{sha256(purchaseToken)} — cached store verdicts
+  storeReports: "_crm_store_reports", // _crm_store_reports/apple-{vendor}-{YYYY-MM-DD} — cached daily store sales reports
 } as const;

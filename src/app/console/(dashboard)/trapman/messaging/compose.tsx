@@ -8,6 +8,7 @@ import {
   sendCampaignAction,
   previewAction,
   type SendState,
+  type PreviewState,
 } from "./actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -40,6 +41,72 @@ function CharCounter({ length, max }: { length: number; max: number }) {
   );
 }
 
+/**
+ * What actually happened, in three distinguishable outcomes: delivered,
+ * reached nobody (usually normal), and failed for everyone (usually a
+ * configuration fault worth acting on). Collapsing these into one green
+ * "sent" banner is how a broken APNs key stays invisible for weeks.
+ */
+function SendOutcome({ summary }: { summary: NonNullable<SendState["summary"]> }) {
+  const nobodyToSendTo = summary.recipients === 0;
+  const allFailed = summary.recipients > 0 && summary.success === 0;
+  const tone = nobodyToSendTo || allFailed ? "action" : "live";
+
+  return (
+    <div
+      className={cn(
+        "flex items-start gap-2 rounded-md border px-3 py-2 text-sm",
+        tone === "live"
+          ? "border-[var(--console-live-border)] bg-[var(--console-live-tint)] text-[var(--console-live)]"
+          : "border-[var(--console-action-border)] bg-[var(--console-action-tint)] text-[var(--console-action)]",
+      )}
+    >
+      {tone === "live" ? (
+        <CheckCircle2 className="mt-0.5 size-4 shrink-0" />
+      ) : (
+        <AlertCircle className="mt-0.5 size-4 shrink-0" />
+      )}
+      <div className="min-w-0">
+        {nobodyToSendTo ? (
+          <>
+            <p className="font-medium">Nothing was sent — nobody to send to.</p>
+            <p className="mt-0.5 text-muted-foreground">
+              {summary.matched === 0
+                ? "No players matched this audience."
+                : `All ${summary.matched} matching player${summary.matched === 1 ? " has" : "s have"} notifications turned off, so the game has no device to send to.`}
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="font-medium">
+              {allFailed
+                ? `Failed for all ${summary.recipients} device${summary.recipients === 1 ? "" : "s"}.`
+                : `Delivered to ${summary.success} of ${summary.recipients} device${summary.recipients === 1 ? "" : "s"}.`}
+            </p>
+            {summary.unreachable > 0 && (
+              <p className="mt-0.5 text-muted-foreground">
+                {summary.unreachable} matching player
+                {summary.unreachable === 1 ? "" : "s"} could not be sent to at
+                all — notifications are off for them.
+              </p>
+            )}
+            {summary.failures.length > 0 && (
+              <ul className="mt-1.5 space-y-1 text-muted-foreground">
+                {summary.failures.map((f) => (
+                  <li key={f.code}>
+                    <span className="font-mono tabular-nums">{f.count}×</span>{" "}
+                    {f.reason}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function SendButton() {
   const { pending } = useFormStatus();
   return (
@@ -65,7 +132,7 @@ export function Compose({ prefillUid }: { prefillUid?: string }) {
   const [previewDismissed, setPreviewDismissed] = useState(false);
 
   const [preview, previewDispatch, previewPending] = useActionState(
-    async (prev: { count?: number; error?: string }, fd: FormData) => {
+    async (prev: PreviewState, fd: FormData) => {
       const res = await previewAction(prev, fd);
       // A fresh preview just landed — whatever made the old one stale (or
       // hidden after a send) no longer applies.
@@ -156,6 +223,10 @@ export function Compose({ prefillUid }: { prefillUid?: string }) {
             </div>
           )}
 
+          {/* Only fields the game actually writes appear here. A filter on a
+              field no player document has returns an empty audience, which is
+              indistinguishable from "nobody qualifies" — so "Character" was
+              removed rather than left as a trap. */}
           {audience === "segment" && (
             <div className="grid grid-cols-2 gap-3 rounded-md border border-border p-3">
               <div className="space-y-1.5">
@@ -163,8 +234,8 @@ export function Compose({ prefillUid }: { prefillUid?: string }) {
                 <Input id="country" name="country" maxLength={2} className="uppercase" />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="character">Character</Label>
-                <Input id="character" name="character" />
+                <Label htmlFor="lastActiveDays">Active within (days)</Label>
+                <Input id="lastActiveDays" name="lastActiveDays" type="number" />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="minLevel">Min level</Label>
@@ -174,10 +245,11 @@ export function Compose({ prefillUid }: { prefillUid?: string }) {
                 <Label htmlFor="maxLevel">Max level</Label>
                 <Input id="maxLevel" name="maxLevel" type="number" />
               </div>
-              <div className="col-span-2 space-y-1.5">
-                <Label htmlFor="lastActiveDays">Active within (days)</Label>
-                <Input id="lastActiveDays" name="lastActiveDays" type="number" />
-              </div>
+              <p className="col-span-2 text-xs text-muted-foreground">
+                &ldquo;Active within&rdquo; uses the last time the game synced
+                the player&apos;s progress, which only{" "}
+                <span className="font-medium">some</span> players have recorded.
+              </p>
             </div>
           )}
 
@@ -206,18 +278,48 @@ export function Compose({ prefillUid }: { prefillUid?: string }) {
             <CharCounter length={bodyLength} max={BODY_MAX} />
           </div>
 
+          {/* A preview of 0 is the usual outcome and almost never a fault, so
+              it is explained rather than just reported: most players have
+              never granted notification permission and have no device token. */}
           {!previewDismissed && preview.count != null && (
-            <p className="text-sm text-muted-foreground">
-              Estimated recipients with push enabled:{" "}
-              <span className="font-mono font-semibold tabular-nums text-foreground">
-                {preview.count}
-              </span>
-              {previewStale && (
-                <span className="ml-2 text-[var(--console-action)]">
-                  — estimate outdated, preview again
-                </span>
+            <div className="rounded-md border border-border bg-muted/30 px-3 py-2 text-sm">
+              <p>
+                This will reach{" "}
+                <span className="font-mono font-semibold tabular-nums">
+                  {preview.count}
+                </span>{" "}
+                device{preview.count === 1 ? "" : "s"}
+                {preview.matched != null && (
+                  <>
+                    {" "}
+                    out of{" "}
+                    <span className="font-mono tabular-nums">
+                      {preview.matched}
+                    </span>{" "}
+                    matching player{preview.matched === 1 ? "" : "s"}
+                  </>
+                )}
+                .
+              </p>
+              {!!preview.unreachable && (
+                <p className="mt-1 text-muted-foreground">
+                  {preview.unreachable} of them cannot be reached — they have
+                  not allowed notifications, so the game has no device to send
+                  to.
+                </p>
               )}
-            </p>
+              {!!preview.sharedDevices && (
+                <p className="mt-1 text-muted-foreground">
+                  {preview.sharedDevices} share a device with another player in
+                  this audience, so that device is sent to once.
+                </p>
+              )}
+              {previewStale && (
+                <p className="mt-1 text-[var(--console-action)]">
+                  Estimate outdated — preview again.
+                </p>
+              )}
+            </div>
           )}
           {!previewDismissed && preview.error && (
             <p className="text-sm text-destructive">{preview.error}</p>
@@ -230,13 +332,7 @@ export function Compose({ prefillUid }: { prefillUid?: string }) {
             </div>
           )}
           {state.ok && state.summary && (
-            <div className="flex items-start gap-2 rounded-md border border-[var(--console-live-border)] bg-[var(--console-live-tint)] px-3 py-2 text-sm text-[var(--console-live)]">
-              <CheckCircle2 className="mt-0.5 size-4 shrink-0" />
-              <span className="font-mono tabular-nums">
-                Sent to {state.summary.recipients} recipient(s) —{" "}
-                {state.summary.success} delivered, {state.summary.failure} failed.
-              </span>
-            </div>
+            <SendOutcome summary={state.summary} />
           )}
 
           <div className="flex gap-2">

@@ -35,6 +35,23 @@ const schema = z.object({
   NEXT_PUBLIC_FIREBASE_PROJECT_ID: z.string().optional(),
   NEXT_PUBLIC_FIREBASE_APP_ID: z.string().optional(),
 
+  // --- Google Play purchase verification ---
+  // Service account with "View financial data" in Play Console, base64 of the
+  // full JSON. Optional: falls back to FIREBASE_SERVICE_ACCOUNT_B64, which
+  // works once that account has been invited in Play Console. When neither
+  // account has the grant, Android purchases are reported as unconfirmed
+  // rather than being silently counted as revenue.
+  ANDROID_PUBLISHER_SERVICE_ACCOUNT_B64: z.string().optional(),
+
+  // --- App Store Connect: live iOS sales reports ---
+  // All four are needed together; any missing and the console reports iOS
+  // sales as "not connected" rather than guessing. The .p8 private key is
+  // base64-encoded so its PEM newlines survive as an environment variable.
+  APPSTORE_ISSUER_ID: z.string().optional(),
+  APPSTORE_KEY_ID: z.string().optional(),
+  APPSTORE_VENDOR_NUMBER: z.string().optional(),
+  APPSTORE_PRIVATE_KEY_B64: z.string().optional(),
+
   // --- Google Analytics 4 (console TrapMan overview) ---
   // GA4 property ID for the Analytics Data API. Optional — falls back to the
   // TrapMan property's known ID when unset.

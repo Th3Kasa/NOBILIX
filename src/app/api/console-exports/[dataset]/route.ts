@@ -66,6 +66,9 @@ export async function GET(
         { status: 503 },
       );
     }
+    // Every record is exported, counted or not, with the reason it was or was
+    // not treated as a sale. A spreadsheet that silently omitted the excluded
+    // rows would be impossible to reconcile against a store's own report.
     const columns = [
       "purchaseId",
       "productId",
@@ -75,9 +78,20 @@ export async function GET(
       "buyerUid",
       "buyerName",
       "timestamp",
+      "isRealSale",
+      "excludedBecause",
+      "storeVerdict",
+      "verifiedBy",
+      "storeOrderId",
     ];
     csv = toCsv(
-      result.purchases.map((p) => ({ ...p })),
+      result.records.map((p) => ({
+        ...p,
+        isRealSale: p.exclusion === null,
+        excludedBecause: p.exclusion ?? "",
+        storeVerdict: p.verification.verdict,
+        verifiedBy: p.verification.source,
+      })),
       columns,
     );
     filename = "trapman-purchases.csv";

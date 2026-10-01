@@ -91,9 +91,12 @@ test("data module pages preserve honest empty and unavailable states", () => {
 });
 
 test("table-heavy modules remain responsive", () => {
+  // Each route names the file that actually renders its table — the leaderboard
+  // renders through a client component so its rows can be multi-selected, and
+  // the responsiveness guarantee has to follow the table, not the route file.
   for (const path of [
     "src/app/console/(dashboard)/trapman/users/page.tsx",
-    "src/app/console/(dashboard)/trapman/leaderboard/page.tsx",
+    "src/app/console/(dashboard)/trapman/leaderboard/leaderboard-table.tsx",
     "src/app/console/(dashboard)/trapman/audit/page.tsx",
   ]) {
     const source = read(path);

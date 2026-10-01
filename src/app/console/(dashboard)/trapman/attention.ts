@@ -70,6 +70,30 @@ export async function getAttentionItems(
     });
   }
 
+  // Revenue that nobody has checked with the store is the kind of problem that
+  // stays quiet until someone quotes the number out loud, so it belongs here.
+  if (purchasesResult.status === "fulfilled") {
+    const purchases = purchasesResult.value;
+    if (purchases.connected && !purchases.verificationConfigured) {
+      items.push({
+        id: "purchases-unverified",
+        label: "Purchases aren't being checked with Google Play",
+        description:
+          "Free licence-test purchases look identical to real sales until the store confirms them. Revenue may be overstated.",
+        severity: "warning",
+        href: "/console/trapman/purchases",
+      });
+    } else if (purchases.connected && purchases.verificationBlockedReason) {
+      items.push({
+        id: "purchases-verification-blocked",
+        label: "Google Play couldn't confirm any purchases",
+        description: purchases.verificationBlockedReason,
+        severity: "warning",
+        href: "/console/trapman/purchases",
+      });
+    }
+  }
+
   if (campaignsResult.status === "fulfilled") {
     const failed = campaignsResult.value.filter((c) => c.failureCount > 0);
     const shown = failed.slice(0, 3);
