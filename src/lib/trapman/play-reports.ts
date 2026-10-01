@@ -86,13 +86,39 @@ function statusOf(err: unknown): number | undefined {
   return e.response?.status ?? e.status ?? (typeof e.code === "number" ? e.code : undefined);
 }
 
+/** Google's own explanation from an error response, when it sent one. */
+function googleReason(err: unknown): string | undefined {
+  const data = (err as { response?: { data?: unknown } }).response?.data;
+  let body: unknown = data;
+  const text =
+    data instanceof ArrayBuffer
+      ? Buffer.from(data).toString("utf8")
+      : typeof data === "string"
+        ? data
+        : null;
+  if (text !== null) {
+    try {
+      body = JSON.parse(text);
+    } catch {
+      return text.slice(0, 300) || undefined;
+    }
+  }
+  const message = (body as { error?: { message?: unknown } } | undefined)?.error?.message;
+  return typeof message === "string" ? message : undefined;
+}
+
 function describeError(err: unknown): string {
   const status = statusOf(err);
+  const reason = googleReason(err);
+  const said = reason ? ` Google said: "${reason}"` : "";
   if (status === 401) {
-    return "Google rejected the console's service account key. Check FIREBASE_SERVICE_ACCOUNT_B64 in Vercel.";
+    return `Google rejected the console's service account key. Check FIREBASE_SERVICE_ACCOUNT_B64 in Vercel.${said}`;
+  }
+  if (status === 403 && reason && /has not been used|is disabled|SERVICE_DISABLED/i.test(reason)) {
+    return `Google Cloud Storage is switched off for the trap-man project. In console.cloud.google.com, open project trap-man and enable "Cloud Storage JSON API".${said}`;
   }
   if (status === 403) {
-    return "The console isn't allowed to read the Play reports yet. In Play Console → Users and permissions, invite firebase-adminsdk-fbsvc@trap-man.iam.gserviceaccount.com with \"View app information and download bulk reports\" and \"View financial data\". New access can take up to 24 hours.";
+    return `Google is refusing access to the Play reports. The service account (firebase-adminsdk-fbsvc@trap-man.iam.gserviceaccount.com) needs "View app information and download bulk reports" and "View financial data" in Play Console → Users and permissions — and once granted, Google can take up to 24 hours to apply it to the reports.${said}`;
   }
   if (status === 404) {
     return "That reports bucket doesn't exist. Copy the Cloud Storage URI from Play Console → Download reports into PLAY_REPORTS_BUCKET.";
@@ -277,7 +303,7 @@ function mergeEarnings(parts: PlayMonthEarnings[]): PlayMonthEarnings[] {
   return [...byMonth.values()].sort((a, b) => b.month.localeCompare(a.month));
 }
 
-/** Never throws: every failure degrades to a panel that explains itself. */
+/** Throws PlayAccessError when the bucket cannot be listed; see getPlaySales. */
 async function loadPlaySales(): Promise<PlaySalesData> {
   const config = readConfig();
   if (!config) return emptyPlay();
@@ -301,7 +327,9 @@ async function loadPlaySales(): Promise<PlaySalesData> {
       return c && months.has(c.month) ? [{ ...o, ...c }] : [];
     });
   } catch (err) {
-    return emptyPlay({ configured: true, error: describeError(err) });
+    // Thrown rather than returned so the 10-minute cache below never holds on
+    // to a failure: the moment Google grants access, the next load sees it.
+    throw new PlayAccessError(describeError(err));
   }
 
   const cached = await readCache(objects.map((o) => o.name));
@@ -353,11 +381,31 @@ async function loadPlaySales(): Promise<PlaySalesData> {
   };
 }
 
+/** The bucket could not be listed at all. Carries the operator-facing reason. */
+class PlayAccessError extends Error {}
+
 /**
- * Cached for 10 minutes: the files change at most daily, and the Purchases
- * page auto-refreshes far more often than that.
+ * Successful reads are cached for 10 minutes: the files change at most daily,
+ * and the Purchases page auto-refreshes far more often than that. Failures are
+ * never cached (unstable_cache does not store a thrown error).
  */
-export const getPlaySales = unstable_cache(loadPlaySales, ["trapman-play-reports"], {
+const loadPlaySalesCached = unstable_cache(loadPlaySales, ["trapman-play-reports"], {
   revalidate: 600,
   tags: ["trapman-console"],
 });
+
+/** Never throws: every failure degrades to a panel that explains itself. */
+export async function getPlaySales(): Promise<PlaySalesData> {
+  if (!readConfig()) return emptyPlay();
+  try {
+    return await loadPlaySalesCached();
+  } catch (err) {
+    return emptyPlay({
+      configured: true,
+      error:
+        err instanceof PlayAccessError
+          ? err.message
+          : `Could not read the Play reports: ${err instanceof Error ? err.message : "unknown error"}`,
+    });
+  }
+}
