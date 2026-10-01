@@ -11,6 +11,8 @@ import {
   setLeaderboardScore,
 } from "@/lib/leaderboard";
 import type { CompetitionPeriod } from "@/types";
+import { setPrizeStatus } from "@/lib/prizes";
+import { isPrizeStatus, type PrizeStatus } from "@/lib/trapman/winners";
 
 export interface ResetState {
   ok?: boolean;
@@ -247,5 +249,38 @@ export async function editScoreAction(
     return { ok: true };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Couldn't save the score." };
+  }
+}
+
+/** Record where a winner's prize is up to: not contacted, emailed, or sent. */
+export async function setPrizeStatusAction(
+  competitionId: string,
+  uid: string,
+  status: PrizeStatus,
+  displayName?: string | null,
+): Promise<{ ok?: boolean; error?: string }> {
+  let admin;
+  try {
+    admin = await requireWriteAccess();
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Unauthorized" };
+  }
+  if (!competitionId || !uid || !isPrizeStatus(status)) {
+    return { error: "Invalid prize update." };
+  }
+
+  try {
+    await setPrizeStatus(competitionId, uid, status, admin.email);
+    await recordAudit({
+      actorId: admin.id,
+      actorEmail: admin.email,
+      action: "prize.status",
+      target: uid,
+      metadata: { competitionId, status, displayName: displayName ?? uid },
+    });
+    revalidatePath("/console/trapman/leaderboard");
+    return { ok: true };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Couldn't save the prize status." };
   }
 }

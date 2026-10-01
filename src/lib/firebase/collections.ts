@@ -38,4 +38,5 @@ export const CRM = {
   testAccounts: "_crm_test_accounts", // _crm_test_accounts/{uid} — internal testers excluded from revenue
   purchaseVerifications: "_crm_purchase_verifications", // _crm_purchase_verifications/{sha256(purchaseToken)} — cached store verdicts
   storeReports: "_crm_store_reports", // _crm_store_reports/apple-{vendor}-{YYYY-MM-DD} — cached daily store sales reports
+  prizes: "_crm_prizes", // _crm_prizes/{competitionId}__{uid} — prize delivery status for each archived winner
 } as const;

@@ -8,6 +8,9 @@ import {
   getCompetitionHistory,
 } from "@/lib/leaderboard";
 import { getPlayerEmails } from "@/lib/users";
+import { getPrizeStatuses } from "@/lib/prizes";
+import { winnerRows } from "@/lib/trapman/winners";
+import { WinnersHistory } from "./winners-history";
 import {
   ResetCompetitionModal,
   CompetitionHistory,
@@ -17,13 +20,20 @@ import { LeaderboardTable } from "./leaderboard-table";
 export const dynamic = "force-dynamic";
 
 export default async function LeaderboardPage() {
-  const [session, { entries, totalCount, connected, error }, history, eventBoards] =
-    await Promise.all([
-      auth(),
-      listLeaderboard(100, 0),
-      getCompetitionHistory(20),
-      listEventBoards(),
-    ]);
+  const [
+    session,
+    { entries, totalCount, connected, error },
+    history,
+    eventBoards,
+    prizeStatuses,
+  ] = await Promise.all([
+    auth(),
+    listLeaderboard(100, 0),
+    // Enough history for the winners list to span many competitions.
+    getCompetitionHistory(50),
+    listEventBoards(),
+    getPrizeStatuses(),
+  ]);
 
   const canWrite = session?.user?.role !== "viewer";
 
@@ -145,7 +155,13 @@ export default async function LeaderboardPage() {
         </div>
 
         {/* Past competition archive */}
-        <CompetitionHistory history={history} emails={emails} />
+        <WinnersHistory
+          rows={winnerRows(history, prizeStatuses)}
+          emails={emails}
+          canWrite={canWrite}
+        />
+
+        <CompetitionHistory history={history} />
       </div>
     </>
   );

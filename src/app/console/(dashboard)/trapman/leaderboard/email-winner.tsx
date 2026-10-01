@@ -25,6 +25,7 @@ export function EmailWinnerButton({
   rank,
   score,
   competition = null,
+  onSent,
 }: {
   uid: string;
   email: string | null | undefined;
@@ -33,6 +34,8 @@ export function EmailWinnerButton({
   score: number;
   /** Name of an archived competition; omit for the live board. */
   competition?: string | null;
+  /** Called when the message is handed to the email app or copied. */
+  onSent?: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const identity = classifyPlayerEmail(email);
@@ -60,6 +63,7 @@ export function EmailWinnerButton({
         `To: ${identity.address}\nSubject: ${subject}\n\n${body}`,
       );
       setCopied(true);
+      onSent?.();
       setTimeout(() => setCopied(false), 2000);
     } catch {
       // Clipboard can be blocked by the browser; the text is still on screen.
@@ -140,7 +144,10 @@ export function EmailWinnerButton({
             </Button>
             <a
               href={mailtoLink(identity.address, subject, body)}
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setOpen(false);
+                onSent?.();
+              }}
               className={cn(buttonVariants(), "flex-1 gap-1.5")}
             >
               <Mail className="size-4" aria-hidden="true" />
