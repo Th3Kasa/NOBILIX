@@ -119,15 +119,6 @@ test("leaderboard reset calls recordAudit", () => {
   );
 });
 
-test("messaging send calls recordAudit", () => {
-  const src = read("src/app/console/(dashboard)/trapman/messaging/actions.ts");
-  assert.match(
-    src,
-    /recordAudit/,
-    "messaging send must call recordAudit",
-  );
-});
-
 test("password change calls recordAudit", () => {
   const src = read("src/app/console/(dashboard)/trapman/settings/actions.ts");
   assert.match(

@@ -22,7 +22,6 @@ export const PROJECTS = {
       "analytics",
       "gameplay",
       "ads",
-      "messaging",
       "exports",
       "audit",
       "settings",

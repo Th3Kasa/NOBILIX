@@ -100,24 +100,6 @@ export interface AuditEntry {
   at: number; // epoch ms
 }
 
-export type CampaignAudience =
-  | { type: "single"; uid: string }
-  | { type: "broadcast" }
-  | {
-      type: "segment";
-      filters: {
-        country?: string;
-        minLevel?: number;
-        maxLevel?: number;
-        /**
-         * Days since the game last synced the player's progress. No `character`
-         * filter: the game writes no such field on any player document, so
-         * filtering by it always produced an empty audience.
-         */
-        lastActiveDays?: number;
-      };
-    };
-
 export interface LeaderboardEntry {
   uid: string;
   displayName?: string | null;
@@ -142,36 +124,3 @@ export interface CompetitionRecord {
   clearedEventBoards: { eventId: string; deleted: number }[];
 }
 
-/** One cause of delivery failure within a campaign, with its FCM error code. */
-export interface CampaignFailure {
-  code: string;
-  reason: string;
-  count: number;
-  /** True when the stored device token will never work again. */
-  deadToken: boolean;
-}
-
-export interface CampaignRecord {
-  id: string;
-  title: string;
-  body: string;
-  data?: Record<string, string> | null;
-  audience: CampaignAudience;
-  status: "draft" | "sending" | "sent" | "failed";
-  /** Devices the message was sent to. */
-  recipientCount: number;
-  /**
-   * Players who matched the audience, reachable or not. Null on campaigns
-   * sent before this was recorded — distinct from a genuine zero.
-   */
-  matchedPlayers: number | null;
-  /** Matched players with no device token. Null on older campaigns. */
-  unreachablePlayers: number | null;
-  successCount: number;
-  failureCount: number;
-  /** Why deliveries failed, grouped by cause. */
-  failures: CampaignFailure[];
-  createdBy: string;
-  createdAt: number;
-  sentAt: number | null;
-}

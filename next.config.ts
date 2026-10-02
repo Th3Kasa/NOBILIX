@@ -56,7 +56,10 @@ const nextConfig: NextConfig = {
       // Legacy console redirects — non-permanent during migration to /console/trapman/*
       { source: "/console/users/:path*", destination: "/console/trapman/users/:path*", permanent: false },
       { source: "/console/leaderboard/:path*", destination: "/console/trapman/leaderboard/:path*", permanent: false },
-      { source: "/console/messaging/:path*", destination: "/console/trapman/messaging/:path*", permanent: false },
+      // The Push notifications tab was removed; old links land on the overview.
+      { source: "/console/messaging/:path*", destination: "/console/trapman", permanent: false },
+      { source: "/console/trapman/messaging/:path*", destination: "/console/trapman", permanent: false },
+      { source: "/console/trapman/messaging", destination: "/console/trapman", permanent: false },
       { source: "/console/analytics/:path*", destination: "/console/trapman/analytics/:path*", permanent: false },
       { source: "/console/purchases/:path*", destination: "/console/trapman/purchases/:path*", permanent: false },
       { source: "/console/exports/:path*", destination: "/console/trapman/exports/:path*", permanent: false },

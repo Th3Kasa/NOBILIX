@@ -47,12 +47,6 @@ function buildCommands(): Command[] {
   // Real, already-wired shortcuts — not invented destinations.
   const actions: Command[] = [
     {
-      id: "action-compose",
-      label: "Compose push notification",
-      group: "Actions",
-      href: "/console/trapman/messaging",
-    },
-    {
       id: "action-export-users",
       label: "Export players (CSV)",
       group: "Actions",

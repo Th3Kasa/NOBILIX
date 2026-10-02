@@ -11,7 +11,6 @@ const modulePages = [
   "src/app/console/(dashboard)/trapman/page.tsx",
   "src/app/console/(dashboard)/trapman/users/page.tsx",
   "src/app/console/(dashboard)/trapman/leaderboard/page.tsx",
-  "src/app/console/(dashboard)/trapman/messaging/page.tsx",
   "src/app/console/(dashboard)/trapman/settings/page.tsx",
   "src/app/console/(dashboard)/trapman/analytics/page.tsx",
   "src/app/console/(dashboard)/trapman/purchases/page.tsx",

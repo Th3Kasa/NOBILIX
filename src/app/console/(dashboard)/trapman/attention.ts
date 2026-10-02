@@ -1,5 +1,4 @@
 import "server-only";
-import { getRecentCampaigns } from "@/lib/campaigns";
 import { getPurchasesData } from "./purchases/data";
 import type { TrapManOverview } from "@/lib/trapman/overview";
 import type { Ga4Snapshot } from "./ga4-data";
@@ -54,10 +53,7 @@ export async function getAttentionItems(
     });
   }
 
-  const [purchasesResult, campaignsResult] = await Promise.allSettled([
-    getPurchasesData(),
-    getRecentCampaigns(25),
-  ]);
+  const [purchasesResult] = await Promise.allSettled([getPurchasesData()]);
 
   if (purchasesResult.status === "fulfilled" && purchasesResult.value.unparsedRecords > 0) {
     const { unparsedRecords } = purchasesResult.value;
@@ -90,28 +86,6 @@ export async function getAttentionItems(
         description: purchases.verificationBlockedReason,
         severity: "warning",
         href: "/console/trapman/purchases",
-      });
-    }
-  }
-
-  if (campaignsResult.status === "fulfilled") {
-    const failed = campaignsResult.value.filter((c) => c.failureCount > 0);
-    const shown = failed.slice(0, 3);
-    for (const campaign of shown) {
-      items.push({
-        id: `campaign-failed-${campaign.id}`,
-        label: `Push "${campaign.title}" failed for ${campaign.failureCount} device${campaign.failureCount === 1 ? "" : "s"}`,
-        description: `${campaign.successCount} delivered successfully.`,
-        severity: "warning",
-        href: "/console/trapman/messaging",
-      });
-    }
-    if (failed.length > shown.length) {
-      items.push({
-        id: "campaigns-failed-more",
-        label: `${failed.length - shown.length} more push campaign${failed.length - shown.length === 1 ? "" : "s"} had failures`,
-        severity: "warning",
-        href: "/console/trapman/messaging",
       });
     }
   }

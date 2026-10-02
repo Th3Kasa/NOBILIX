@@ -8,7 +8,6 @@ export type ConsoleModule =
   | "analytics"
   | "gameplay"
   | "ads"
-  | "messaging"
   | "exports"
   | "audit"
   | "settings";
