@@ -36,8 +36,9 @@ export default async function ExportsPage() {
           </CardHeader>
           <CardContent className="flex flex-1 flex-col justify-between gap-4 pt-0">
             <p className="text-sm text-muted-foreground">
-              Up to 1,000 player profiles — country, level, high score, account
-              type, and timestamps.
+              Up to 1,000 player profiles — name, email, country, account type,
+              highest level, levels completed, real purchases and whether
+              they can be notified.
             </p>
             <a
               href="/api/console-exports/users"

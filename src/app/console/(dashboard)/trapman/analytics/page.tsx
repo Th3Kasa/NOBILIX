@@ -26,17 +26,18 @@ export default async function AnalyticsPage() {
       {ga4.connected && (
         <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <StatCard
-            label="Active today"
+            label="Active app users today"
             value={ga4.activeUsers1d}
             icon={Activity}
+            hint="Devices that played · Google Analytics"
           />
           <StatCard
-            label="Active (last 7 days)"
+            label="Active app users (last 7 days)"
             value={ga4.activeUsers7d}
             icon={Activity}
           />
           <StatCard
-            label="Active (last 28 days)"
+            label="Active app users (last 28 days)"
             value={ga4.activeUsers28d}
             icon={Activity}
           />
@@ -46,7 +47,7 @@ export default async function AnalyticsPage() {
             icon={Globe2}
             hint={
               ga4.countries[0]
-                ? `${ga4.countries[0].activeUsers} active players`
+                ? `${ga4.countries[0].activeUsers} active app users`
                 : undefined
             }
           />
@@ -73,12 +74,17 @@ export default async function AnalyticsPage() {
       {data.connected && (
         <>
           <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <StatCard label="Sampled players" value={data.sampleSize} icon={Users} />
+            <StatCard
+              label="Players"
+              value={data.sampleSize}
+              icon={Users}
+              hint={data.scanCapped ? "First 1,000 accounts" : "Accounts in the game database"}
+            />
             <StatCard
               label="Countries represented"
-              value={data.countries.length}
+              value={data.countryCount}
               icon={Globe2}
-              hint={data.sampleSize >= 1000 ? "Capped at first 1,000 docs" : undefined}
+              hint="From the country on each player profile"
             />
             <StatCard
               label="Signed-up share"
@@ -100,7 +106,7 @@ export default async function AnalyticsPage() {
 
             <Card className="console-glass console-grid-span-6">
               <CardHeader>
-                <CardTitle className="text-base">Level progress distribution</CardTitle>
+                <CardTitle className="text-base">Furthest level reached</CardTitle>
               </CardHeader>
               <CardContent>
                 <LevelDistributionChart levelBuckets={data.levelBuckets} />
@@ -112,7 +118,7 @@ export default async function AnalyticsPage() {
             <Card className="console-glass mt-4">
               <CardHeader>
                 <CardTitle className="text-base">
-                  Active players by country (Google Analytics, last 30 days)
+                  Active app users by country (Google Analytics, last 30 days)
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">

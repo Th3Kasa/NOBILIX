@@ -20,7 +20,6 @@ export interface TrapManOverview {
   unavailable: string[];
 }
 
-const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
 
 /**
  * Fetches verified live metrics for the TrapMan mission-control overview.
@@ -38,13 +37,9 @@ export async function getTrapManOverview(): Promise<TrapManOverview> {
     const db = getDb();
     const users = db.collection(GAME.users);
 
-    const [total, guests, newUsers] = await Promise.all([
+    const [total, guests] = await Promise.all([
       users.count().get(),
       users.where("isGuest", "==", true).count().get(),
-      users
-        .where("createdAt", ">=", Date.now() - SEVEN_DAYS_MS)
-        .count()
-        .get(),
     ]);
 
     const totalPlayers = total.data().count;
@@ -64,7 +59,9 @@ export async function getTrapManOverview(): Promise<TrapManOverview> {
       totalPlayers,
       registeredPlayers: totalPlayers - guestPlayers,
       guestPlayers,
-      newPlayers7d: newUsers.data().count,
+      // The game never writes createdAt, so Firestore cannot count new
+      // players; the Overview uses Google Analytics for this instead.
+      newPlayers7d: null,
       purchases24h: null,
       revenue24h: null,
       adsClosed24h: null,

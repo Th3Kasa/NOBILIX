@@ -22,7 +22,16 @@ import { getAdminById } from "@/lib/admins";
 import { getTrapManOverview, type TrapManOverview } from "@/lib/trapman/overview";
 import { getLiveMetrics, type LiveMetrics } from "./live-metrics";
 import { getGa4Snapshot, type Ga4Snapshot } from "./ga4-data";
-import { getAudRates, convertToAud, formatAud, formatOriginal, type FxRates } from "./fx";
+import {
+  getAudRates,
+  convertToAud,
+  formatAud,
+  formatAudTotal,
+  formatOriginal,
+  sumInAud,
+  type FxRates,
+} from "./fx";
+import { getPurchasesData, summarise } from "./purchases/data";
 import { getOverviewWidget, resolveOverviewLayout } from "./overview-widgets";
 import { CustomizeOverview } from "./customize-overview";
 import { ActivityChart } from "./activity-chart";
@@ -45,13 +54,11 @@ const FALLBACK_OVERVIEW: TrapManOverview = {
 
 const FALLBACK_LIVE: LiveMetrics = {
   connected: false,
+  players: 0,
+  scanCapped: false,
   pushReachable: 0,
-  purchaseCount: 0,
-  buyerCount: 0,
-  topRevenue: null,
-  revenueByCurrency: [],
-  maxLevelReached: null,
-  avgCompletedLevels: null,
+  highestLevel: null,
+  avgLevelsCompleted: null,
   recentActivity: [],
   latestActivityAt: null,
   error: "Panel failed to load",
@@ -68,6 +75,7 @@ const FALLBACK_GA4: Ga4Snapshot = {
   adClicked30d: 0,
   adClosed30d: 0,
   totalRevenue: 0,
+  revenueCurrency: "USD",
   purchaseRevenue: 0,
   avgSessionSeconds: 0,
   engagedSessions: 0,
@@ -88,13 +96,14 @@ export default async function TrapManOverviewPage() {
   // source failing unexpectedly (outside its own internal try/catch) still
   // renders the rest of the page — with that panel's own honest
   // "unavailable" state — instead of crashing the whole overview.
-  const [mResult, liveResult, ga4Result, fxResult, session] =
+  const [mResult, liveResult, ga4Result, fxResult, session, purchasesResult] =
     await Promise.allSettled([
       getTrapManOverview(),
       getLiveMetrics(),
       getGa4Snapshot(),
       getAudRates(),
       auth(),
+      getPurchasesData(),
     ]);
 
   const m = mResult.status === "fulfilled" ? mResult.value : FALLBACK_OVERVIEW;
@@ -129,25 +138,19 @@ export default async function TrapManOverviewPage() {
       : {}),
   };
 
-  // Store revenue (embedded receipts, mixed currencies) converted to AUD.
-  let storeRevenueAud: number | null = null;
-  if (fx.connected && live.revenueByCurrency.length > 0) {
-    let total = 0;
-    let allConverted = true;
-    for (const { currency, total: amount } of live.revenueByCurrency) {
-      const aud = convertToAud(amount, currency, fx);
-      if (aud == null) {
-        allConverted = false;
-        break;
-      }
-      total += aud;
-    }
-    if (allConverted) storeRevenueAud = total;
-  }
+  // Sales and revenue use the Purchases page's own accounting (same records,
+  // same exclusions, same AUD rule), all time — so the two pages always agree.
+  const purchases =
+    purchasesResult.status === "fulfilled" && purchasesResult.value.connected
+      ? purchasesResult.value
+      : null;
+  const sales = purchases ? summarise(purchases.records) : null;
+  const salesAud = sales ? sumInAud(sales.revenueByCurrency, fx) : null;
 
+  // GA4 reports in the property's own currency, which it states on the report.
   const ga4RevenueAud =
     fx.connected && ga4.connected
-      ? convertToAud(ga4.totalRevenue, "USD", fx)
+      ? convertToAud(ga4.totalRevenue, ga4.revenueCurrency, fx)
       : null;
 
   // One node per registry widget. A null node means the widget has nothing
@@ -169,39 +172,39 @@ export default async function TrapManOverviewPage() {
     "players-guests": (
       <StatCard key="players-guests" label="Guest players" value={m.guestPlayers} icon={Ghost} />
     ),
-    "players-new-7d": (
+    "players-new-7d": ga4.connected ? (
       <StatCard
         key="players-new-7d"
-        label="New players (last 7 days)"
-        value={ga4.connected ? ga4.newUsers7d : m.newPlayers7d}
+        label="New app users (last 7 days)"
+        value={ga4.newUsers7d}
         icon={UserPlus}
-        hint={ga4.connected ? "Counted by Google Analytics" : undefined}
+        hint="Devices opening the game for the first time · Google Analytics"
       />
-    ),
+    ) : null,
     "ga4-active-7d": ga4.connected ? (
       <StatCard
         key="ga4-active-7d"
-        label="Active players (last 7 days)"
+        label="Active app users (last 7 days)"
         value={ga4.activeUsers7d}
         icon={Activity}
-        hint={`${ga4.activeUsers28d} in the last 28 days`}
+        hint={`Every device that played, with or without an account · ${ga4.activeUsers28d} in 28 days`}
         delta={ga4.activeUsers7dDelta}
       />
     ) : null,
     "ga4-revenue-30d": ga4.connected ? (
       <StatCard
         key="ga4-revenue-30d"
-        label="Google Analytics revenue (last 30 days)"
+        label="Revenue tracked by Google Analytics (last 30 days)"
         value={
           ga4RevenueAud != null
             ? formatAud(ga4RevenueAud)
-            : formatOriginal(ga4.totalRevenue, "USD")
+            : formatOriginal(ga4.totalRevenue, ga4.revenueCurrency)
         }
         icon={Receipt}
         hint={
-          ga4RevenueAud != null
-            ? `${formatOriginal(ga4.totalRevenue, "USD")} USD · converted at the live exchange rate`
-            : "In US dollars — exchange rate unavailable"
+          ga4RevenueAud != null && ga4.revenueCurrency !== "AUD"
+            ? `In-app purchases + ads · ${formatOriginal(ga4.totalRevenue, ga4.revenueCurrency)} ${ga4.revenueCurrency} converted`
+            : "In-app purchases + ads"
         }
         delta={ga4.revenue30dDelta}
       />
@@ -228,37 +231,25 @@ export default async function TrapManOverviewPage() {
         delta={ga4.engagedSessionsDelta}
       />
     ) : null,
-    "store-purchases": live.connected ? (
+    "store-purchases": sales ? (
       <StatCard
         key="store-purchases"
-        label="Store purchases"
-        value={live.purchaseCount}
+        label="Real sales (all time)"
+        value={sales.totalCount}
         icon={ShoppingCart}
-        hint={
-          live.buyerCount > 0
-            ? `${live.buyerCount} unique buyer${live.buyerCount === 1 ? "" : "s"}`
-            : undefined
-        }
+        hint={`${sales.buyerCount} ${sales.buyerCount === 1 ? "person" : "people"} bought · tests and refunds excluded`}
       />
     ) : null,
-    "store-revenue-aud": live.connected ? (
+    "store-revenue-aud": sales && salesAud ? (
       <StatCard
         key="store-revenue-aud"
-        label="Store revenue (AUD)"
-        value={
-          storeRevenueAud != null
-            ? formatAud(storeRevenueAud)
-            : live.topRevenue
-              ? formatOriginal(live.topRevenue.total, live.topRevenue.currency)
-              : null
-        }
+        label="Revenue (AUD, all time)"
+        value={formatAudTotal(salesAud)}
         icon={Receipt}
         hint={
-          storeRevenueAud != null
-            ? `Converted at today's exchange rate · ${fx.asOf}`
-            : live.topRevenue
-              ? "Exchange rate unavailable — shown in the original currency"
-              : undefined
+          salesAud.unconverted.length > 0
+            ? "Some currencies have no exchange rate and are shown as-is"
+            : "What players paid, as recorded by the game · matches Purchases"
         }
       />
     ) : null,
@@ -275,11 +266,11 @@ export default async function TrapManOverviewPage() {
       <StatCard
         key="top-level"
         label="Highest level reached"
-        value={live.maxLevelReached}
+        value={live.highestLevel}
         icon={Gauge}
         hint={
-          live.avgCompletedLevels != null
-            ? `A typical player finishes ${live.avgCompletedLevels} levels`
+          live.avgLevelsCompleted != null
+            ? `Players complete ${live.avgLevelsCompleted} levels on average`
             : undefined
         }
       />
@@ -307,10 +298,10 @@ export default async function TrapManOverviewPage() {
                 <tbody>
                   {live.recentActivity.map((entry) => (
                     <tr
-                      key={`${entry.username}-${entry.timestamp}`}
+                      key={`${entry.name}-${entry.timestamp}`}
                       className="border-b border-border/60 last:border-0 hover:bg-accent/40"
                     >
-                      <td className="py-2.5 pr-4">{entry.username}</td>
+                      <td className="py-2.5 pr-4">{entry.name}</td>
                       <td className="py-2.5 pr-4 font-mono text-xs">{entry.country ?? "—"}</td>
                       <td className="py-2.5 pr-4 font-mono tabular-nums">
                         {entry.score.toLocaleString()}
@@ -327,14 +318,15 @@ export default async function TrapManOverviewPage() {
         </Card>
       ) : null,
     "revenue-note":
-      live.connected || ga4.connected ? (
+      sales || ga4.connected ? (
         <p key="revenue-note" className="mb-6 text-xs text-muted-foreground">
-          We show two revenue numbers on purpose:{" "}
-          <strong className="text-foreground">Store revenue</strong> adds up
-          the purchase receipts saved on player profiles, while{" "}
+          <strong className="text-foreground">Revenue</strong> is what players
+          paid, from the purchases the game saved, with tests and refunds taken
+          out — the same figure as the Purchases page.{" "}
           <strong className="text-foreground">Google Analytics revenue</strong>{" "}
-          is what Google measured over the last 30 days. They come from
-          different sources, so they will rarely match exactly.
+          also counts ad income and covers only the last 30 days. For the
+          stores&apos; official numbers after their fees, see the App Store and
+          Google Play cards on the Purchases page.
         </p>
       ) : null,
     "activity-30d": (
@@ -345,7 +337,7 @@ export default async function TrapManOverviewPage() {
               className="size-4 text-[var(--console-live)] drop-shadow-[0_0_4px_var(--console-live)]"
               aria-hidden="true"
             />
-            Daily active players (last 30 days)
+            Daily active app users (last 30 days)
           </CardTitle>
         </CardHeader>
         <CardContent>

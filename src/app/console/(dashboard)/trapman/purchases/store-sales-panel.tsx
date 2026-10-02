@@ -7,7 +7,14 @@ import { productLabel } from "@/lib/trapman/labels";
 import type { AppleSalesData } from "@/lib/trapman/app-store-connect";
 import type { PlaySalesData } from "@/lib/trapman/play-reports";
 import type { StoreSalesSummary } from "@/lib/trapman/store-reports";
-import { convertToAud, formatAud, formatOriginal, type FxRates } from "../fx";
+import {
+  convertToAud,
+  formatAud,
+  formatAudTotal,
+  formatOriginal,
+  sumInAud,
+  type FxRates,
+} from "../fx";
 
 /**
  * Each store's own account of what sold, next to the console's Firestore-
@@ -19,21 +26,7 @@ import { convertToAud, formatAud, formatOriginal, type FxRates } from "../fx";
  * and the game's records for who bought.
  */
 
-/** Sum per-currency amounts in AUD, listing any currency without a rate. */
-function toAud(
-  amounts: { currency: string; total: number }[],
-  fx: FxRates,
-): { aud: number; unconverted: string[] } {
-  let aud = 0;
-  const unconverted: string[] = [];
-  for (const { currency, total } of amounts) {
-    const converted = fx.connected ? convertToAud(total, currency, fx) : null;
-    if (converted === null) unconverted.push(formatOriginal(total, currency));
-    else aud += converted;
-  }
-  return { aud, unconverted };
-}
-
+/** A multi-currency amount in AUD, by the console-wide rule (fx.sumInAud). */
 function Money({
   amounts,
   fx,
@@ -42,17 +35,7 @@ function Money({
   fx: FxRates;
 }) {
   if (amounts.length === 0) return <>—</>;
-  const { aud, unconverted } = toAud(amounts, fx);
-  return (
-    <>
-      {formatAud(aud)}
-      {unconverted.length > 0 && (
-        <span className="block text-xs text-muted-foreground">
-          + {unconverted.join(" + ")}
-        </span>
-      )}
-    </>
-  );
+  return <>{formatAudTotal(sumInAud(amounts, fx))}</>;
 }
 
 function Tile({ label, children }: { label: string; children: ReactNode }) {

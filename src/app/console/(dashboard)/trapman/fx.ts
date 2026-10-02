@@ -76,3 +76,40 @@ export function formatOriginal(amount: number, currency: string): string {
     return `${amount.toFixed(2)} ${currency.toUpperCase()}`;
   }
 }
+
+export interface AudTotal {
+  /** Everything that could be converted, in AUD. */
+  aud: number;
+  /** Amounts with no published rate, left in their own currency. */
+  unconverted: { currency: string; total: number }[];
+}
+
+/**
+ * Add up amounts in several currencies as one AUD figure.
+ *
+ * The single rule every money figure in the console uses: convert what has a
+ * rate, and return what doesn't separately so the page can show it beside the
+ * total — never drop it, and never present one currency under an AUD label.
+ */
+export function sumInAud(
+  amounts: { currency: string; total: number }[],
+  fx: FxRates,
+): AudTotal {
+  let aud = 0;
+  const unconverted: { currency: string; total: number }[] = [];
+  for (const { currency, total } of amounts) {
+    const converted = fx.connected ? convertToAud(total, currency, fx) : null;
+    if (converted === null) unconverted.push({ currency, total });
+    else aud += converted;
+  }
+  return { aud, unconverted };
+}
+
+/** "A$12.50", or "A$12.50 + €3.00" when some currencies had no rate. */
+export function formatAudTotal(total: AudTotal): string {
+  const parts = [formatAud(total.aud)];
+  for (const u of total.unconverted) parts.push(formatOriginal(u.total, u.currency));
+  return total.unconverted.length > 0 && total.aud === 0
+    ? parts.slice(1).join(" + ")
+    : parts.join(" + ");
+}

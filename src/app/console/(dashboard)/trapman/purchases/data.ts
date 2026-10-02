@@ -1,12 +1,7 @@
 import "server-only";
 import { unstable_cache } from "next/cache";
-import { getDb } from "@/lib/firebase/firestore";
-import { GAME } from "@/lib/firebase/collections";
-import {
-  buyerNameFrom,
-  parsePurchaseMap,
-  type NormalizedPurchase,
-} from "@/lib/trapman/purchases";
+import type { NormalizedPurchase } from "@/lib/trapman/purchases";
+import { getPlayerScan, PLAYER_SCAN_CAP } from "@/lib/trapman/player-scan";
 import { getTestAccountUids } from "@/lib/trapman/test-accounts";
 import {
   verifyPlayPurchases,
@@ -34,8 +29,6 @@ import { classify, type PurchaseRecord } from "@/lib/trapman/purchase-accounting
  * `@/lib/trapman/purchase-accounting`, which has no database or framework
  * imports and can be tested directly.
  */
-
-const MAX_SAMPLE = 1000;
 
 // Re-exported so pages keep a single import site for the purchase shape.
 export type {
@@ -99,25 +92,15 @@ function notChecked(purchase: NormalizedPurchase): Verification {
 
 async function fetchPurchasesData(): Promise<PurchasesData> {
   try {
-    const db = getDb();
-    const [snap, testUids] = await Promise.all([
-      db.collection(GAME.users).limit(MAX_SAMPLE).get(),
+    // The same player snapshot every other tab reads (see player-scan).
+    const [scan, testUids] = await Promise.all([
+      getPlayerScan(),
       getTestAccountUids(),
     ]);
+    if (!scan.connected) return emptyData(scan.error);
 
-    const parsed: NormalizedPurchase[] = [];
-    let unparsedRecords = 0;
-
-    for (const doc of snap.docs) {
-      const data = doc.data();
-      const { purchases, unparsed } = parsePurchaseMap(
-        doc.id,
-        buyerNameFrom(data),
-        data.purchases,
-      );
-      parsed.push(...purchases);
-      unparsedRecords += unparsed.length;
-    }
+    const parsed: NormalizedPurchase[] = scan.players.flatMap((p) => p.purchases);
+    const unparsedRecords = scan.players.reduce((n, p) => n + p.unparsedPurchases, 0);
 
     parsed.sort((a, b) => b.timestamp - a.timestamp);
 
@@ -149,8 +132,8 @@ async function fetchPurchasesData(): Promise<PurchasesData> {
 
     return {
       connected: true,
-      sampleSize: snap.size,
-      scanCapped: snap.size >= MAX_SAMPLE,
+      sampleSize: scan.players.length,
+      scanCapped: scan.players.length >= PLAYER_SCAN_CAP,
       records,
       unparsedRecords,
       verificationConfigured: pass.configured,

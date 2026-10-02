@@ -1,121 +1,87 @@
 import "server-only";
-import { unstable_cache } from "next/cache";
-import { getDb } from "@/lib/firebase/firestore";
-import { GAME } from "@/lib/firebase/collections";
+import { getPlayerScan } from "@/lib/trapman/player-scan";
+import { average } from "@/lib/trapman/player-fields";
 
 /**
- * Real gameplay/progression analytics computed from the confirmed live
- * schema (`users.currentLevel` and `users.completedLevels`). Replaces the
- * placeholder that waited on a `player_progress` collection that no longer
- * exists — progression now lives directly on the player document.
+ * Gameplay and progression figures, from the shared player snapshot (see
+ * player-scan) and the shared field rules (see player-fields) — the same
+ * definitions the Overview and Players tabs use, so "highest level reached"
+ * and "levels completed" read identically everywhere.
  */
-
-const MAX_SAMPLE = 1000;
 
 export interface LevelRow {
   level: number;
+  /** Players whose current level is this one. */
   playersAtLevel: number;
+  /** Players who have completed this level. */
   playersCompleted: number;
 }
 
 export interface GameplayLiveData {
   connected: boolean;
   sampleSize: number;
+  scanCapped: boolean;
   levels: LevelRow[];
+  /** Furthest level any player has reached (current or completed). */
   maxLevel: number | null;
   avgCurrentLevel: number | null;
+  /** Average distinct levels completed per player. */
   avgCompleted: number | null;
   playersWithProgress: number;
   error?: string;
 }
 
-async function fetchGameplayLiveData(): Promise<GameplayLiveData> {
-  try {
-    const db = getDb();
-    const snap = await db.collection(GAME.users).limit(MAX_SAMPLE).get();
-
-    const atLevel = new Map<number, number>();
-    const completedAtLevel = new Map<number, number>();
-    let levelSum = 0;
-    let levelCount = 0;
-    let completedSum = 0;
-    let completedCount = 0;
-    let maxLevel: number | null = null;
-    let withProgress = 0;
-
-    for (const doc of snap.docs) {
-      const d = doc.data();
-      let hasProgress = false;
-
-      if (typeof d.currentLevel === "number") {
-        atLevel.set(d.currentLevel, (atLevel.get(d.currentLevel) ?? 0) + 1);
-        levelSum += d.currentLevel;
-        levelCount += 1;
-        maxLevel = maxLevel == null ? d.currentLevel : Math.max(maxLevel, d.currentLevel);
-        hasProgress = true;
-      }
-
-      if (Array.isArray(d.completedLevels)) {
-        completedSum += d.completedLevels.length;
-        completedCount += 1;
-        if (d.completedLevels.length > 0) hasProgress = true;
-        for (const lvl of d.completedLevels) {
-          if (typeof lvl === "number") {
-            completedAtLevel.set(lvl, (completedAtLevel.get(lvl) ?? 0) + 1);
-          }
-        }
-      }
-
-      if (hasProgress) withProgress += 1;
-    }
-
-    const allLevels = new Set<number>([
-      ...atLevel.keys(),
-      ...completedAtLevel.keys(),
-    ]);
-    const levels: LevelRow[] = [...allLevels]
-      .sort((a, b) => a - b)
-      .map((level) => ({
-        level,
-        playersAtLevel: atLevel.get(level) ?? 0,
-        playersCompleted: completedAtLevel.get(level) ?? 0,
-      }));
-
-    return {
-      connected: true,
-      sampleSize: snap.size,
-      levels,
-      maxLevel,
-      avgCurrentLevel:
-        levelCount > 0 ? Math.round((levelSum / levelCount) * 10) / 10 : null,
-      avgCompleted:
-        completedCount > 0
-          ? Math.round((completedSum / completedCount) * 10) / 10
-          : null,
-      playersWithProgress: withProgress,
-    };
-  } catch (err) {
+export async function getGameplayLiveData(): Promise<GameplayLiveData> {
+  const scan = await getPlayerScan();
+  if (!scan.connected) {
     return {
       connected: false,
       sampleSize: 0,
+      scanCapped: false,
       levels: [],
       maxLevel: null,
       avgCurrentLevel: null,
       avgCompleted: null,
       playersWithProgress: 0,
-      error: err instanceof Error ? err.message : "Unknown error",
+      error: scan.error,
     };
   }
-}
 
-/**
- * 30s shared cache: one 1,000-doc scan serves every admin for the whole
- * auto-refresh window instead of a scan per request. (unstable_cache is
- * deprecated in favour of "use cache", which needs the app-wide
- * cacheComponents migration — out of scope here.)
- */
-export const getGameplayLiveData = unstable_cache(
-  fetchGameplayLiveData,
-  ["trapman-gameplay"],
-  { revalidate: 30, tags: ["trapman-console"] },
-);
+  const atLevel = new Map<number, number>();
+  const completedAtLevel = new Map<number, number>();
+  for (const p of scan.players) {
+    if (p.currentLevel !== null) {
+      atLevel.set(p.currentLevel, (atLevel.get(p.currentLevel) ?? 0) + 1);
+    }
+    for (const lvl of p.completedLevels) {
+      completedAtLevel.set(lvl, (completedAtLevel.get(lvl) ?? 0) + 1);
+    }
+  }
+
+  const levels: LevelRow[] = [...new Set([...atLevel.keys(), ...completedAtLevel.keys()])]
+    .sort((a, b) => a - b)
+    .map((level) => ({
+      level,
+      playersAtLevel: atLevel.get(level) ?? 0,
+      playersCompleted: completedAtLevel.get(level) ?? 0,
+    }));
+
+  const highest = scan.players
+    .map((p) => p.highestLevel)
+    .filter((n): n is number => n !== null);
+
+  return {
+    connected: true,
+    sampleSize: scan.players.length,
+    scanCapped: scan.scanCapped,
+    levels,
+    maxLevel: highest.length ? Math.max(...highest) : null,
+    avgCurrentLevel: average(
+      scan.players.map((p) => p.currentLevel).filter((n): n is number => n !== null),
+    ),
+    avgCompleted: average(scan.players.map((p) => p.levelsCompleted)),
+    playersWithProgress: scan.players.filter(
+      (p) => (p.currentLevel ?? 0) > 0 || p.levelsCompleted > 0,
+    ).length,
+  };
+}

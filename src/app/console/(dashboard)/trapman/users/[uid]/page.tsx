@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { format } from "date-fns";
-import { ArrowLeft, Send, Bell, BellOff } from "lucide-react";
+import { ArrowLeft, Bell, BellOff } from "lucide-react";
 import { auth } from "@/auth";
-import { getUser } from "@/lib/users";
+import { getUser, getAccountCreatedAt } from "@/lib/users";
+import { getLeaderboardScore } from "@/lib/leaderboard";
+import { readPlayerFields } from "@/lib/trapman/player-fields";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -29,25 +31,21 @@ export default async function UserDetailPage({
   params: Promise<{ uid: string }>;
 }) {
   const { uid } = await params;
-  const [user, session] = await Promise.all([getUser(uid), auth()]);
+  const [user, session, leaderboardScore, createdAt] = await Promise.all([
+    getUser(uid),
+    auth(),
+    getLeaderboardScore(uid),
+    getAccountCreatedAt(uid),
+  ]);
   if (!user) notFound();
 
   const canWrite = session?.user?.role !== "viewer";
   const emailIdentity = classifyPlayerEmail(user.email);
-  const ts = (v: unknown) =>
-    typeof v === "number" ? format(new Date(v), "PPpp") : "—";
+  const ts = (v: number | null) => (v !== null ? format(new Date(v), "PPpp") : "—");
 
-  // The live game writes currentLevel/completedLevels, not the documented
-  // level field; the mapper preserves them as extra properties.
-  const extra = user as unknown as {
-    currentLevel?: unknown;
-    completedLevels?: unknown;
-  };
-  const currentLevel =
-    typeof extra.currentLevel === "number" ? extra.currentLevel : null;
-  const completedLevels = Array.isArray(extra.completedLevels)
-    ? extra.completedLevels.length
-    : null;
+  // The same field rules every other tab uses (see player-fields), so this
+  // page can't show a different level, name or status than the Players list.
+  const player = readPlayerFields(user as unknown as Record<string, unknown>);
 
   return (
     <>
@@ -59,18 +57,10 @@ export default async function UserDetailPage({
       </Link>
 
       <PageHeader
-        title={user.displayName ?? "(no name)"}
+        title={player.name ?? "(no name)"}
         description={user.email ?? user.uid}
         action={
           <div className="flex flex-wrap gap-2">
-            {user.fcmToken ? (
-              <Link
-                href={`/console/trapman/messaging?uid=${user.uid}`}
-                className={buttonVariants({ variant: "outline" })}
-              >
-                <Send className="size-4" /> Push
-              </Link>
-            ) : null}
             <a
               href={`/api/users/${user.uid}/export`}
               className={buttonVariants({ variant: "outline" })}
@@ -91,7 +81,7 @@ export default async function UserDetailPage({
               label="Player ID"
               value={<span className="font-mono text-xs">{user.uid}</span>}
             />
-            <Field label="Display name" value={user.displayName ?? "—"} />
+            <Field label="Name" value={player.name ?? "—"} />
             <Field
               label={emailIdentity.label}
               value={
@@ -108,19 +98,25 @@ export default async function UserDetailPage({
             <Field
               label="Country"
               value={
-                user.country
-                  ? `${countryFlag(user.country)} ${user.country}`
+                player.country
+                  ? `${countryFlag(player.country)} ${player.country}`
                   : "—"
               }
             />
             <Field label="Character" value={user.character ?? "—"} />
             <Field
-              label="Level"
+              label="Highest level reached"
               value={
                 <span className="font-mono tabular-nums">
-                  {(currentLevel ?? user.level) != null
-                    ? formatNumber((currentLevel ?? user.level) as number)
-                    : "—"}
+                  {player.highestLevel != null ? formatNumber(player.highestLevel) : "—"}
+                </span>
+              }
+            />
+            <Field
+              label="Current level"
+              value={
+                <span className="font-mono tabular-nums">
+                  {player.currentLevel != null ? formatNumber(player.currentLevel) : "—"}
                 </span>
               }
             />
@@ -128,22 +124,22 @@ export default async function UserDetailPage({
               label="Levels completed"
               value={
                 <span className="font-mono tabular-nums">
-                  {completedLevels != null ? formatNumber(completedLevels) : "—"}
+                  {formatNumber(player.levelsCompleted)}
                 </span>
               }
             />
             <Field
-              label="High score"
+              label="Leaderboard score"
               value={
                 <span className="font-mono tabular-nums">
-                  {user.highScore != null ? formatNumber(user.highScore) : "—"}
+                  {leaderboardScore != null ? formatNumber(leaderboardScore) : "—"}
                 </span>
               }
             />
             <Field
               label="Account type"
               value={
-                user.isGuest ? (
+                player.isGuest ? (
                   <Badge variant="secondary" className="font-mono uppercase tracking-wide">
                     Guest
                   </Badge>
@@ -155,9 +151,9 @@ export default async function UserDetailPage({
               }
             />
             <Field
-              label="Push enabled"
+              label="Notifications allowed"
               value={
-                user.fcmToken ? (
+                player.pushToken ? (
                   <span className="inline-flex items-center gap-1 text-[var(--console-live)]">
                     <Bell className="size-3.5" /> Yes
                   </span>
@@ -168,8 +164,8 @@ export default async function UserDetailPage({
                 )
               }
             />
-            <Field label="Created" value={ts(user.createdAt)} />
-            <Field label="Last seen" value={ts(user.lastSeenAt)} />
+            <Field label="Account created" value={ts(createdAt)} />
+            <Field label="Last played" value={ts(player.lastSeenMs)} />
           </CardContent>
         </Card>
 
@@ -181,8 +177,8 @@ export default async function UserDetailPage({
               displayName: user.displayName ?? "",
               country: user.country ?? "",
               character: user.character ?? "",
-              currentLevel: currentLevel ?? user.level ?? 0,
-              highScore: user.highScore ?? 0,
+              currentLevel: player.currentLevel ?? 0,
+              highScore: leaderboardScore ?? 0,
             }}
           />
         </div>

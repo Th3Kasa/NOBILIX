@@ -27,9 +27,9 @@ type SP = {
 const COLUMNS: { field: SortField; label: string }[] = [
   { field: "name", label: "Player" },
   { field: "country", label: "Country" },
-  { field: "level", label: "Level" },
+  { field: "level", label: "Highest level" },
   { field: "levelsDone", label: "Levels done" },
-  { field: "purchases", label: "Purchases" },
+  { field: "purchases", label: "Real purchases" },
 ];
 
 export default async function UsersPage({
@@ -183,12 +183,12 @@ export default async function UsersPage({
                         )}
                       </td>
                       <td className="px-4 py-3 font-mono tabular-nums">
-                        {p.currentLevel != null
-                          ? formatNumber(p.currentLevel)
+                        {p.highestLevel != null
+                          ? formatNumber(p.highestLevel)
                           : "—"}
                       </td>
                       <td className="px-4 py-3 font-mono tabular-nums">
-                        {p.completedLevels != null
+                        {p.completedLevels > 0
                           ? formatNumber(p.completedLevels)
                           : "—"}
                       </td>

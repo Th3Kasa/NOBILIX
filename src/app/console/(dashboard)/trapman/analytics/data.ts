@@ -1,21 +1,14 @@
 import "server-only";
-import { unstable_cache } from "next/cache";
-import { getDb } from "@/lib/firebase/firestore";
-import { GAME } from "@/lib/firebase/collections";
+import { getPlayerScan } from "@/lib/trapman/player-scan";
 
 /**
- * Analytics data-access for the TrapMan console.
+ * Player distributions for the Analytics tab, from the shared player snapshot
+ * (see player-scan) and the shared field rules (see player-fields), so country,
+ * level and guest figures match the Players, Gameplay and Overview tabs.
  *
- * Reads directly from the confirmed `users` collection (country, currentLevel,
- * completedLevels, isGuest fields are confirmed present — see Phase 0 discovery).
- * There is no dedicated `player_progress` or `purchases` data yet, so this module
- * intentionally limits itself to distributions derivable from `users` documents.
- *
- * Never fabricates values — an empty/small sample renders as a small, honest
- * distribution rather than being padded or hidden.
+ * Never fabricates values — an empty or small sample renders as a small,
+ * honest distribution rather than being padded or hidden.
  */
-
-const MAX_SAMPLE = 1000;
 
 export interface CountrySlice {
   country: string;
@@ -30,7 +23,11 @@ export interface LevelBucket {
 export interface AnalyticsData {
   connected: boolean;
   sampleSize: number;
+  scanCapped: boolean;
+  /** Top 8 countries, for the chart. */
   countries: CountrySlice[];
+  /** How many distinct countries players come from (not capped at 8). */
+  countryCount: number;
   levelBuckets: LevelBucket[];
   guestShare: { guests: number; registered: number };
   error?: string;
@@ -39,82 +36,51 @@ export interface AnalyticsData {
 function bucketLabel(level: number): string {
   if (level <= 0) return "0";
   const start = Math.floor((level - 1) / 10) * 10 + 1;
-  const end = start + 9;
-  return `${start}-${end}`;
+  return `${start}-${start + 9}`;
 }
 
-async function fetchAnalyticsData(): Promise<AnalyticsData> {
-  try {
-    const db = getDb();
-    const snap = await db.collection(GAME.users).limit(MAX_SAMPLE).get();
-
-    const countryCounts = new Map<string, number>();
-    const levelCounts = new Map<string, number>();
-    let guests = 0;
-    let registered = 0;
-
-    for (const doc of snap.docs) {
-      const data = doc.data();
-
-      const country =
-        typeof data.country === "string" && data.country.trim()
-          ? data.country.trim().toUpperCase()
-          : null;
-      if (country) {
-        countryCounts.set(country, (countryCounts.get(country) ?? 0) + 1);
-      }
-
-      const level =
-        typeof data.currentLevel === "number"
-          ? data.currentLevel
-          : typeof data.level === "number"
-            ? data.level
-            : null;
-      if (level != null) {
-        const bucket = bucketLabel(level);
-        levelCounts.set(bucket, (levelCounts.get(bucket) ?? 0) + 1);
-      }
-
-      if (data.isGuest === true) guests += 1;
-      else registered += 1;
-    }
-
-    const countries = Array.from(countryCounts.entries())
-      .map(([country, count]) => ({ country, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 8);
-
-    const levelBuckets = Array.from(levelCounts.entries())
-      .map(([bucket, count]) => ({ bucket, count }))
-      .sort((a, b) => Number(a.bucket.split("-")[0]) - Number(b.bucket.split("-")[0]));
-
-    return {
-      connected: true,
-      sampleSize: snap.size,
-      countries,
-      levelBuckets,
-      guestShare: { guests, registered },
-    };
-  } catch (err) {
+export async function getAnalyticsData(): Promise<AnalyticsData> {
+  const scan = await getPlayerScan();
+  if (!scan.connected) {
     return {
       connected: false,
       sampleSize: 0,
+      scanCapped: false,
       countries: [],
+      countryCount: 0,
       levelBuckets: [],
       guestShare: { guests: 0, registered: 0 },
-      error: err instanceof Error ? err.message : "Unknown error",
+      error: scan.error,
     };
   }
-}
 
-/**
- * 30s shared cache: one 1,000-doc scan serves every admin for the whole
- * auto-refresh window instead of a scan per request. (unstable_cache is
- * deprecated in favour of "use cache", which needs the app-wide
- * cacheComponents migration — out of scope here.)
- */
-export const getAnalyticsData = unstable_cache(
-  fetchAnalyticsData,
-  ["trapman-analytics"],
-  { revalidate: 30, tags: ["trapman-console"] },
-);
+  const countryCounts = new Map<string, number>();
+  const levelCounts = new Map<string, number>();
+  let guests = 0;
+  for (const p of scan.players) {
+    if (p.country) countryCounts.set(p.country, (countryCounts.get(p.country) ?? 0) + 1);
+    // Bucketed by the furthest level reached, the same measure as "Highest
+    // level reached" — a player back on the menu at level 0 still counts
+    // where they got to.
+    if (p.highestLevel !== null) {
+      const bucket = bucketLabel(p.highestLevel);
+      levelCounts.set(bucket, (levelCounts.get(bucket) ?? 0) + 1);
+    }
+    if (p.isGuest) guests += 1;
+  }
+
+  return {
+    connected: true,
+    sampleSize: scan.players.length,
+    scanCapped: scan.scanCapped,
+    countries: [...countryCounts.entries()]
+      .map(([country, count]) => ({ country, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 8),
+    countryCount: countryCounts.size,
+    levelBuckets: [...levelCounts.entries()]
+      .map(([bucket, count]) => ({ bucket, count }))
+      .sort((a, b) => Number(a.bucket.split("-")[0]) - Number(b.bucket.split("-")[0])),
+    guestShare: { guests, registered: scan.players.length - guests },
+  };
+}

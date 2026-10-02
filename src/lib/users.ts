@@ -131,6 +131,21 @@ export async function getPlayerEmails(
   }
 }
 
+/**
+ * When the player's account was created, from Firebase Auth. The game never
+ * writes a creation date onto the profile, so this is the only real source.
+ * Null when the player has no Auth record or the lookup fails.
+ */
+export async function getAccountCreatedAt(uid: string): Promise<number | null> {
+  try {
+    const record = await getAuthAdmin().getUser(uid);
+    const t = Date.parse(record.metadata.creationTime);
+    return Number.isNaN(t) ? null : t;
+  } catch {
+    return null;
+  }
+}
+
 export async function getUser(uid: string): Promise<GameUser | null> {
   const doc = await getDb().collection(GAME.users).doc(uid).get();
   if (!doc.exists) return null;

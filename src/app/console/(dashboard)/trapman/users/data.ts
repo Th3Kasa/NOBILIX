@@ -1,22 +1,16 @@
 import "server-only";
-import { unstable_cache } from "next/cache";
-import { getDb } from "@/lib/firebase/firestore";
-import { GAME } from "@/lib/firebase/collections";
-import { parsePurchaseMap } from "@/lib/trapman/purchases";
+import { getPlayerScan, PLAYER_SCAN_CAP } from "@/lib/trapman/player-scan";
+import { getPurchasesData } from "../purchases/data";
 
 /**
- * Players listing built on the CONFIRMED live schema.
+ * The Players list, from the shared player snapshot (see player-scan) read
+ * through the shared field rules (see player-fields) — the same snapshot and
+ * rules as the Overview, Gameplay, Analytics and Purchases tabs.
  *
- * The game writes `username`, `currentLevel`, `completedLevels`, `isGuest`,
- * `fcmToken`, and an embedded `purchases` map — it never writes `createdAt`
- * or `displayName`. The generic lib listing orders by those missing fields,
- * and Firestore silently excludes any document that lacks an orderBy field,
- * which made the Players tab show "No players found" while Overview counted
- * 5. This module reads documents without a server-side orderBy and does its
- * filtering, sorting, and paging in memory (the sample is capped at 1,000).
+ * The game never writes `createdAt` or `displayName`, and Firestore silently
+ * drops documents that lack an orderBy field, so filtering, sorting and paging
+ * happen in memory over the snapshot (capped at PLAYER_SCAN_CAP players).
  */
-
-const MAX_SAMPLE = 1000;
 
 export interface PlayerRow {
   uid: string;
@@ -24,8 +18,15 @@ export interface PlayerRow {
   email: string | null;
   country: string | null;
   isGuest: boolean;
+  /** Furthest level reached, current or completed — as on Overview and Gameplay. */
+  highestLevel: number | null;
   currentLevel: number | null;
-  completedLevels: number | null;
+  /** Distinct levels completed. */
+  completedLevels: number;
+  /**
+   * Real sales by this player, counted exactly as the Purchases page counts
+   * them (tests, Editor sessions and refunds excluded).
+   */
   purchaseCount: number;
   pushReachable: boolean;
 }
@@ -82,9 +83,9 @@ function compareBy(field: SortField, a: PlayerRow, b: PlayerRow): number {
       return 0;
     }
     case "level":
-      return (a.currentLevel ?? -1) - (b.currentLevel ?? -1);
+      return (a.highestLevel ?? -1) - (b.highestLevel ?? -1);
     case "levelsDone":
-      return (a.completedLevels ?? -1) - (b.completedLevels ?? -1);
+      return a.completedLevels - b.completedLevels;
     case "purchases":
       return a.purchaseCount - b.purchaseCount;
     case "name":
@@ -97,79 +98,45 @@ function compareBy(field: SortField, a: PlayerRow, b: PlayerRow): number {
   }
 }
 
-/**
- * Counts a player's purchases through the shared parser, so this column can
- * never disagree with the Purchases page or the Overview cards. Includes test
- * and Editor purchases deliberately — this is a per-player record count, not a
- * revenue figure, and hiding a tester's purchases here would make the row
- * confusing when investigating that exact account.
- */
-function countPurchases(uid: string, value: unknown): number {
-  return parsePurchaseMap(uid, null, value).purchases.length;
-}
-
-interface PlayerScan {
+/** Players as rows, with real-sale counts from the Purchases accounting. */
+async function loadPlayerRows(): Promise<{
   connected: boolean;
   players: PlayerRow[];
+  scanCapped: boolean;
   error?: string;
-}
-
-async function fetchPlayerScan(): Promise<PlayerScan> {
-  try {
-    const db = getDb();
-    const snap = await db.collection(GAME.users).limit(MAX_SAMPLE).get();
-
-    const players: PlayerRow[] = snap.docs.map((doc) => {
-      const d = doc.data();
-      return {
-        uid: doc.id,
-        username:
-          typeof d.username === "string" && d.username.trim()
-            ? d.username.trim()
-            : null,
-        email: typeof d.email === "string" ? d.email : null,
-        country:
-          typeof d.country === "string" && d.country.trim()
-            ? d.country.trim().toUpperCase()
-            : null,
-        isGuest: d.isGuest === true,
-        currentLevel: typeof d.currentLevel === "number" ? d.currentLevel : null,
-        completedLevels: Array.isArray(d.completedLevels)
-          ? d.completedLevels.length
-          : null,
-        purchaseCount: countPurchases(doc.id, d.purchases),
-        pushReachable: typeof d.fcmToken === "string" && d.fcmToken.length > 0,
-      };
-    });
-
-    return { connected: true, players };
-  } catch (err) {
-    return {
-      connected: false,
-      players: [],
-      error: err instanceof Error ? err.message : "Unknown error",
-    };
+}> {
+  const [scan, purchases] = await Promise.all([getPlayerScan(), getPurchasesData()]);
+  if (!scan.connected) {
+    return { connected: false, players: [], scanCapped: false, error: scan.error };
   }
+  const realSales = new Map<string, number>();
+  for (const r of purchases.records) {
+    if (r.exclusion === null) realSales.set(r.buyerUid, (realSales.get(r.buyerUid) ?? 0) + 1);
+  }
+  return {
+    connected: true,
+    scanCapped: scan.scanCapped,
+    players: scan.players.map((p) => ({
+      uid: p.uid,
+      username: p.name,
+      email: p.email,
+      country: p.country,
+      isGuest: p.isGuest,
+      highestLevel: p.highestLevel,
+      currentLevel: p.currentLevel,
+      completedLevels: p.levelsCompleted,
+      purchaseCount: realSales.get(p.uid) ?? 0,
+      pushReachable: p.pushToken !== null,
+    })),
+  };
 }
-
-/**
- * 30s shared cache on the RAW scan only — search/filter/paging run
- * per-request below, so a hundred different searches still cost one
- * 1,000-doc scan per refresh window, not one scan each. (unstable_cache is
- * deprecated in favour of "use cache", which needs the app-wide
- * cacheComponents migration — out of scope here.)
- */
-const getPlayerScan = unstable_cache(fetchPlayerScan, ["trapman-players-scan"], {
-  revalidate: 30,
-  tags: ["trapman-console"],
-});
 
 export async function listPlayers(
   params: ListPlayersParams = {},
 ): Promise<ListPlayersResult> {
   const { search, country, guest = "all", limit = 50, offset = 0 } = params;
   const { field: sortField, direction: sortDirection } = parseSort(params.sort);
-  const scan = await getPlayerScan();
+  const scan = await loadPlayerRows();
   if (!scan.connected) {
     return {
       players: [],
@@ -177,13 +144,13 @@ export async function listPlayers(
       nextOffset: null,
       connected: false,
       scanCapped: false,
-      sampleCap: MAX_SAMPLE,
+      sampleCap: PLAYER_SCAN_CAP,
       sortField,
       sortDirection,
       error: scan.error,
     };
   }
-  const scanCapped = scan.players.length >= MAX_SAMPLE;
+  const scanCapped = scan.scanCapped;
   let players = [...scan.players];
 
   if (search?.trim()) {
@@ -217,7 +184,7 @@ export async function listPlayers(
     nextOffset,
     connected: true,
     scanCapped,
-    sampleCap: MAX_SAMPLE,
+    sampleCap: PLAYER_SCAN_CAP,
     sortField,
     sortDirection,
   };

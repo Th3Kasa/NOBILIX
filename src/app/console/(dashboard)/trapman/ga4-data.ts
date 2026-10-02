@@ -54,6 +54,8 @@ export interface Ga4Snapshot {
   adClosed30d: number;
   /** Commerce + engagement over the last 30 days */
   totalRevenue: number;
+  /** The GA4 property's reporting currency, as stated in the report itself. */
+  revenueCurrency: string;
   purchaseRevenue: number;
   avgSessionSeconds: number;
   engagedSessions: number;
@@ -93,6 +95,8 @@ interface ReportRow {
 
 interface ReportResult {
   rows?: ReportRow[];
+  /** GA4 states the property's reporting currency on every report. */
+  metadata?: { currencyCode?: string };
 }
 
 /**
@@ -177,6 +181,7 @@ async function fetchGa4Snapshot(): Promise<Ga4Snapshot> {
     adClicked30d: 0,
     adClosed30d: 0,
     totalRevenue: 0,
+    revenueCurrency: "USD",
     purchaseRevenue: 0,
     avgSessionSeconds: 0,
     engagedSessions: 0,
@@ -185,7 +190,10 @@ async function fetchGa4Snapshot(): Promise<Ga4Snapshot> {
   };
 
   try {
-    const last30 = [{ startDate: "30daysAgo", endDate: "today" }];
+    // GA4 date ranges include both ends and "today" counts as a day, so
+    // "30daysAgo"→"today" is 31 days. These are exactly 30 and 7 days, the
+    // windows the cards' labels promise.
+    const last30 = [{ startDate: "29daysAgo", endDate: "today" }];
     const [
       activity,
       events,
@@ -195,6 +203,7 @@ async function fetchGa4Snapshot(): Promise<Ga4Snapshot> {
       dailyActivityReport,
       activeUsersDeltaReport,
       engagementDeltaReport,
+      adEventsReport,
     ] = await batchRunReports([
       {
         dateRanges: last30,
@@ -229,7 +238,7 @@ async function fetchGa4Snapshot(): Promise<Ga4Snapshot> {
         limit: 8,
       },
       {
-        dateRanges: [{ startDate: "7daysAgo", endDate: "today" }],
+        dateRanges: [{ startDate: "6daysAgo", endDate: "today" }],
         metrics: [{ name: "newUsers" }],
       },
       // Daily active-user counts for the overview's activity chart.
@@ -249,16 +258,16 @@ async function fetchGa4Snapshot(): Promise<Ga4Snapshot> {
       // findByDateRange() reads the auto-appended value.
       {
         dateRanges: [
-          { startDate: "7daysAgo", endDate: "today" },
-          { startDate: "14daysAgo", endDate: "8daysAgo" },
+          { startDate: "6daysAgo", endDate: "today" },
+          { startDate: "13daysAgo", endDate: "7daysAgo" },
         ],
         metrics: [{ name: "active7DayUsers" }],
       },
       // Same comparison pattern for the 30-day commerce/engagement metrics.
       {
         dateRanges: [
-          { startDate: "30daysAgo", endDate: "today" },
-          { startDate: "60daysAgo", endDate: "31daysAgo" },
+          { startDate: "29daysAgo", endDate: "today" },
+          { startDate: "59daysAgo", endDate: "30daysAgo" },
         ],
         metrics: [
           { name: "totalRevenue" },
@@ -266,14 +275,30 @@ async function fetchGa4Snapshot(): Promise<Ga4Snapshot> {
           { name: "engagedSessions" },
         ],
       },
+      // The ad events by name. Read from the top-25 events list they read as 0
+      // whenever ads fell outside the 25 most common events.
+      {
+        dateRanges: last30,
+        dimensions: [{ name: "eventName" }],
+        metrics: [{ name: "eventCount" }],
+        dimensionFilter: {
+          filter: {
+            fieldName: "eventName",
+            inListFilter: { values: ["ad_clicked", "ad_closed"] },
+          },
+        },
+      },
     ]);
 
     const eventCounts: Ga4EventCount[] = (events.rows ?? []).map((row) => ({
       eventName: row.dimensionValues?.[0]?.value ?? "(unknown)",
       count: num(row, 0),
     }));
-    const eventCount = (name: string) =>
-      eventCounts.find((e) => e.eventName === name)?.count ?? 0;
+    const adEventCount = (name: string) =>
+      num(
+        adEventsReport?.rows?.find((r) => r.dimensionValues?.[0]?.value === name),
+        0,
+      );
 
     const activityRow = activity.rows?.[0];
     const commerceRow = commerce.rows?.[0];
@@ -305,9 +330,10 @@ async function fetchGa4Snapshot(): Promise<Ga4Snapshot> {
       totalUsers30d: num(activityRow, 3),
       newUsers7d: num(acquisition.rows?.[0], 0),
       events: eventCounts,
-      adClicked30d: eventCount("ad_clicked"),
-      adClosed30d: eventCount("ad_closed"),
+      adClicked30d: adEventCount("ad_clicked"),
+      adClosed30d: adEventCount("ad_closed"),
       totalRevenue: num(commerceRow, 0),
+      revenueCurrency: commerce.metadata?.currencyCode || "USD",
       purchaseRevenue: num(commerceRow, 1),
       avgSessionSeconds: num(commerceRow, 2),
       engagedSessions: num(commerceRow, 3),

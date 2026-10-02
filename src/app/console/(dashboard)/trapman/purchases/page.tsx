@@ -28,7 +28,14 @@ import {
 import { resolveRangeNow } from "./range";
 import { RangePicker } from "./range-picker";
 import { StoreSalesPanel } from "./store-sales-panel";
-import { getAudRates, convertToAud, formatAud, formatOriginal } from "../fx";
+import {
+  getAudRates,
+  convertToAud,
+  formatAud,
+  formatAudTotal,
+  formatOriginal,
+  sumInAud,
+} from "../fx";
 
 export const dynamic = "force-dynamic";
 
@@ -132,25 +139,10 @@ export default async function PurchasesPage({
       : formatOriginal(amount, currency);
   };
 
-  // Total revenue across all currencies, converted to AUD. Convert everything
-  // convertible and disclose the remainder rather than discarding the total
-  // because one live store currency (IDR, VND, NGN, PKR…) has no rate.
-  let totalRevenueAud: number | null = null;
-  const unconvertedCurrencies: string[] = [];
-  if (fx.connected && summary.revenueByCurrency.length > 0) {
-    let total = 0;
-    let convertedAny = false;
-    for (const { currency, total: amount } of summary.revenueByCurrency) {
-      const converted = convertToAud(amount, currency, fx);
-      if (converted == null) {
-        unconvertedCurrencies.push(currency);
-        continue;
-      }
-      total += converted;
-      convertedAny = true;
-    }
-    if (convertedAny) totalRevenueAud = total;
-  }
+  // The console-wide AUD rule (see fx.sumInAud): convert what has a rate and
+  // show the rest beside it — the Overview uses exactly the same figure.
+  const revenue = sumInAud(summary.revenueByCurrency, fx);
+  const unconvertedCurrencies = revenue.unconverted.map((u) => u.currency);
 
   const activeExclusions = (
     Object.entries(summary.exclusions) as [ExclusionReason, number][]
@@ -221,32 +213,18 @@ export default async function PurchasesPage({
                   : undefined
               }
             />
-            {totalRevenueAud != null ? (
-              <StatCard
-                label="Revenue (AUD)"
-                value={formatAud(totalRevenueAud)}
-                icon={Receipt}
-                hint={`Converted at today's exchange rate · ${fx.asOf}`}
-              />
-            ) : (
-              <StatCard
-                label="Revenue (AUD)"
-                value={
-                  summary.revenueByCurrency[0]
-                    ? formatOriginal(
-                        summary.revenueByCurrency[0].total,
-                        summary.revenueByCurrency[0].currency,
-                      )
-                    : formatAud(0)
-                }
-                icon={Receipt}
-                hint={
-                  summary.revenueByCurrency[0]
-                    ? "Exchange rate unavailable — shown in the original currency"
-                    : "No counted sales in this period"
-                }
-              />
-            )}
+            <StatCard
+              label="Revenue (AUD)"
+              value={formatAudTotal(revenue)}
+              icon={Receipt}
+              hint={
+                summary.revenueByCurrency.length === 0
+                  ? "No counted sales in this period"
+                  : revenue.unconverted.length > 0
+                    ? "Some currencies have no exchange rate and are shown as-is"
+                    : `What players paid · today's exchange rate (${fx.asOf})`
+              }
+            />
             <StatCard
               label="Confirmed by the store"
               value={`${summary.storeConfirmedCount} of ${summary.totalCount}`}

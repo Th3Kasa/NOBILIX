@@ -130,6 +130,19 @@ async function readCurrentEvent(): Promise<{
  * Surfaces boards the console previously could not see at all, which is why
  * "Reset competition" appeared to work while leaving the event board intact.
  */
+/**
+ * One player's score on the all-time board, read the same way the Leaderboard
+ * tab reads it. Null when the player has no entry or the read fails.
+ */
+export async function getLeaderboardScore(uid: string): Promise<number | null> {
+  try {
+    const doc = await getDb().collection(GAME.leaderboard).doc(uid).get();
+    return doc.exists ? mapEntry(doc.id, doc.data() ?? {}, 0).score : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function listEventBoards(): Promise<EventBoard[]> {
   try {
     const db = getDb();

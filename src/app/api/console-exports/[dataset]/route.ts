@@ -109,6 +109,7 @@ export async function GET(
       "email",
       "country",
       "isGuest",
+      "highestLevel",
       "currentLevel",
       "completedLevels",
       "purchaseCount",

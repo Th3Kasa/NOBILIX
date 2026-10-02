@@ -34,22 +34,29 @@ export default async function GameplayPage() {
       ) : (
         <>
           <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard label="Highest level reached" value={data.maxLevel} icon={Gauge} />
+            <StatCard
+              label="Highest level reached"
+              value={data.maxLevel}
+              icon={Gauge}
+              hint="Furthest any player has got — current or completed"
+            />
             <StatCard
               label="Avg current level"
               value={data.avgCurrentLevel}
               icon={TrendingUp}
+              hint="Where players are right now"
             />
             <StatCard
               label="Avg levels completed"
               value={data.avgCompleted}
               icon={ListChecks}
+              hint="Distinct levels finished, per player"
             />
             <StatCard
               label="Players with progress"
               value={data.playersWithProgress}
               icon={Users}
-              hint={`of ${data.sampleSize} sampled`}
+              hint={`of ${data.sampleSize} players${data.scanCapped ? " (first 1,000)" : ""}`}
             />
           </div>
 

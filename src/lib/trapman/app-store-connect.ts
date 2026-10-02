@@ -37,6 +37,10 @@ const API_ROOT = "https://api.appstoreconnect.apple.com/v1";
 const TOKEN_TTL_SECONDS = 15 * 60;
 /** Bound how many daily reports one refresh will pull. */
 const MAX_DAYS_PER_PASS = 35;
+/** How many of the most recent days get re-checked when Apple had no report. */
+const RECHECK_EMPTY_DAYS = 3;
+/** How long to wait before asking Apple about an empty recent day again. */
+const RECHECK_AFTER_MS = 6 * 60 * 60 * 1000;
 
 export interface AppleCredentials {
   issuerId: string;
@@ -274,7 +278,15 @@ export async function getAppleSales(days = 30): Promise<AppleSalesData> {
 
   const dates = reportDateRange(Date.now(), Math.min(days, MAX_DAYS_PER_PASS));
   const cached = await readCachedDays(creds.vendorNumber, dates);
-  const missing = dates.filter((d) => !cached.has(d));
+  // A day with no report is re-checked for a few days: Apple sometimes
+  // publishes late, and caching "no sales" on the first miss would lose that
+  // day for good. Older empty days are settled.
+  const recheck = new Set(dates.slice(-RECHECK_EMPTY_DAYS));
+  const missing = dates.filter((d) => {
+    const day = cached.get(d);
+    if (!day) return true;
+    return day.empty && recheck.has(d) && Date.now() - day.fetchedAt > RECHECK_AFTER_MS;
+  });
 
   const fetched: CachedDay[] = [];
   let failure: string | null = null;
