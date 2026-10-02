@@ -147,6 +147,76 @@ async function listObjects(client: JWT, bucket: string, prefix: string): Promise
   return out;
 }
 
+/** One object's metadata by exact name, or null when it doesn't exist. */
+async function statObject(
+  client: JWT,
+  bucket: string,
+  name: string,
+): Promise<StorageObject | null> {
+  try {
+    const res = await client.request<StorageObject>({
+      url: `${STORAGE_API}/b/${encodeURIComponent(bucket)}/o/${encodeURIComponent(name)}`,
+      params: { fields: "name,generation" },
+    });
+    return res.data;
+  } catch (err) {
+    if (statusOf(err) === 404) return null;
+    throw err;
+  }
+}
+
+/**
+ * The report files a month should have, by exact name — for when Google
+ * grants read access to the files but refuses to list the folder. Earnings
+ * file names carry the developer id (the bucket's number) and a part index.
+ */
+function expectedObjectNames(bucket: string, packageName: string, month: string): string[] {
+  const developerId = bucket.match(/(\d+)$/)?.[1];
+  return [
+    `stats/installs/installs_${packageName}_${month}_overview.csv`,
+    `sales/salesreport_${month}.zip`,
+    ...(developerId
+      ? [0, 1, 2].map((part) => `earnings/earnings_${month}_${developerId}-${part}.zip`)
+      : []),
+  ];
+}
+
+/**
+ * Find this window's report files: list the folders, or — if Google refuses
+ * the listing — ask for each expected file by name. Throws the listing error
+ * when neither works, so the panel shows Google's own reason.
+ */
+async function findReportObjects(
+  client: JWT,
+  bucket: string,
+  packageName: string,
+  months: Set<string>,
+): Promise<StorageObject[]> {
+  try {
+    return (
+      await Promise.all(
+        [`stats/installs/installs_${packageName}_`, "sales/salesreport_", "earnings/earnings_"].map(
+          (prefix) => listObjects(client, bucket, prefix),
+        ),
+      )
+    ).flat();
+  } catch (listError) {
+    if (statusOf(listError) !== 403) throw listError;
+    const names = [...months].flatMap((m) => expectedObjectNames(bucket, packageName, m));
+    let found: StorageObject[];
+    try {
+      found = (
+        await Promise.all(names.map((n) => statObject(client, bucket, n)))
+      ).filter((o): o is StorageObject => o !== null);
+    } catch {
+      throw listError;
+    }
+    // Nothing readable by name either: report why the listing failed.
+    if (found.length === 0) throw listError;
+    return found;
+  }
+}
+
 async function download(client: JWT, bucket: string, name: string): Promise<Uint8Array> {
   const res = await client.request<ArrayBuffer>({
     url: `${STORAGE_API}/b/${encodeURIComponent(bucket)}/o/${encodeURIComponent(name)}`,
@@ -315,13 +385,7 @@ async function loadPlaySales(): Promise<PlaySalesData> {
 
   let objects: (StorageObject & { kind: PlayReportKind; month: string })[];
   try {
-    const listed = (
-      await Promise.all(
-        [`stats/installs/installs_${packageName}_`, "sales/salesreport_", "earnings/earnings_"].map(
-          (prefix) => listObjects(client, bucket, prefix),
-        ),
-      )
-    ).flat();
+    const listed = await findReportObjects(client, bucket, packageName, months);
     objects = listed.flatMap((o) => {
       const c = classifyPlayObject(o.name, packageName);
       return c && months.has(c.month) ? [{ ...o, ...c }] : [];
