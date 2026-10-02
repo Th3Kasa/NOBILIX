@@ -1,4 +1,5 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
 import { getAuthAdmin } from "@/lib/firebase/auth";
 import { getDb } from "@/lib/firebase/firestore";
 import { GAME } from "@/lib/firebase/collections";
@@ -52,21 +53,18 @@ function mapUser(
 // would have thrown FAILED_PRECONDITION on first use — Firestore has no
 // composite indexes declared for them. Removed rather than indexed.
 
-/**
- * Email addresses for a set of players, keyed by uid.
- *
- * The game's profile document is checked first; the Firebase Auth record is
- * the fallback, since a player who signed in with Apple or Google can have an
- * address there that the game never copied onto their profile. Players with
- * neither (guests, seeded entries) are simply absent from the result.
- * Never throws — a lookup failure only hides the email buttons.
- */
-export async function getPlayerEmails(
-  uids: string[],
+/** A lookup that partly failed. Thrown so the failure is never cached. */
+class PartialEmailLookup extends Error {
+  constructor(readonly emails: Record<string, string>) {
+    super("Player email lookup partly failed");
+  }
+}
+
+async function loadPlayerEmails(
+  unique: string[],
 ): Promise<Record<string, string>> {
-  const unique = [...new Set(uids.filter(Boolean))];
   const emails: Record<string, string> = {};
-  if (unique.length === 0) return emails;
+  let failed = false;
 
   try {
     const db = getDb();
@@ -80,6 +78,7 @@ export async function getPlayerEmails(
       }
     }
   } catch (err) {
+    failed = true;
     console.error("[users] email lookup (profiles) failed", err);
   }
 
@@ -93,10 +92,43 @@ export async function getPlayerEmails(
       for (const u of users) if (u.email) emails[u.uid] = u.email;
     }
   } catch (err) {
+    failed = true;
     console.error("[users] email lookup (auth) failed", err);
   }
 
+  if (failed) throw new PartialEmailLookup(emails);
   return emails;
+}
+
+/**
+ * Cached for an hour: an email address almost never changes, and without this
+ * the Leaderboard's auto-refresh re-read every player profile on screen once a
+ * minute — the extra reads that helped exhaust the project's daily quota.
+ */
+const loadPlayerEmailsCached = unstable_cache(loadPlayerEmails, ["player-emails"], {
+  revalidate: 3600,
+});
+
+/**
+ * Email addresses for a set of players, keyed by uid.
+ *
+ * The game's profile document is checked first; the Firebase Auth record is
+ * the fallback, since a player who signed in with Apple or Google can have an
+ * address there that the game never copied onto their profile. Players with
+ * neither (guests, seeded entries) are simply absent from the result.
+ * Never throws — a lookup failure only hides the email buttons.
+ */
+export async function getPlayerEmails(
+  uids: string[],
+): Promise<Record<string, string>> {
+  // Sorted so the same set of players always hits the same cache entry.
+  const unique = [...new Set(uids.filter(Boolean))].sort();
+  if (unique.length === 0) return {};
+  try {
+    return await loadPlayerEmailsCached(unique);
+  } catch (err) {
+    return err instanceof PartialEmailLookup ? err.emails : {};
+  }
 }
 
 export async function getUser(uid: string): Promise<GameUser | null> {

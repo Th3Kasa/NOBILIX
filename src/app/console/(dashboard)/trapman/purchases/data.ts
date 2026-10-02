@@ -166,12 +166,16 @@ async function fetchPurchasesData(): Promise<PurchasesData> {
 }
 
 /**
- * 30s shared cache: one scan serves every admin for the whole auto-refresh
- * window instead of a scan per request. Store verdicts have their own, much
- * longer cache in Firestore, so this does not re-hit the Play API.
+ * 2-minute shared cache: one scan serves every admin across several
+ * auto-refreshes instead of a scan per request. The scan reads up to 1,000
+ * player documents, and at 30s it alone could spend the project's free daily
+ * Firestore quota (shared with the game) in well under an hour of viewing.
+ * Marking a test account uses updateTag, so that change still shows at once.
+ * Store verdicts have their own, much longer cache in Firestore, so this does
+ * not re-hit the Play API.
  */
 export const getPurchasesData = unstable_cache(
   fetchPurchasesData,
   ["trapman-purchases"],
-  { revalidate: 30, tags: ["trapman-console"] },
+  { revalidate: 120, tags: ["trapman-console"] },
 );
