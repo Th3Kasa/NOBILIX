@@ -5,6 +5,9 @@ import { z } from "zod";
 import { requireWriteAccess } from "@/lib/authz";
 import { recordAudit } from "@/lib/audit";
 import { markTestAccount, unmarkTestAccount } from "@/lib/trapman/test-accounts";
+import { markTestPurchases, clearTestPurchases } from "@/lib/trapman/test-purchases";
+import { purchaseKey } from "@/lib/trapman/purchase-accounting";
+import { getPurchasesData } from "./data";
 
 /**
  * Marking a buyer as an internal tester excludes their purchases from every
@@ -109,4 +112,81 @@ export async function unmarkTestAccountAction(
   revalidatePath("/console/trapman/purchases");
   revalidatePath("/console/trapman");
   return { ok: true };
+}
+
+export interface TestPurchasesState {
+  ok?: boolean;
+  error?: string;
+  /** How many purchases the last action marked or unmarked. */
+  count?: number;
+}
+
+async function writer(): Promise<{ id: string; email: string } | { error: string }> {
+  try {
+    return await requireWriteAccess();
+  } catch (err) {
+    return {
+      error:
+        err instanceof Error && err.message.includes("read-only")
+          ? "Your role is read-only."
+          : "Your session expired — please sign in again.",
+    };
+  }
+}
+
+function refreshFigures() {
+  updateTag("trapman-console");
+  revalidatePath("/console/trapman/purchases");
+  revalidatePath("/console/trapman");
+  revalidatePath("/console/trapman/users");
+}
+
+/**
+ * Mark every purchase that currently counts as a real sale as a test.
+ *
+ * For clearing out pre-launch and QA purchases in one go. Purchases recorded
+ * after this runs count normally. Console-side only — the game's records are
+ * untouched — and undone by unmarkAllTestPurchasesAction.
+ */
+export async function markAllPurchasesAsTestAction(): Promise<TestPurchasesState> {
+  const admin = await writer();
+  if ("error" in admin) return { error: admin.error };
+  try {
+    const data = await getPurchasesData();
+    if (!data.connected) return { error: data.error ?? "Couldn't read purchases." };
+    const keys = data.records.filter((r) => r.exclusion === null).map(purchaseKey);
+    if (keys.length === 0) return { ok: true, count: 0 };
+    const count = await markTestPurchases(keys, admin.email);
+    await recordAudit({
+      actorId: admin.id,
+      actorEmail: admin.email,
+      action: "purchases.test_purchases.mark_all",
+      target: `${count} purchases`,
+      metadata: { count },
+    });
+    refreshFigures();
+    return { ok: true, count };
+  } catch {
+    return { error: "Couldn't save that — please try again." };
+  }
+}
+
+/** Count every purchase marked as a test again. */
+export async function unmarkAllTestPurchasesAction(): Promise<TestPurchasesState> {
+  const admin = await writer();
+  if ("error" in admin) return { error: admin.error };
+  try {
+    const count = await clearTestPurchases();
+    await recordAudit({
+      actorId: admin.id,
+      actorEmail: admin.email,
+      action: "purchases.test_purchases.unmark_all",
+      target: `${count} purchases`,
+      metadata: { count },
+    });
+    refreshFigures();
+    return { ok: true, count };
+  } catch {
+    return { error: "Couldn't save that — please try again." };
+  }
 }

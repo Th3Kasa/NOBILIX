@@ -3,12 +3,17 @@ import { unstable_cache } from "next/cache";
 import type { NormalizedPurchase } from "@/lib/trapman/purchases";
 import { getPlayerScan, PLAYER_SCAN_CAP } from "@/lib/trapman/player-scan";
 import { getTestAccountUids } from "@/lib/trapman/test-accounts";
+import { getTestPurchaseKeys } from "@/lib/trapman/test-purchases";
 import {
   verifyPlayPurchases,
   APPLE_UNVERIFIABLE_REASON,
   type Verification,
 } from "@/lib/trapman/play-verify";
-import { classify, type PurchaseRecord } from "@/lib/trapman/purchase-accounting";
+import {
+  classify,
+  purchaseKey,
+  type PurchaseRecord,
+} from "@/lib/trapman/purchase-accounting";
 
 /**
  * Purchases data-access for the TrapMan console.
@@ -93,9 +98,10 @@ function notChecked(purchase: NormalizedPurchase): Verification {
 async function fetchPurchasesData(): Promise<PurchasesData> {
   try {
     // The same player snapshot every other tab reads (see player-scan).
-    const [scan, testUids] = await Promise.all([
+    const [scan, testUids, testPurchaseKeys] = await Promise.all([
       getPlayerScan(),
       getTestAccountUids(),
+      getTestPurchaseKeys(),
     ]);
     if (!scan.connected) return emptyData(scan.error);
 
@@ -108,7 +114,10 @@ async function fetchPurchasesData(): Promise<PurchasesData> {
     // purchases and known testers are already settled, and spending quota to
     // confirm what an operator has already excluded would be waste.
     const worthVerifying = parsed.filter(
-      (p) => !p.isEditorPurchase && !testUids.has(p.buyerUid),
+      (p) =>
+        !p.isEditorPurchase &&
+        !testUids.has(p.buyerUid) &&
+        !testPurchaseKeys.has(purchaseKey(p)),
     );
     const pass = await verifyPlayPurchases(
       worthVerifying.map((p) => ({
@@ -126,7 +135,7 @@ async function fetchPurchasesData(): Promise<PurchasesData> {
       return {
         ...p,
         verification,
-        exclusion: classify(p, verification, testUids),
+        exclusion: classify(p, verification, testUids, testPurchaseKeys),
       };
     });
 

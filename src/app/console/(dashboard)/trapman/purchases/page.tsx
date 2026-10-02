@@ -28,6 +28,7 @@ import {
 import { resolveRangeNow } from "./range";
 import { RangePicker } from "./range-picker";
 import { StoreSalesPanel } from "./store-sales-panel";
+import { TestPurchasesControl } from "./test-purchases-control";
 import {
   getAudRates,
   convertToAud,
@@ -51,6 +52,10 @@ const EXCLUSION_COPY: Record<
   "test-account": {
     label: "Bought by an internal tester",
     detail: "Accounts you marked as testers in the list below.",
+  },
+  "marked-test": {
+    label: "Marked as a test purchase",
+    detail: "Purchases you marked as tests with \"Mark all as tests\". Undo puts them back.",
   },
   "store-test": {
     label: "Google Play licence-test purchase",
@@ -106,6 +111,9 @@ export default async function PurchasesPage({
   const canWrite = session?.user?.role !== "viewer";
 
   const summary = summarise(data.records, range);
+  // All-time counts for the test-purchase control, independent of the range.
+  const realSalesAllTime = data.records.filter((r) => r.exclusion === null).length;
+  const markedTestAllTime = data.records.filter((r) => r.exclusion === "marked-test").length;
 
   // One row per buyer across every record in the window, including excluded
   // ones — the point of this list is to decide which buyers are internal
@@ -236,6 +244,12 @@ export default async function PurchasesPage({
               }
             />
           </div>
+
+          <TestPurchasesControl
+            realSales={realSalesAllTime}
+            marked={markedTestAllTime}
+            canWrite={canWrite}
+          />
 
           {/* How much of the headline figure is proven, and what is blocking
               the rest. This is the difference between a number and a number

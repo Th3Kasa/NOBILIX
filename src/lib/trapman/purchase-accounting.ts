@@ -81,6 +81,8 @@ export type ExclusionReason =
   | "editor"
   /** The buyer is on the console's internal-tester register. */
   | "test-account"
+  /** An operator marked this specific purchase as a test. */
+  | "marked-test"
   /** Google Play says this was a licence-test purchase. */
   | "store-test"
   /** Redeemed with a promo code — a real player, but no money. */
@@ -110,6 +112,7 @@ export type ExclusionCounts = Record<ExclusionReason, number>;
 export const NO_EXCLUSIONS: ExclusionCounts = {
   editor: 0,
   "test-account": 0,
+  "marked-test": 0,
   "store-test": 0,
   promo: 0,
   rewarded: 0,
@@ -140,6 +143,14 @@ export interface PurchasesSummary {
 }
 
 /**
+ * The identity of one purchase across the console: the buyer plus the record's
+ * own id. A purchase id alone is only unique within one player's profile.
+ */
+export function purchaseKey(p: Pick<NormalizedPurchase, "buyerUid" | "purchaseId">): string {
+  return `${p.buyerUid}::${p.purchaseId}`;
+}
+
+/**
  * Decide, once, why a purchase is or is not a real sale.
  *
  * Order matters: the cheapest and most certain disqualifiers come first, so a
@@ -149,9 +160,12 @@ export function classify(
   purchase: NormalizedPurchase,
   verification: Verification,
   testUids: Set<string>,
+  /** Purchases an operator marked as tests, by `purchaseKey`. */
+  testPurchaseKeys: ReadonlySet<string> = new Set(),
 ): ExclusionReason | null {
   if (purchase.isEditorPurchase) return "editor";
   if (testUids.has(purchase.buyerUid)) return "test-account";
+  if (testPurchaseKeys.has(purchaseKey(purchase))) return "marked-test";
   if (isRevenue(verification)) return null;
   switch (verification.verdict) {
     case "test":

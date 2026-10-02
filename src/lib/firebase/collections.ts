@@ -36,6 +36,7 @@ export const CRM = {
   passkeys: "_admin_passkeys", // _admin_passkeys/{credentialId-base64url}
   loginTickets: "_admin_login_tickets", // _admin_login_tickets/{sha256(ticket) hex}
   testAccounts: "_crm_test_accounts", // _crm_test_accounts/{uid} — internal testers excluded from revenue
+  testPurchases: "_crm_test_purchases", // _crm_test_purchases/{sha1(purchaseKey)} — individual purchases marked as tests
   purchaseVerifications: "_crm_purchase_verifications", // _crm_purchase_verifications/{sha256(purchaseToken)} — cached store verdicts
   storeReports: "_crm_store_reports", // _crm_store_reports/apple-{vendor}-{YYYY-MM-DD} — cached daily store sales reports
   prizes: "_crm_prizes", // _crm_prizes/{competitionId}__{uid} — prize delivery status for each archived winner

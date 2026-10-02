@@ -244,3 +244,16 @@ test("platform buckets are named for people, and Editor is called out", () => {
   assert.equal(platformLabel("android"), "Android");
   assert.match(platformLabel("editor"), /not a real sale/);
 });
+
+test("a purchase marked as a test is excluded, and only that purchase", async () => {
+  const { classify, purchaseKey } = await import("../src/lib/trapman/purchase-accounting.ts");
+  const paid = { verdict: "unverified", source: "none", reason: null, acknowledged: null, regionCode: null, checkedAt: 0 };
+  const a = { buyerUid: "u1", purchaseId: "p1", isEditorPurchase: false };
+  const b = { buyerUid: "u1", purchaseId: "p2", isEditorPurchase: false };
+  const other = { buyerUid: "u2", purchaseId: "p1", isEditorPurchase: false };
+  const marked = new Set([purchaseKey(a)]);
+  assert.equal(classify(a, paid, new Set(), marked), "marked-test");
+  assert.equal(classify(b, paid, new Set(), marked), null);
+  assert.equal(classify(other, paid, new Set(), marked), null, "same purchase id, different player");
+  assert.equal(classify(a, paid, new Set(), undefined), null, "no marks means it counts");
+});
