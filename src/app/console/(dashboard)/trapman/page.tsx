@@ -11,12 +11,12 @@ import {
   Activity,
   Gauge,
 } from "lucide-react";
-import { format } from "date-fns";
 import { auth } from "@/auth";
 import { PageHeader } from "@/components/page-header";
 import { StatCard } from "@/components/stat-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { LiveStatus } from "@/components/console/live-status";
+import { LocalTime } from "@/components/console/local-time";
 import { AttentionPanel } from "@/components/console/attention-panel";
 import { getAdminById } from "@/lib/admins";
 import { getTrapManOverview, type TrapManOverview } from "@/lib/trapman/overview";
@@ -38,6 +38,7 @@ import { getOverviewWidget, resolveOverviewLayout } from "./overview-widgets";
 import { CustomizeOverview } from "./customize-overview";
 import { ActivityChart } from "./activity-chart";
 import { getAttentionItems } from "./attention";
+import { DataFreshness } from "./data-freshness";
 
 export const dynamic = "force-dynamic";
 
@@ -69,6 +70,7 @@ const FALLBACK_LIVE: LiveMetrics = {
 
 const FALLBACK_GA4: Ga4Snapshot = {
   connected: false,
+  fetchedAt: 0,
   activeUsers1d: 0,
   activeUsers7d: 0,
   activeUsers28d: 0,
@@ -157,14 +159,12 @@ export default async function TrapManOverviewPage() {
   // figure App Store Connect ("Sales") and Play Console show, so it is the one
   // to read beside them. The game's own records above cover in-app purchases
   // only, because the game never records the paid download itself.
-  const apple =
-    appleResult.status === "fulfilled" && appleResult.value.connected
-      ? appleResult.value.summary
-      : null;
-  const play =
-    playResult.status === "fulfilled" && playResult.value.connected
-      ? playResult.value.sales
-      : null;
+  const appleData =
+    appleResult.status === "fulfilled" && appleResult.value.connected ? appleResult.value : null;
+  const playData =
+    playResult.status === "fulfilled" && playResult.value.connected ? playResult.value : null;
+  const apple = appleData?.summary ?? null;
+  const play = playData?.sales ?? null;
   const appleSalesAud = apple ? sumInAud(apple.salesByCurrency, fx) : null;
   const playSalesAud = play ? sumInAud(play.salesByCurrency, fx) : null;
   const storeSalesAud =
@@ -174,6 +174,12 @@ export default async function TrapManOverviewPage() {
           fx,
         )
       : null;
+  const launchSales = [
+    ...(appleData?.sinceLaunch?.salesByCurrency ?? []),
+    ...(playData?.salesSinceLaunch?.salesByCurrency ?? []),
+  ];
+  const storeSalesLaunchAud =
+    appleData?.sinceLaunch || playData?.salesSinceLaunch ? sumInAud(launchSales, fx) : null;
 
   // GA4 reports in the property's own currency, which it states on the report.
   const ga4RevenueAud =
@@ -282,6 +288,25 @@ export default async function TrapManOverviewPage() {
         ].join(" · ")}
       />
     ) : null,
+    "store-sales-launch": storeSalesLaunchAud ? (
+      <StatCard
+        key="store-sales-launch"
+        label="Store sales (AUD, since launch)"
+        value={formatAudTotal(storeSalesLaunchAud)}
+        icon={Receipt}
+        hint={[
+          appleData?.sinceLaunch
+            ? `App Store ${formatAudTotal(sumInAud(appleData.sinceLaunch.salesByCurrency, fx))}`
+            : "App Store not connected",
+          playData?.salesSinceLaunch
+            ? `Google Play ${formatAudTotal(sumInAud(playData.salesSinceLaunch.salesByCurrency, fx))}`
+            : playData
+              ? "Google Play no sales"
+              : "Google Play not connected",
+          appleData?.backfilling ? "older days still loading" : "downloads + in-app purchases",
+        ].join(" · ")}
+      />
+    ) : null,
     "store-purchases": sales ? (
       <StatCard
         key="store-purchases"
@@ -358,7 +383,7 @@ export default async function TrapManOverviewPage() {
                         {entry.score.toLocaleString()}
                       </td>
                       <td className="py-2.5 font-mono text-xs tabular-nums text-muted-foreground">
-                        {entry.timestamp ? format(new Date(entry.timestamp), "PP p") : "—"}
+                        {entry.timestamp ? <LocalTime ms={entry.timestamp} variant="datetime" /> : "—"}
                       </td>
                     </tr>
                   ))}
@@ -457,6 +482,8 @@ export default async function TrapManOverviewPage() {
       </div>
 
       <AttentionPanel items={attentionItems} className="mb-6" />
+
+      <DataFreshness className="mb-6" />
 
       {/* Connection warning — always shown when disconnected, not a widget. */}
       {!m.connected && (

@@ -1,6 +1,6 @@
 import Link from "next/link";
+import { LocalTime } from "@/components/console/local-time";
 import { notFound } from "next/navigation";
-import { format } from "date-fns";
 import { ArrowLeft, Bell, BellOff } from "lucide-react";
 import { auth } from "@/auth";
 import { getUser, getAccountCreatedAt } from "@/lib/users";
@@ -41,7 +41,8 @@ export default async function UserDetailPage({
 
   const canWrite = session?.user?.role !== "viewer";
   const emailIdentity = classifyPlayerEmail(user.email);
-  const ts = (v: number | null) => (v !== null ? format(new Date(v), "PPpp") : "—");
+  const ts = (v: number | null) =>
+    v !== null ? <LocalTime ms={v} variant="datetime" /> : "—";
 
   // The same field rules every other tab uses (see player-fields), so this
   // page can't show a different level, name or status than the Players list.

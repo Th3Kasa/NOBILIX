@@ -122,6 +122,24 @@ test("an Apple purchase is not verifiable — the game stores no receipt", () =>
   assert.equal(purchases[0].platform, "ios");
 });
 
+test("an App Store transaction id is recovered once the game saves one", () => {
+  // Unity IAP's own receipt for an iPhone purchase, as the game should save it.
+  const unity = JSON.stringify({ Store: "AppleAppStore", TransactionID: "2000000812345678", Payload: "MIIT…" });
+  const { purchases } = parsePurchaseMap("uid1", "Aba300", {
+    a: { ...APPLE_FLAT, receipt: unity },
+    b: { ...APPLE_FLAT, receipt: "", transactionId: "2000000899999999" },
+    c: { ...APPLE_FLAT, receipt: "" },
+  });
+  const ids = Object.fromEntries(purchases.map((p) => [p.storeOrderId ?? "none", p]));
+  assert.ok(ids["2000000812345678"], "read from Unity's receipt envelope");
+  assert.ok(ids["2000000899999999"], "read from a transactionId field");
+  assert.ok(ids.none, "today's empty receipt still parses, just without an id");
+  for (const p of purchases) {
+    assert.equal(p.platform, "ios");
+    assert.equal(p.isVerifiable, false, "Apple verification is not wired up yet");
+  }
+});
+
 test("flags Unity Editor purchases, which never touched a store", () => {
   const { purchases } = parsePurchaseMap("uid3", "Guest", { k: EDITOR_FLAT });
   assert.equal(purchases[0].isEditorPurchase, true);

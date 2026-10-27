@@ -7,6 +7,7 @@ import {
   classifyProductType,
   normaliseAppleDate,
   reportDateRange,
+  reportDatesSince,
 } from "../src/lib/trapman/store-reports.ts";
 
 
@@ -297,4 +298,15 @@ test("report dates stop short of today, which Apple has not published yet", () =
   const dates = reportDateRange(now, 3);
   assert.deepEqual(dates, ["2026-08-23", "2026-08-24", "2026-08-25"]);
   assert.ok(!dates.includes("2026-08-26"), "today's report does not exist yet");
+});
+
+test("since-launch dates run from the start day through yesterday", () => {
+  const now = Date.UTC(2026, 9, 27, 3); // 27 Oct
+  const dates = reportDatesSince("2026-10-20", now);
+  assert.equal(dates[0], "2026-10-20");
+  assert.equal(dates.at(-1), "2026-10-26", "today's report never exists yet");
+  assert.equal(dates.length, 7);
+  // Crossing a month boundary keeps every day.
+  assert.equal(reportDatesSince("2026-09-29", Date.UTC(2026, 9, 3)).join(), "2026-09-29,2026-09-30,2026-10-01,2026-10-02");
+  assert.deepEqual(reportDatesSince("2026-10-27", now), [], "a start after yesterday is empty");
 });

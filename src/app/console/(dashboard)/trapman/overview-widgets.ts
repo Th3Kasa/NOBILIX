@@ -38,6 +38,7 @@ export const OVERVIEW_WIDGETS: OverviewWidgetDef[] = [
   { id: "ga4-avg-session", name: "Average session length", section: "Google Analytics", kind: "stat", source: "ga4" },
   { id: "ga4-engaged-sessions", name: "Meaningful play sessions (last 30 days)", section: "Google Analytics", kind: "stat", source: "ga4" },
   { id: "store-sales-30d", name: "Store sales (AUD, last 30 days)", section: "Store & engagement", kind: "stat" },
+  { id: "store-sales-launch", name: "Store sales (AUD, since launch)", section: "Store & engagement", kind: "stat" },
   { id: "store-purchases", name: "In-app purchases (all time)", section: "Store & engagement", kind: "stat", source: "firestore" },
   { id: "store-revenue-aud", name: "In-app purchase sales (AUD, all time)", section: "Store & engagement", kind: "stat", source: "firestore" },
   { id: "push-reachable", name: "Players we can notify", section: "Store & engagement", kind: "stat", source: "firestore" },

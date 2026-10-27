@@ -8,6 +8,9 @@ import {
   parseAppleSalesReport,
   summariseStoreSales,
   reportDateRange,
+  reportDatesSince,
+  STORE_TRACKING_START,
+  STORE_REPORTS_TAG,
   type AppleSalesRow,
   type StoreSalesSummary,
 } from "@/lib/trapman/store-reports";
@@ -36,8 +39,10 @@ import {
 const API_ROOT = "https://api.appstoreconnect.apple.com/v1";
 /** Apple rejects tokens with a lifetime over 20 minutes. */
 const TOKEN_TTL_SECONDS = 15 * 60;
-/** Bound how many daily reports one refresh will pull. */
+/** Bound how many daily reports a page view will pull; the rest follow. */
 const MAX_DAYS_PER_PASS = 35;
+/** The daily job has a 60-second budget at roughly half a second a report. */
+const MAX_DAYS_PER_REFRESH = 80;
 /** How many of the most recent days get re-checked when Apple had no report. */
 const RECHECK_EMPTY_DAYS = 3;
 /** How long to wait before asking Apple about an empty recent day again. */
@@ -247,7 +252,14 @@ async function writeCachedDays(
 export interface AppleSalesData {
   configured: boolean;
   connected: boolean;
+  /** The last 30 complete days. */
   summary: StoreSalesSummary | null;
+  /** Every day since STORE_TRACKING_START — App Store Connect's lifetime view. */
+  sinceLaunch: StoreSalesSummary | null;
+  /** First day of `sinceLaunch`. */
+  trackingSince: string;
+  /** True while older days are still being downloaded, so `sinceLaunch` is short. */
+  backfilling: boolean;
   /** ISO date of the most recent day Apple had data for. */
   latestReportDate: string | null;
   /** Days requested that Apple had no report for (usually zero-sale days). */
@@ -261,31 +273,45 @@ const emptyAppleSales = (
   configured: false,
   connected: false,
   summary: null,
+  sinceLaunch: null,
+  trackingSince: STORE_TRACKING_START,
+  backfilling: false,
   latestReportDate: null,
   daysWithNoReport: 0,
   ...patch,
 });
 
-async function loadAppleSales(days: number): Promise<AppleSalesData> {
+async function loadAppleSales(
+  days: number,
+  maxFetches: number = MAX_DAYS_PER_PASS,
+): Promise<AppleSalesData> {
   const creds = readCredentials();
   if (!creds) return emptyAppleSales();
 
-  const dates = reportDateRange(Date.now(), Math.min(days, MAX_DAYS_PER_PASS));
+  // One read serves both views: every day since tracking began, with the
+  // recent window carved out of it. Past days are cached for good, so after
+  // the first fill this only ever downloads yesterday.
+  const now = Date.now();
+  const dates = reportDatesSince(STORE_TRACKING_START, now);
+  const window = new Set(reportDateRange(now, days));
   const cached = await readCachedDays(creds.vendorNumber, dates);
   // A day with no report is re-checked for a few days: Apple sometimes
   // publishes late, and caching "no sales" on the first miss would lose that
   // day for good. Older empty days are settled.
   const recheck = new Set(dates.slice(-RECHECK_EMPTY_DAYS));
-  const missing = dates.filter((d) => {
-    const day = cached.get(d);
-    if (!day) return true;
-    return day.empty && recheck.has(d) && Date.now() - day.fetchedAt > RECHECK_AFTER_MS;
-  });
+  const missing = dates
+    .filter((d) => {
+      const day = cached.get(d);
+      if (!day) return true;
+      return day.empty && recheck.has(d) && now - day.fetchedAt > RECHECK_AFTER_MS;
+    })
+    // Newest first, so a capped pass completes the recent window before history.
+    .reverse();
 
   const fetched: CachedDay[] = [];
   let failure: string | null = null;
 
-  for (const date of missing) {
+  for (const date of missing.slice(0, maxFetches)) {
     try {
       const tsv = await fetchDailyReport(creds, date);
       fetched.push({
@@ -310,7 +336,10 @@ async function loadAppleSales(days: number): Promise<AppleSalesData> {
 
   await writeCachedDays(creds.vendorNumber, fetched);
 
-  const allDays = [...cached.values(), ...fetched];
+  // A re-checked day is in both lists; the fresh copy wins.
+  const byDate = new Map(cached);
+  for (const day of fetched) byDate.set(day.date, day);
+  const allDays = [...byDate.values()];
   if (allDays.length === 0) {
     return emptyAppleSales({
       configured: true,
@@ -318,7 +347,7 @@ async function loadAppleSales(days: number): Promise<AppleSalesData> {
     });
   }
 
-  const rows = allDays.flatMap((d) => d.rows);
+  const recent = allDays.filter((d) => window.has(d.date));
   const withData = allDays.filter((d) => d.rows.length > 0);
   const latestReportDate =
     withData.map((d) => d.date).sort().at(-1) ?? null;
@@ -326,12 +355,24 @@ async function loadAppleSales(days: number): Promise<AppleSalesData> {
   return {
     configured: true,
     connected: true,
-    summary: summariseStoreSales(rows),
+    summary: summariseStoreSales(recent.flatMap((d) => d.rows)),
+    sinceLaunch: summariseStoreSales(allDays.flatMap((d) => d.rows)),
+    trackingSince: STORE_TRACKING_START,
+    backfilling: missing.length > maxFetches || failure !== null,
     latestReportDate,
-    daysWithNoReport: allDays.filter((d) => d.empty).length,
+    daysWithNoReport: recent.filter((d) => d.empty).length,
     // A partial failure is still worth surfacing alongside the data we have.
     error: failure ?? undefined,
   };
+}
+
+/**
+ * Pull every Apple report the window is missing, bypassing the page cache —
+ * what the daily job runs, so the console is current before anyone opens it.
+ */
+export async function refreshAppleSales(days = 30): Promise<AppleSalesData> {
+  if (!readCredentials()) return emptyAppleSales();
+  return loadAppleSales(days, MAX_DAYS_PER_REFRESH);
 }
 
 /** A read that failed outright, thrown so the cache below never keeps it. */
@@ -342,9 +383,10 @@ class AppleSalesFailure extends Error {
 }
 
 /**
- * 10 minutes, shared: reports land once a day, and both the Overview and the
- * Purchases page read them on every auto-refresh — uncached, each refresh
- * cost ~30 Firestore reads against the quota the game also uses.
+ * An hour, shared: reports land once a day and the daily job fetches them, and
+ * both the Overview and the Purchases page read them on every auto-refresh —
+ * uncached, each refresh cost ~90 Firestore reads against the quota the game
+ * also uses.
  */
 const loadAppleSalesCached = unstable_cache(
   async (days: number) => {
@@ -353,7 +395,7 @@ const loadAppleSalesCached = unstable_cache(
     return data;
   },
   ["trapman-apple-sales"],
-  { revalidate: 600, tags: ["trapman-console"] },
+  { revalidate: 3600, tags: ["trapman-console", STORE_REPORTS_TAG] },
 );
 
 /**

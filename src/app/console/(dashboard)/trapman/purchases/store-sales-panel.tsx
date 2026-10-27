@@ -173,6 +173,39 @@ function Countries({ summary }: { summary: StoreSalesSummary }) {
   );
 }
 
+/** "Since launch" totals — the figure App Store Connect and Play Console show for all time. */
+function SinceLaunch({
+  since,
+  parts,
+  money,
+  note,
+}: {
+  since: string;
+  parts: string[];
+  money: ReactNode;
+  note?: string | null;
+}) {
+  const [y, m, d] = since.split("-").map(Number);
+  const from = new Date(Date.UTC(y, m - 1, d)).toLocaleDateString("en-AU", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+  return (
+    <div className="space-y-1 rounded-md border border-border p-3">
+      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        Since launch (from {from})
+      </p>
+      <p className="flex flex-wrap justify-between gap-x-4 gap-y-1">
+        <span>{parts.join(" · ")}</span>
+        <span className="font-mono tabular-nums">{money}</span>
+      </p>
+      {note && <p className="text-xs text-muted-foreground">{note}</p>}
+    </div>
+  );
+}
+
 function monthLabel(yyyymm: string): string {
   const d = new Date(Date.UTC(Number(yyyymm.slice(0, 4)), Number(yyyymm.slice(4)) - 1, 1));
   return d.toLocaleDateString("en-AU", { month: "long", year: "numeric", timeZone: "UTC" });
@@ -217,8 +250,28 @@ function ApplePanel({ apple, fx }: { apple: AppleSalesData; fx: FxRates }) {
                   : ""}
                 .
               </p>
-              <ProductsTable summary={s} fx={fx} moneyLabel="Earnings" />
+              <ProductsTable summary={s} fx={fx} moneyLabel="Proceeds" />
               <Countries summary={s} />
+              {apple.sinceLaunch && (
+                <SinceLaunch
+                  since={apple.trackingSince}
+                  parts={[
+                    `${apple.sinceLaunch.appUnits.toLocaleString()} downloads`,
+                    `${apple.sinceLaunch.iapUnits.toLocaleString()} in-app purchases`,
+                  ]}
+                  money={
+                    <>
+                      Sales <Money amounts={apple.sinceLaunch.salesByCurrency} fx={fx} /> · Proceeds{" "}
+                      <Money amounts={apple.sinceLaunch.proceedsByCurrency} fx={fx} />
+                    </>
+                  }
+                  note={
+                    apple.backfilling
+                      ? "Still downloading older reports — the total fills in over the next refreshes."
+                      : null
+                  }
+                />
+              )}
             </>
           )}
         </>
@@ -285,6 +338,29 @@ function PlayPanel({ play, fx }: { play: PlaySalesData; fx: FxRates }) {
 
               {s && <ProductsTable summary={s} fx={fx} moneyLabel="Sales" />}
               {s && <Countries summary={s} />}
+
+              {(play.salesSinceLaunch || play.installsSinceLaunch != null) && (
+                <SinceLaunch
+                  since={play.trackingSince}
+                  parts={[
+                    ...(play.installsSinceLaunch != null
+                      ? [`${play.installsSinceLaunch.toLocaleString()} new installs`]
+                      : []),
+                    `${(play.salesSinceLaunch?.appUnits ?? 0).toLocaleString()} paid downloads`,
+                    `${(play.salesSinceLaunch?.iapUnits ?? 0).toLocaleString()} in-app purchases`,
+                  ]}
+                  money={
+                    <>
+                      Sales{" "}
+                      {play.salesSinceLaunch ? (
+                        <Money amounts={play.salesSinceLaunch.salesByCurrency} fx={fx} />
+                      ) : (
+                        formatAud(0)
+                      )}
+                    </>
+                  }
+                />
+              )}
 
               {play.earnings.length > 0 && (
                 <div className="space-y-1 rounded-md border border-border p-3">

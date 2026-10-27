@@ -6,6 +6,8 @@ import { getDb } from "@/lib/firebase/firestore";
 import { CRM } from "@/lib/firebase/collections";
 import {
   reportDateRange,
+  STORE_REPORTS_TAG,
+  STORE_TRACKING_START,
   summariseStoreSales,
   type AppleSalesRow,
   type StoreSalesSummary,
@@ -40,8 +42,12 @@ import { readZipCsvs } from "@/lib/trapman/zip";
 const STORAGE_SCOPE = "https://www.googleapis.com/auth/devstorage.read_only";
 const STORAGE_API = "https://storage.googleapis.com/storage/v1";
 const DEFAULT_PACKAGE = "com.cultshotta.trapman";
-/** Months of files read: the current one plus the two before it. */
-const MONTHS = 3;
+/** Months of files read: every month since tracking began, never fewer than 3. */
+function monthsTracked(now: number): number {
+  const d = new Date(now);
+  const [y, m] = STORE_TRACKING_START.split("-").map(Number);
+  return Math.max(3, (d.getUTCFullYear() - y) * 12 + (d.getUTCMonth() + 1 - m) + 1);
+}
 /** Installs and sales are summarised over this many days. */
 export const PLAY_WINDOW_DAYS = 30;
 /** Bound the downloads one refresh can trigger; the rest follow next refresh. */
@@ -332,6 +338,12 @@ export interface PlaySalesData {
   } | null;
   /** Orders over the last PLAY_WINDOW_DAYS days, at the price the buyer paid (before Google's fee). */
   sales: StoreSalesSummary | null;
+  /** Every order since STORE_TRACKING_START — Play Console's lifetime view. */
+  salesSinceLaunch: StoreSalesSummary | null;
+  /** New installs since STORE_TRACKING_START. */
+  installsSinceLaunch: number | null;
+  /** First day of the since-launch figures. */
+  trackingSince: string;
   latestSaleDate: string | null;
   /** Payouts after Google's fee and tax, one entry per month, newest first. */
   earnings: PlayMonthEarnings[];
@@ -347,6 +359,9 @@ const emptyPlay = (patch: Partial<PlaySalesData> = {}): PlaySalesData => ({
   connected: false,
   installs: null,
   sales: null,
+  salesSinceLaunch: null,
+  installsSinceLaunch: null,
+  trackingSince: STORE_TRACKING_START,
   latestSaleDate: null,
   earnings: [],
   backfilling: false,
@@ -375,13 +390,15 @@ function mergeEarnings(parts: PlayMonthEarnings[]): PlayMonthEarnings[] {
 }
 
 /** Throws PlayAccessError when the bucket cannot be listed; see getPlaySales. */
-async function loadPlaySales(): Promise<PlaySalesData> {
+async function loadPlaySales(
+  maxDownloads: number = MAX_DOWNLOADS_PER_PASS,
+): Promise<PlaySalesData> {
   const config = readConfig();
   if (!config) return emptyPlay();
   const { bucket, packageName, client } = config;
 
   const now = Date.now();
-  const months = new Set(playMonths(now, MONTHS));
+  const months = new Set(playMonths(now, monthsTracked(now)));
   // The same 30 complete days, ending yesterday, as the App Store card and
   // Play Console's own "Last 30 days" — not 31 days running into today.
   const window = reportDateRange(now, PLAY_WINDOW_DAYS);
@@ -410,7 +427,7 @@ async function loadPlaySales(): Promise<PlaySalesData> {
 
   const fresh: CachedFile[] = [];
   let failure: string | undefined;
-  for (const obj of stale.slice(0, MAX_DOWNLOADS_PER_PASS)) {
+  for (const obj of stale.slice(0, maxDownloads)) {
     try {
       fresh.push(await parseFile(client, bucket, obj, obj.kind, obj.month, packageName));
     } catch (err) {
@@ -424,11 +441,15 @@ async function loadPlaySales(): Promise<PlaySalesData> {
   for (const f of fresh) files.set(f.objectName, f);
   const current = objects.map((o) => files.get(o.name)).filter((f): f is CachedFile => !!f);
 
-  const installDays = current
+  const allInstallDays = current
     .flatMap((f) => f.installs ?? [])
-    .filter((d) => inWindow(d.date))
+    .filter((d) => d.date >= STORE_TRACKING_START && d.date <= last)
     .sort((a, b) => a.date.localeCompare(b.date));
-  const saleRows = current.flatMap((f) => f.sales ?? []).filter((r) => inWindow(r.beginDate));
+  const installDays = allInstallDays.filter((d) => inWindow(d.date));
+  const allSaleRows = current
+    .flatMap((f) => f.sales ?? [])
+    .filter((r) => r.beginDate >= STORE_TRACKING_START && r.beginDate <= last);
+  const saleRows = allSaleRows.filter((r) => inWindow(r.beginDate));
   const latestInstall = installDays.at(-1);
 
   return {
@@ -443,9 +464,14 @@ async function loadPlaySales(): Promise<PlaySalesData> {
         }
       : null,
     sales: saleRows.length ? summariseStoreSales(saleRows) : null,
+    salesSinceLaunch: allSaleRows.length ? summariseStoreSales(allSaleRows) : null,
+    installsSinceLaunch: allInstallDays.length
+      ? allInstallDays.reduce((n, d) => n + d.userInstalls, 0)
+      : null,
+    trackingSince: STORE_TRACKING_START,
     latestSaleDate: saleRows.map((r) => r.beginDate).sort().at(-1) ?? null,
     earnings: mergeEarnings(current.flatMap((f) => (f.earnings ? [f.earnings] : []))),
-    backfilling: stale.length > MAX_DOWNLOADS_PER_PASS || !!failure,
+    backfilling: stale.length > maxDownloads || !!failure,
     unreadableFiles: current.filter((f) => f.unreadable).map((f) => f.objectName),
     error: failure,
   };
@@ -459,9 +485,9 @@ class PlayAccessError extends Error {}
  * and the Purchases page auto-refreshes far more often than that. Failures are
  * never cached (unstable_cache does not store a thrown error).
  */
-const loadPlaySalesCached = unstable_cache(loadPlaySales, ["trapman-play-reports"], {
+const loadPlaySalesCached = unstable_cache(() => loadPlaySales(), ["trapman-play-reports"], {
   revalidate: 600,
-  tags: ["trapman-console"],
+  tags: ["trapman-console", STORE_REPORTS_TAG],
 });
 
 /** Never throws: every failure degrades to a panel that explains itself. */
@@ -476,6 +502,22 @@ export async function getPlaySales(): Promise<PlaySalesData> {
         err instanceof PlayAccessError
           ? err.message
           : `Could not read the Play reports: ${err instanceof Error ? err.message : "unknown error"}`,
+    });
+  }
+}
+
+/**
+ * Download every report file Google has changed, with no per-pass cap and no
+ * page cache — what the daily job runs. Never throws.
+ */
+export async function refreshPlaySales(): Promise<PlaySalesData> {
+  if (!readConfig()) return emptyPlay();
+  try {
+    return await loadPlaySales(Number.POSITIVE_INFINITY);
+  } catch (err) {
+    return emptyPlay({
+      configured: true,
+      error: err instanceof Error ? err.message : "Could not read the Play reports.",
     });
   }
 }

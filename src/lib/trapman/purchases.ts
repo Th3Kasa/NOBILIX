@@ -110,8 +110,10 @@ export function normalisePlatform(raw: string): PurchasePlatform {
 
 /**
  * Pulls the order id, purchase token and acknowledgement state out of a Google
- * Play receipt envelope. Returns nulls for Apple receipts or anything
- * unreadable — a malformed receipt must never discard an otherwise good record.
+ * Play receipt envelope, or the transaction id out of Unity's App Store
+ * receipt (`{"Store":"AppleAppStore","TransactionID":…}`). Returns nulls for
+ * anything else — a malformed receipt must never discard an otherwise good
+ * record.
  */
 function readReceiptMeta(receipt: unknown): {
   storeOrderId: string | null;
@@ -128,6 +130,15 @@ function readReceiptMeta(receipt: unknown): {
   if (typeof receipt !== "string") return empty;
   try {
     const envelope = JSON.parse(receipt) as Record<string, unknown>;
+    if (envelope.Store === "AppleAppStore") {
+      return {
+        ...empty,
+        storeOrderId:
+          typeof envelope.TransactionID === "string" && envelope.TransactionID
+            ? envelope.TransactionID
+            : null,
+      };
+    }
     if (typeof envelope.json !== "string") return empty;
     const inner = JSON.parse(envelope.json) as Record<string, unknown>;
     return {
@@ -152,6 +163,11 @@ function buildPurchase(
 ): NormalizedPurchase {
   const rawPlatform = String(record.platform);
   const meta = readReceiptMeta(record.receipt);
+  // Apple's transaction id, when the game saves it beside the receipt — the
+  // fix the game needs so iPhone purchases can be matched to Apple's records.
+  if (!meta.storeOrderId && typeof record.transactionId === "string" && record.transactionId) {
+    meta.storeOrderId = record.transactionId;
+  }
   return {
     purchaseId: meta.storeOrderId ?? key,
     productId: String(record.productId),

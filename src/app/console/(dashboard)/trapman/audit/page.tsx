@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { LocalTime } from "@/components/console/local-time";
 import { PageHeader } from "@/components/page-header";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -79,9 +79,7 @@ export default async function AuditPage({
                       className="border-b border-border/60 last:border-0 hover:bg-accent/40"
                     >
                       <td className="whitespace-nowrap px-4 py-3 font-mono text-xs text-muted-foreground">
-                        {e.at
-                          ? format(new Date(e.at), "MMM d, HH:mm:ss")
-                          : "—"}
+                        {e.at ? <LocalTime ms={e.at} variant="seconds" /> : "—"}
                       </td>
                       <td className="px-4 py-3">{e.actorEmail}</td>
                       <td className="px-4 py-3">

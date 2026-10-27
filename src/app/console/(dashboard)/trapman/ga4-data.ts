@@ -42,6 +42,8 @@ export interface Ga4DailyActivity {
 
 export interface Ga4Snapshot {
   connected: boolean;
+  /** When Google was asked (epoch ms). */
+  fetchedAt: number;
   /** Distinct active users: today so far, and the last 7 / 28 complete days. */
   activeUsers1d: number;
   activeUsers7d: number;
@@ -171,7 +173,7 @@ function computeDelta(
 }
 
 async function fetchGa4Snapshot(): Promise<Ga4Snapshot> {
-  const empty: Omit<Ga4Snapshot, "connected" | "error"> = {
+  const empty: Omit<Ga4Snapshot, "connected" | "fetchedAt" | "error"> = {
     activeUsers1d: 0,
     activeUsers7d: 0,
     activeUsers28d: 0,
@@ -324,6 +326,7 @@ async function fetchGa4Snapshot(): Promise<Ga4Snapshot> {
 
     return {
       connected: true,
+      fetchedAt: Date.now(),
       activeUsers1d: num(activityIn(0), 0),
       activeUsers7d: num(activityIn(1), 0),
       activeUsers28d: num(activityIn(2), 0),
@@ -368,7 +371,7 @@ async function fetchGa4Snapshot(): Promise<Ga4Snapshot> {
     const friendly = /403|PERMISSION_DENIED/i.test(message)
       ? "The service account has not been granted Viewer access on the GA4 property yet (Analytics Admin → Property access management)."
       : message;
-    return { connected: false, ...empty, error: friendly };
+    return { connected: false, fetchedAt: Date.now(), ...empty, error: friendly };
   }
 }
 

@@ -9,12 +9,12 @@ import {
   Smartphone,
   Users,
 } from "lucide-react";
-import { format } from "date-fns";
 import { auth } from "@/auth";
 import { PageHeader } from "@/components/page-header";
 import { StatCard } from "@/components/stat-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { LocalTime } from "@/components/console/local-time";
 import { getTestAccountUids } from "@/lib/trapman/test-accounts";
 import { getAppleSales } from "@/lib/trapman/app-store-connect";
 import { getPlaySales } from "@/lib/trapman/play-reports";
@@ -28,6 +28,7 @@ import {
 import { resolveRangeNow } from "./range";
 import { RangePicker } from "./range-picker";
 import { StoreSalesPanel } from "./store-sales-panel";
+import { DataFreshness } from "../data-freshness";
 import { TestPurchasesControl } from "./test-purchases-control";
 import {
   getAudRates,
@@ -167,6 +168,8 @@ export default async function PurchasesPage({
           billed, and they do not depend on the game having saved anything.
           Kept separate from the totals below, which follow the range picker
           rather than each store's 30-day reporting window. */}
+      <DataFreshness className="mb-6" />
+
       <StoreSalesPanel apple={apple} play={play} fx={fx} />
 
       {!data.connected ? (
@@ -578,7 +581,7 @@ export default async function PurchasesPage({
                               )}
                             </td>
                             <td className="py-2.5 font-mono text-xs tabular-nums text-muted-foreground">
-                              {format(new Date(p.timestamp), "PP p")}
+                              <LocalTime ms={p.timestamp} variant="datetime" />
                             </td>
                           </tr>
                         );

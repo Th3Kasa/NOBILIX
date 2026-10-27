@@ -21,6 +21,35 @@
 export const REPORT_LAG_DAYS = 1;
 
 /**
+ * The first day the console tracks store reports from — before TrapMan's
+ * first sale on either store — so "since launch" totals cover every sale.
+ */
+export const STORE_TRACKING_START = "2026-08-01";
+
+/** Cache tag on both stores' report caches, cleared by the daily job. */
+export const STORE_REPORTS_TAG = "trapman-store-reports";
+
+/**
+ * Every report day from `start` up to `lagDays` before `now`, oldest first —
+ * the "since launch" counterpart of `reportDateRange`.
+ */
+export function reportDatesSince(
+  start: string,
+  now: number,
+  lagDays: number = REPORT_LAG_DAYS,
+): string[] {
+  const dayMs = 24 * 60 * 60 * 1000;
+  const last = new Date(now - lagDays * dayMs).toISOString().slice(0, 10);
+  const dates: string[] = [];
+  for (let t = Date.parse(`${start}T00:00:00Z`); ; t += dayMs) {
+    const d = new Date(t).toISOString().slice(0, 10);
+    if (d > last) break;
+    dates.push(d);
+  }
+  return dates;
+}
+
+/**
  * ISO dates for the `days` report-days ending `lagDays` before `now`, oldest
  * first.
  *

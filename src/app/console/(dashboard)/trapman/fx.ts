@@ -11,6 +11,12 @@ import "server-only";
  */
 
 const FX_ENDPOINT = "https://api.frankfurter.dev/v1/latest?base=AUD";
+/**
+ * The ECB publishes about 30 currencies; Apple and Google sell in many more
+ * (TrapMan has a Taiwan-dollar sale). This keyless daily feed fills in only the
+ * currencies the ECB leaves out — it never overrides an ECB rate.
+ */
+const FX_FALLBACK_ENDPOINT = "https://open.er-api.com/v6/latest/AUD";
 
 export interface FxRates {
   connected: boolean;
@@ -18,6 +24,8 @@ export interface FxRates {
   audTo: Record<string, number>;
   /** ECB reference date the rates were published for */
   asOf?: string;
+  /** Currencies whose rate came from the fallback feed, not the ECB. */
+  fallbackCurrencies?: string[];
   error?: string;
 }
 
@@ -30,10 +38,19 @@ export async function getAudRates(): Promise<FxRates> {
       rates?: Record<string, number>;
     };
     if (!data.rates) throw new Error("FX service returned no rates");
+    const fallback = await getFallbackRates();
+    const fallbackCurrencies = Object.keys(fallback).filter(
+      (code) => !(code in data.rates!) && code !== "AUD",
+    );
     return {
       connected: true,
-      audTo: { ...data.rates, AUD: 1 },
+      audTo: {
+        ...Object.fromEntries(fallbackCurrencies.map((c) => [c, fallback[c]])),
+        ...data.rates,
+        AUD: 1,
+      },
       asOf: data.date,
+      fallbackCurrencies,
     };
   } catch (err) {
     return {
@@ -41,6 +58,21 @@ export async function getAudRates(): Promise<FxRates> {
       audTo: {},
       error: err instanceof Error ? err.message : "Unknown FX error",
     };
+  }
+}
+
+/** The fallback feed's rates, or none — a missing gap-filler is never fatal. */
+async function getFallbackRates(): Promise<Record<string, number>> {
+  try {
+    const res = await fetch(FX_FALLBACK_ENDPOINT, { next: { revalidate: 3600 } });
+    if (!res.ok) return {};
+    const data = (await res.json()) as { result?: string; rates?: Record<string, number> };
+    if (data.result !== "success" || !data.rates) return {};
+    return Object.fromEntries(
+      Object.entries(data.rates).filter(([, r]) => typeof r === "number" && r > 0),
+    );
+  } catch {
+    return {};
   }
 }
 
