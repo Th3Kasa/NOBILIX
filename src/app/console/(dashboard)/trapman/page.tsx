@@ -5,7 +5,6 @@ import {
   UserPlus,
   Ghost,
   AlertTriangle,
-  ShoppingCart,
   BellRing,
   Receipt,
   Activity,
@@ -24,10 +23,7 @@ import { getLiveMetrics, type LiveMetrics } from "./live-metrics";
 import { getGa4Snapshot, type Ga4Snapshot } from "./ga4-data";
 import {
   getAudRates,
-  convertToAud,
-  formatAud,
   formatAudTotal,
-  formatOriginal,
   sumInAud,
   type FxRates,
 } from "./fx";
@@ -152,7 +148,6 @@ export default async function TrapManOverviewPage() {
       ? purchasesResult.value
       : null;
   const sales = purchases ? summarise(purchases.records) : null;
-  const salesAud = sales ? sumInAud(sales.revenueByCurrency, fx) : null;
 
   // What the stores themselves billed over their last 30 days — paid
   // downloads and in-app purchases, at the price customers paid. This is the
@@ -180,12 +175,6 @@ export default async function TrapManOverviewPage() {
   ];
   const storeSalesLaunchAud =
     appleData?.sinceLaunch || playData?.salesSinceLaunch ? sumInAud(launchSales, fx) : null;
-
-  // GA4 reports in the property's own currency, which it states on the report.
-  const ga4RevenueAud =
-    fx.connected && ga4.connected
-      ? convertToAud(ga4.totalRevenue, ga4.revenueCurrency, fx)
-      : null;
 
   // One node per registry widget. A null node means the widget has nothing
   // to show right now (its data source is not connected) and is skipped —
@@ -231,26 +220,8 @@ export default async function TrapManOverviewPage() {
         label="Active app users (last 7 days)"
         value={ga4.activeUsers7d}
         icon={Activity}
-        hint={`Every device that played, with or without an account · ${ga4.activeUsers28d} in 28 days`}
+        hint={`Every device that played · ${ga4.activeUsers1d.toLocaleString()} today · ${ga4.activeUsers28d.toLocaleString()} in the last 28 days`}
         delta={ga4.activeUsers7dDelta}
-      />
-    ) : null,
-    "ga4-revenue-30d": ga4.connected ? (
-      <StatCard
-        key="ga4-revenue-30d"
-        label="Revenue tracked by Google Analytics (last 30 days)"
-        value={
-          ga4RevenueAud != null
-            ? formatAud(ga4RevenueAud)
-            : formatOriginal(ga4.totalRevenue, ga4.revenueCurrency)
-        }
-        icon={Receipt}
-        hint={
-          ga4RevenueAud != null && ga4.revenueCurrency !== "AUD"
-            ? `In-app purchases + ads · ${formatOriginal(ga4.totalRevenue, ga4.revenueCurrency)} ${ga4.revenueCurrency} converted`
-            : "In-app purchases + ads"
-        }
-        delta={ga4.revenue30dDelta}
       />
     ) : null,
     "ga4-avg-session": ga4.connected ? (
@@ -275,19 +246,6 @@ export default async function TrapManOverviewPage() {
         delta={ga4.engagedSessionsDelta}
       />
     ) : null,
-    "store-sales-30d": storeSalesAud ? (
-      <StatCard
-        key="store-sales-30d"
-        label="Store sales (AUD, last 30 days)"
-        value={formatAudTotal(storeSalesAud)}
-        icon={Receipt}
-        hint={[
-          appleSalesAud ? `App Store ${formatAudTotal(appleSalesAud)}` : "App Store not connected",
-          playSalesAud ? `Google Play ${formatAudTotal(playSalesAud)}` : "Google Play not connected",
-          "downloads + in-app purchases, what customers paid",
-        ].join(" · ")}
-      />
-    ) : null,
     "store-sales-launch": storeSalesLaunchAud ? (
       <StatCard
         key="store-sales-launch"
@@ -295,38 +253,22 @@ export default async function TrapManOverviewPage() {
         value={formatAudTotal(storeSalesLaunchAud)}
         icon={Receipt}
         hint={[
+          storeSalesAud ? `${formatAudTotal(storeSalesAud)} in the last 30 days` : null,
           appleData?.sinceLaunch
             ? `App Store ${formatAudTotal(sumInAud(appleData.sinceLaunch.salesByCurrency, fx))}`
             : "App Store not connected",
           playData?.salesSinceLaunch
             ? `Google Play ${formatAudTotal(sumInAud(playData.salesSinceLaunch.salesByCurrency, fx))}`
             : playData
-              ? "Google Play no sales"
+              ? "Google Play no sales yet"
               : "Google Play not connected",
-          appleData?.backfilling ? "older days still loading" : "downloads + in-app purchases",
-        ].join(" · ")}
-      />
-    ) : null,
-    "store-purchases": sales ? (
-      <StatCard
-        key="store-purchases"
-        label="In-app purchases (all time)"
-        value={sales.totalCount}
-        icon={ShoppingCart}
-        hint={`${sales.buyerCount} ${sales.buyerCount === 1 ? "person" : "people"} bought · tests and refunds excluded`}
-      />
-    ) : null,
-    "store-revenue-aud": sales && salesAud ? (
-      <StatCard
-        key="store-revenue-aud"
-        label="In-app purchase sales (AUD, all time)"
-        value={formatAudTotal(salesAud)}
-        icon={Receipt}
-        hint={
-          salesAud.unconverted.length > 0
-            ? "Some currencies have no exchange rate and are shown as-is"
-            : "What players paid for in-app items, as recorded by the game · excludes the paid download"
-        }
+          sales
+            ? `${sales.totalCount} in-app purchases by ${sales.buyerCount} ${sales.buyerCount === 1 ? "person" : "people"}`
+            : null,
+          appleData?.backfilling ? "older days still loading" : null,
+        ]
+          .filter(Boolean)
+          .join(" · ")}
       />
     ) : null,
     "push-reachable": live.connected ? (
@@ -336,19 +278,6 @@ export default async function TrapManOverviewPage() {
         value={live.pushReachable}
         icon={BellRing}
         hint="Have notifications turned on"
-      />
-    ) : null,
-    "top-level": live.connected ? (
-      <StatCard
-        key="top-level"
-        label="Highest level reached"
-        value={live.highestLevel}
-        icon={Gauge}
-        hint={
-          live.avgLevelsCompleted != null
-            ? `Players complete ${live.avgLevelsCompleted} levels on average`
-            : undefined
-        }
       />
     ) : null,
     "latest-scores":
@@ -393,21 +322,16 @@ export default async function TrapManOverviewPage() {
           </CardContent>
         </Card>
       ) : null,
-    "revenue-note":
-      sales || ga4.connected ? (
-        <p key="revenue-note" className="mb-6 text-xs text-muted-foreground">
-          <strong className="text-foreground">Store sales</strong> is what
-          Apple and Google billed customers over their last 30 complete days —
-          the paid download plus in-app purchases — the same figures App Store
-          Connect and Play Console show.{" "}
-          <strong className="text-foreground">In-app purchase sales</strong>{" "}
-          comes from the purchases the game saved and leaves out the download
-          itself. Other currencies are converted to AUD at today&apos;s
-          reference rate, so they can differ by a few cents from the
-          stores&apos; own conversion. For earnings after the stores&apos; fees,
-          see the Purchases page.
-        </p>
-      ) : null,
+    "revenue-note": storeSalesLaunchAud ? (
+      <p key="revenue-note" className="mb-6 text-xs text-muted-foreground">
+        <strong className="text-foreground">Store sales</strong> is what Apple
+        and Google billed customers — the paid download plus in-app purchases —
+        the same figures as App Store Connect and Play Console. Other currencies
+        are converted to AUD at today&apos;s reference rate, so they can differ
+        by a few cents from the stores&apos; own conversion. Earnings after
+        fees, per-product sales and top buyers are on the Purchases page.
+      </p>
+    ) : null,
     "activity-30d": (
       <Card key="activity-30d" className="console-glass mb-6">
         <CardHeader>

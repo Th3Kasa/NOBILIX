@@ -1,20 +1,15 @@
 "use client";
 
 import {
-  Bar,
-  BarChart,
-  CartesianGrid,
   Cell,
   Pie,
   PieChart,
   ResponsiveContainer,
   Tooltip,
-  XAxis,
-  YAxis,
 } from "recharts";
 import { countryFlag } from "@/lib/utils";
 import { ChartTooltip } from "@/components/console/chart-tooltip";
-import type { CountrySlice, LevelBucket } from "./data";
+import type { CountrySlice } from "./data";
 
 const PIE_COLORS = [
   "var(--console-live)",
@@ -80,51 +75,6 @@ export function CountryDistributionChart({
           </li>
         ))}
       </ul>
-    </div>
-  );
-}
-
-export function LevelDistributionChart({
-  levelBuckets,
-}: {
-  levelBuckets: LevelBucket[];
-}) {
-  if (levelBuckets.length === 0) {
-    return (
-      <p className="flex h-56 items-center justify-center text-sm text-muted-foreground">
-        No level progress data available yet.
-      </p>
-    );
-  }
-
-  return (
-    <div className="h-56 w-full">
-      <ResponsiveContainer width="100%" height="100%">
-        <BarChart data={levelBuckets} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
-          <CartesianGrid stroke="var(--border)" vertical={false} />
-          <XAxis
-            dataKey="bucket"
-            tick={{ fill: "var(--muted-foreground)", fontSize: 11, fontFamily: "var(--font-mono)" }}
-            axisLine={{ stroke: "var(--border)" }}
-            tickLine={false}
-          />
-          <YAxis
-            allowDecimals={false}
-            tick={{ fill: "var(--muted-foreground)", fontSize: 11, fontFamily: "var(--font-mono)" }}
-            axisLine={false}
-            tickLine={false}
-            width={32}
-          />
-          <Tooltip content={<ChartTooltip />} cursor={{ fill: "var(--accent)" }} />
-          <Bar
-            dataKey="count"
-            fill="var(--neon-violet)"
-            radius={[4, 4, 0, 0]}
-            maxBarSize={36}
-            isAnimationActive={false}
-          />
-        </BarChart>
-      </ResponsiveContainer>
     </div>
   );
 }

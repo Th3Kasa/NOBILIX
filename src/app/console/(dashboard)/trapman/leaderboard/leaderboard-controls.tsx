@@ -9,8 +9,6 @@ import {
   Trash2,
   AlertTriangle,
   AlertCircle,
-  ChevronDown,
-  ChevronUp,
   Pencil,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,7 +16,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Modal } from "@/components/ui/modal";
 import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
 import {
   resetLeaderboardAction,
   removeEntryAction,
@@ -27,7 +24,6 @@ import {
   type RemoveState,
   type EditScoreState,
 } from "./actions";
-import type { CompetitionRecord } from "@/types";
 import type { EventBoard } from "@/lib/leaderboard";
 import { WINNER_PLACES } from "@/lib/trapman/winners";
 
@@ -460,114 +456,5 @@ export function EditScoreButton({
         </form>
       </Modal>
     </>
-  );
-}
-
-// ─── Competition history accordion ───────────────────────────────────────────
-
-function periodBadgeVariant(p: string) {
-  if (p === "daily") return "secondary" as const;
-  if (p === "weekly") return "default" as const;
-  if (p === "monthly") return "success" as const;
-  return "outline" as const;
-}
-
-export function CompetitionHistory({
-  history,
-}: {
-  history: CompetitionRecord[];
-}) {
-  const [expanded, setExpanded] = useState<string | null>(null);
-
-  if (history.length === 0) return null;
-
-  return (
-    <div className="console-glass rounded-lg border border-border bg-card">
-      <div className="flex items-center gap-2 border-b border-border px-5 py-4">
-        <Trophy className="size-4 text-primary drop-shadow-[0_0_4px_var(--neon-violet)]" />
-        <h2 className="font-semibold">Past competitions</h2>
-        <span className="ml-auto text-xs text-muted-foreground">
-          {history.length} archived
-        </span>
-      </div>
-
-      <ul className="divide-y divide-border/60">
-        {history.map((comp) => {
-          const isOpen = expanded === comp.id;
-          return (
-            <li key={comp.id}>
-              <button
-                type="button"
-                onClick={() => setExpanded(isOpen ? null : comp.id)}
-                className="flex w-full items-center gap-3 px-5 py-3 text-left text-sm hover:bg-accent/50 transition-colors"
-              >
-                <Badge
-                  variant={periodBadgeVariant(comp.periodType)}
-                  className="shrink-0 font-mono uppercase tracking-wide"
-                >
-                  {comp.periodType}
-                </Badge>
-                <span className="min-w-0 flex-1 truncate font-medium">
-                  {comp.label}
-                </span>
-                <span className="shrink-0 font-mono text-xs tabular-nums text-muted-foreground">
-                  {comp.totalEntries} players
-                </span>
-                <span className="shrink-0 font-mono text-xs text-muted-foreground">
-                  {new Date(comp.resetAt).toLocaleDateString()}
-                </span>
-                {isOpen ? (
-                  <ChevronUp className="size-4 shrink-0 text-muted-foreground" />
-                ) : (
-                  <ChevronDown className="size-4 shrink-0 text-muted-foreground" />
-                )}
-              </button>
-
-              {isOpen && (
-                <div className="border-t border-border/40 bg-muted/20 px-5 py-3">
-                  <p className="mb-2 text-xs text-muted-foreground">
-                    Reset by {comp.resetBy} · {new Date(comp.resetAt).toLocaleString()}
-                  </p>
-                  <ol className="space-y-1.5">
-                    {comp.winners.slice(0, WINNER_PLACES).map((w, i) => (
-                      <li
-                        key={w.uid}
-                        className="flex items-center gap-3 text-sm"
-                      >
-                        <span
-                          className={cn(
-                            "flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold",
-                            i === 0
-                              ? "bg-yellow-400/20 text-yellow-500"
-                              : i === 1
-                                ? "bg-slate-400/20 text-slate-400"
-                                : i === 2
-                                  ? "bg-orange-400/20 text-orange-400"
-                                  : "bg-muted text-muted-foreground",
-                          )}
-                        >
-                          {i + 1}
-                        </span>
-                        <span className="flex-1 font-medium">
-                          {w.displayName ?? w.uid.slice(0, 8) + "…"}
-                        </span>
-                        {w.country && (
-                          <span className="text-xs text-muted-foreground">
-                            {w.country}
-                          </span>
-                        )}
-                        <span className="font-mono text-xs font-semibold tabular-nums">
-                          {w.score.toLocaleString()}
-                        </span>
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              )}
-            </li>
-          );
-        })}
-      </ul>
-    </div>
   );
 }

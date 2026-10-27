@@ -19,7 +19,23 @@ test("overview widget registry exists with unique kebab-case ids", () => {
   const src = read(REGISTRY_PATH);
 
   const ids = [...src.matchAll(/^\s*\{ id: "([^"]+)"/gm)].map((m) => m[1]);
-  assert.ok(ids.length >= 14, `expected at least 14 widgets, found ${ids.length}`);
+  // Pinned so a widget only ever leaves the Overview on purpose. Duplicates
+  // of other pages (GA4 revenue, the two in-app purchase cards, the 30-day
+  // store sales card, highest level) were removed deliberately.
+  assert.deepEqual(ids, [
+    "players-total",
+    "players-registered",
+    "players-guests",
+    "players-new-7d",
+    "ga4-active-7d",
+    "ga4-avg-session",
+    "ga4-engaged-sessions",
+    "store-sales-launch",
+    "push-reachable",
+    "latest-scores",
+    "revenue-note",
+    "activity-30d",
+  ]);
   assert.equal(new Set(ids).size, ids.length, "widget ids must be unique");
   for (const id of ids) {
     assert.match(id, /^[a-z0-9]+(-[a-z0-9]+)*$/, `id "${id}" must be kebab-case`);

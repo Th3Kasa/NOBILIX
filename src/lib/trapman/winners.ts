@@ -33,6 +33,8 @@ export interface WinnerRow {
   periodType: CompetitionPeriod;
   /** When the competition was closed (epoch ms). */
   resetAt: number;
+  /** How many players took part. */
+  entries: number;
   /** 1-based finishing position. */
   place: number;
   uid: string;
@@ -60,6 +62,7 @@ export function winnerRows(
           competition: comp.label,
           periodType: comp.periodType,
           resetAt: comp.resetAt,
+          entries: comp.totalEntries,
           // The archive is stored in finishing order; trust that over a rank
           // field older archives may lack.
           place: i + 1,

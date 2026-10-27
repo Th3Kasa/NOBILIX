@@ -126,7 +126,14 @@ export function WinnersHistory({
                   <td className="whitespace-nowrap px-5 py-3 font-mono text-xs text-muted-foreground">
                     {new Date(r.resetAt).toLocaleDateString("en-AU")}
                   </td>
-                  <td className="px-3 py-3">{r.competition}</td>
+                  <td className="px-3 py-3">
+                    {r.competition}
+                    {r.place === 1 && (
+                      <span className="ml-2 font-mono text-xs text-muted-foreground">
+                        {r.entries.toLocaleString()} players
+                      </span>
+                    )}
+                  </td>
                   <td className="px-3 py-3">
                     <span
                       className={cn(

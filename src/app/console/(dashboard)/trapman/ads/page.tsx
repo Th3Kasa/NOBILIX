@@ -47,7 +47,11 @@ export default async function AdsPage() {
                   stays underneath, so this page is readable at a glance and
                   still cross-checkable against GA4 itself. */}
               <ul className="divide-y divide-border">
-                {ga4.events.slice(0, 12).map((event) => {
+                {/* The two ad events already have their own cards above. */}
+                {ga4.events
+                  .filter((e) => e.eventName !== "ad_clicked" && e.eventName !== "ad_closed")
+                  .slice(0, 12)
+                  .map((event) => {
                   const hint = eventHint(event.eventName);
                   return (
                     <li

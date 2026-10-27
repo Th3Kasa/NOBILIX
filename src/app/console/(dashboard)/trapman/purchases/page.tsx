@@ -1,12 +1,12 @@
 import {
   AlertTriangle,
   BadgeCheck,
-  FlaskConical,
   HelpCircle,
   Receipt,
   ShieldQuestion,
   ShoppingCart,
   Smartphone,
+  Trophy,
   Users,
 } from "lucide-react";
 import { auth } from "@/auth";
@@ -21,14 +21,10 @@ import { getPlaySales } from "@/lib/trapman/play-reports";
 import { productLabel, platformLabel } from "@/lib/trapman/labels";
 import type { PurchaseVerdict } from "@/lib/trapman/play-verify";
 import { getPurchasesData, summarise, type ExclusionReason } from "./data";
-import {
-  TestAccountControls,
-  type BuyerSummary,
-} from "./test-account-controls";
+import { TopBuyers, type BuyerSummary } from "./top-buyers";
 import { resolveRangeNow } from "./range";
 import { RangePicker } from "./range-picker";
 import { StoreSalesPanel } from "./store-sales-panel";
-import { DataFreshness } from "../data-freshness";
 import { TestPurchasesControl } from "./test-purchases-control";
 import {
   getAudRates,
@@ -116,29 +112,73 @@ export default async function PurchasesPage({
   const realSalesAllTime = data.records.filter((r) => r.exclusion === null).length;
   const markedTestAllTime = data.records.filter((r) => r.exclusion === "marked-test").length;
 
-  // One row per buyer across every record in the window, including excluded
-  // ones — the point of this list is to decide which buyers are internal
-  // testing, which you cannot do if the testers are already hidden.
-  const buyerMap = new Map<string, BuyerSummary>();
-  for (const p of summary.all) {
-    const existing = buyerMap.get(p.buyerUid);
-    if (existing) {
-      existing.purchaseCount += 1;
-      existing.editorOnly = existing.editorOnly && p.isEditorPurchase;
-      existing.name ??= p.buyerName;
-    } else {
-      buyerMap.set(p.buyerUid, {
-        uid: p.buyerUid,
-        name: p.buyerName,
-        purchaseCount: 1,
-        isTestAccount: testUids.has(p.buyerUid),
-        editorOnly: p.isEditorPurchase,
-      });
+  // Top buyers: one row per buyer in the window, ranked by what their counted
+  // purchases came to in AUD. Buyers whose purchases were all excluded
+  // (testers, editor) stay listed at the bottom, so a tester can be unmarked.
+  const buyerMap = new Map<
+    string,
+    {
+      uid: string;
+      name: string | null;
+      purchaseCount: number;
+      excludedCount: number;
+      amounts: Map<string, number>;
+      platforms: Set<string>;
+      lastPurchaseAt: number;
+      editorOnly: boolean;
     }
+  >();
+  for (const p of summary.all) {
+    const b = buyerMap.get(p.buyerUid) ?? {
+      uid: p.buyerUid,
+      name: p.buyerName,
+      purchaseCount: 0,
+      excludedCount: 0,
+      amounts: new Map<string, number>(),
+      platforms: new Set<string>(),
+      lastPurchaseAt: 0,
+      editorOnly: true,
+    };
+    b.name ??= p.buyerName;
+    b.editorOnly = b.editorOnly && p.isEditorPurchase;
+    b.platforms.add(platformLabel(p.platform));
+    b.lastPurchaseAt = Math.max(b.lastPurchaseAt, p.timestamp);
+    if (p.exclusion === null) {
+      b.purchaseCount += 1;
+      b.amounts.set(p.currency, (b.amounts.get(p.currency) ?? 0) + p.price);
+    } else {
+      b.excludedCount += 1;
+    }
+    buyerMap.set(p.buyerUid, b);
   }
-  const buyers = [...buyerMap.values()].sort(
-    (a, b) => b.purchaseCount - a.purchaseCount,
-  );
+  const buyers: BuyerSummary[] = [...buyerMap.values()]
+    .map((b) => {
+      const total = sumInAud(
+        [...b.amounts].map(([currency, t]) => ({ currency, total: t })),
+        fx,
+      );
+      return {
+        buyer: {
+          uid: b.uid,
+          name: b.name,
+          purchaseCount: b.purchaseCount,
+          excludedCount: b.excludedCount,
+          spent: b.purchaseCount > 0 ? formatAudTotal(total) : "—",
+          platforms: [...b.platforms],
+          lastPurchaseAt: b.lastPurchaseAt,
+          isTestAccount: testUids.has(b.uid),
+          editorOnly: b.editorOnly,
+        } satisfies BuyerSummary,
+        sortKey: total.aud,
+      };
+    })
+    .sort(
+      (a, b) =>
+        b.sortKey - a.sortKey ||
+        b.buyer.purchaseCount - a.buyer.purchaseCount ||
+        b.buyer.lastPurchaseAt - a.buyer.lastPurchaseAt,
+    )
+    .map((x) => x.buyer);
 
   /** AUD display with honest original-currency fallback when FX is down. */
   const aud = (amount: number, currency: string): string => {
@@ -168,8 +208,6 @@ export default async function PurchasesPage({
           billed, and they do not depend on the game having saved anything.
           Kept separate from the totals below, which follow the range picker
           rather than each store's 30-day reporting window. */}
-      <DataFreshness className="mb-6" />
-
       <StoreSalesPanel apple={apple} play={play} fx={fx} />
 
       {!data.connected ? (
@@ -486,30 +524,29 @@ export default async function PurchasesPage({
             </Card>
           </div>
 
-          {/* Test-account register */}
-          {canWrite && buyers.length > 0 && (
-            <Card className="console-glass mb-6">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-base">
-                  <FlaskConical
-                    className="size-4 text-[var(--console-violet)]"
-                    aria-hidden="true"
-                  />
-                  Buyers
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="pt-0">
+          {/* Who bought the most — and where testers are marked */}
+          <Card className="console-glass mb-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Trophy
+                  className="size-4 text-[var(--console-violet)]"
+                  aria-hidden="true"
+                />
+                Top buyers · {range.label}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              {canWrite && (
                 <p className="mb-2 text-sm text-muted-foreground">
-                  Marking a buyer as a test account removes their purchases from
-                  every revenue figure. Nothing is deleted from the game&apos;s
-                  data and the change can be undone at any time. Use this for
-                  iPhone testers — Apple purchases cannot be detected
-                  automatically.
+                  Marking a buyer as a tester removes their purchases from every
+                  revenue figure. Nothing is deleted from the game&apos;s data
+                  and it can be undone at any time — use it for iPhone testers,
+                  whose purchases Apple can&apos;t identify automatically.
                 </p>
-                <TestAccountControls buyers={buyers} />
-              </CardContent>
-            </Card>
-          )}
+              )}
+              <TopBuyers buyers={buyers} canWrite={canWrite} />
+            </CardContent>
+          </Card>
 
           {/* Every record in the window, counted or not */}
           <Card className="console-glass">

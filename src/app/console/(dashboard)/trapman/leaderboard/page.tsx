@@ -13,7 +13,6 @@ import { winnerRows } from "@/lib/trapman/winners";
 import { WinnersHistory } from "./winners-history";
 import {
   ResetCompetitionModal,
-  CompetitionHistory,
 } from "./leaderboard-controls";
 import { LeaderboardTable } from "./leaderboard-table";
 
@@ -160,8 +159,6 @@ export default async function LeaderboardPage() {
           emails={emails}
           canWrite={canWrite}
         />
-
-        <CompetitionHistory history={history} />
       </div>
     </>
   );

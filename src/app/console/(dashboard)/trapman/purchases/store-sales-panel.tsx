@@ -3,7 +3,6 @@ import { Info, Store } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { countryFlag } from "@/lib/utils";
-import { productLabel } from "@/lib/trapman/labels";
 import type { AppleSalesData } from "@/lib/trapman/app-store-connect";
 import type { PlaySalesData } from "@/lib/trapman/play-reports";
 import type { StoreSalesSummary } from "@/lib/trapman/store-reports";
@@ -105,60 +104,6 @@ function NotConnected({ children }: { children: ReactNode }) {
   );
 }
 
-function ProductsTable({
-  summary,
-  fx,
-  moneyLabel,
-}: {
-  summary: StoreSalesSummary;
-  fx: FxRates;
-  moneyLabel: string;
-}) {
-  if (summary.products.length === 0) return null;
-  return (
-    <div className="overflow-x-auto">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
-            <th scope="col" className="py-2 pr-4 font-medium">Product</th>
-            <th scope="col" className="py-2 pr-4 font-medium">Units</th>
-            <th scope="col" className="py-2 font-medium">{moneyLabel}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {summary.products.map((p) => {
-            const aud = fx.connected ? convertToAud(p.proceeds, p.currency, fx) : null;
-            return (
-              <tr
-                key={`${p.sku}-${p.currency}`}
-                className="border-b border-border/60 last:border-0"
-              >
-                <td className="py-2 pr-4">
-                  <span className="font-medium">{productLabel(p.sku)}</span>
-                  <Badge variant="outline" className="ml-2 text-[10px] uppercase">
-                    {p.kind === "iap" ? "In-app" : "App"}
-                  </Badge>
-                </td>
-                <td className="py-2 pr-4 font-mono tabular-nums">
-                  {p.units.toLocaleString()}
-                </td>
-                <td className="py-2 font-mono tabular-nums">
-                  {aud !== null ? formatAud(aud) : formatOriginal(p.proceeds, p.currency)}
-                  {aud !== null && p.currency !== "AUD" && (
-                    <span className="ml-2 text-xs text-muted-foreground">
-                      {formatOriginal(p.proceeds, p.currency)}
-                    </span>
-                  )}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
 function Countries({ summary }: { summary: StoreSalesSummary }) {
   if (summary.countries.length === 0) return null;
   return (
@@ -250,7 +195,6 @@ function ApplePanel({ apple, fx }: { apple: AppleSalesData; fx: FxRates }) {
                   : ""}
                 .
               </p>
-              <ProductsTable summary={s} fx={fx} moneyLabel="Proceeds" />
               <Countries summary={s} />
               {apple.sinceLaunch && (
                 <SinceLaunch
@@ -336,7 +280,6 @@ function PlayPanel({ play, fx }: { play: PlaySalesData; fx: FxRates }) {
                 </p>
               )}
 
-              {s && <ProductsTable summary={s} fx={fx} moneyLabel="Sales" />}
               {s && <Countries summary={s} />}
 
               {(play.salesSinceLaunch || play.installsSinceLaunch != null) && (
