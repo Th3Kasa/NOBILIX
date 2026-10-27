@@ -1,4 +1,6 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
+import { getAuthAdmin } from "@/lib/firebase/auth";
 import { getDb } from "@/lib/firebase/firestore";
 import { GAME } from "@/lib/firebase/collections";
 
@@ -7,6 +9,12 @@ export interface TrapManOverview {
   totalPlayers: number | null;
   registeredPlayers: number | null;
   guestPlayers: number | null;
+  /**
+   * Accounts in Firebase Authentication — the "Users" count the Firebase
+   * console shows. Higher than totalPlayers when someone signed in but the
+   * game never saved a profile for them. Null when it couldn't be read.
+   */
+  authAccounts: number | null;
   newPlayers7d: number | null;
   /** null = collection/field not yet confirmed in production schema */
   purchases24h: number | null;
@@ -20,6 +28,24 @@ export interface TrapManOverview {
   unavailable: string[];
 }
 
+
+/** Every Firebase Authentication account, counted a page at a time. */
+async function countAuthAccounts(): Promise<number> {
+  let count = 0;
+  let pageToken: string | undefined;
+  do {
+    const page = await getAuthAdmin().listUsers(1000, pageToken);
+    count += page.users.length;
+    pageToken = page.pageToken;
+  } while (pageToken);
+  return count;
+}
+
+/** 10 minutes: a full account listing is heavier than a Firestore count(). */
+const getAuthAccountCount = unstable_cache(countAuthAccounts, ["trapman-auth-accounts"], {
+  revalidate: 600,
+  tags: ["trapman-console"],
+});
 
 /**
  * Fetches verified live metrics for the TrapMan mission-control overview.
@@ -37,9 +63,10 @@ export async function getTrapManOverview(): Promise<TrapManOverview> {
     const db = getDb();
     const users = db.collection(GAME.users);
 
-    const [total, guests] = await Promise.all([
+    const [total, guests, authAccounts] = await Promise.all([
       users.count().get(),
       users.where("isGuest", "==", true).count().get(),
+      getAuthAccountCount().catch(() => null),
     ]);
 
     const totalPlayers = total.data().count;
@@ -59,6 +86,7 @@ export async function getTrapManOverview(): Promise<TrapManOverview> {
       totalPlayers,
       registeredPlayers: totalPlayers - guestPlayers,
       guestPlayers,
+      authAccounts,
       // The game never writes createdAt, so Firestore cannot count new
       // players; the Overview uses Google Analytics for this instead.
       newPlayers7d: null,
@@ -75,6 +103,7 @@ export async function getTrapManOverview(): Promise<TrapManOverview> {
       totalPlayers: null,
       registeredPlayers: null,
       guestPlayers: null,
+      authAccounts: null,
       newPlayers7d: null,
       purchases24h: null,
       revenue24h: null,

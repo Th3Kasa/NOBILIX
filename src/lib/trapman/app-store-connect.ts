@@ -1,6 +1,7 @@
 import "server-only";
 import { createSign } from "node:crypto";
 import { gunzipSync } from "node:zlib";
+import { unstable_cache } from "next/cache";
 import { getDb } from "@/lib/firebase/firestore";
 import { CRM } from "@/lib/firebase/collections";
 import {
@@ -265,14 +266,7 @@ const emptyAppleSales = (
   ...patch,
 });
 
-/**
- * Apple's own account of iOS sales over the last `days` days.
- *
- * Never throws: a missing key, a rejected key or a rate limit all degrade to
- * `connected: false` with an explanation, so the page renders and says what is
- * wrong instead of going blank.
- */
-export async function getAppleSales(days = 30): Promise<AppleSalesData> {
+async function loadAppleSales(days: number): Promise<AppleSalesData> {
   const creds = readCredentials();
   if (!creds) return emptyAppleSales();
 
@@ -338,4 +332,46 @@ export async function getAppleSales(days = 30): Promise<AppleSalesData> {
     // A partial failure is still worth surfacing alongside the data we have.
     error: failure ?? undefined,
   };
+}
+
+/** A read that failed outright, thrown so the cache below never keeps it. */
+class AppleSalesFailure extends Error {
+  constructor(readonly data: AppleSalesData) {
+    super(data.error ?? "Apple sales unavailable");
+  }
+}
+
+/**
+ * 10 minutes, shared: reports land once a day, and both the Overview and the
+ * Purchases page read them on every auto-refresh — uncached, each refresh
+ * cost ~30 Firestore reads against the quota the game also uses.
+ */
+const loadAppleSalesCached = unstable_cache(
+  async (days: number) => {
+    const data = await loadAppleSales(days);
+    if (data.configured && !data.connected) throw new AppleSalesFailure(data);
+    return data;
+  },
+  ["trapman-apple-sales"],
+  { revalidate: 600, tags: ["trapman-console"] },
+);
+
+/**
+ * Apple's own account of iOS sales over the last `days` days.
+ *
+ * Never throws: a missing key, a rejected key or a rate limit all degrade to
+ * `connected: false` with an explanation, so the page renders and says what is
+ * wrong instead of going blank.
+ */
+export async function getAppleSales(days = 30): Promise<AppleSalesData> {
+  if (!readCredentials()) return emptyAppleSales();
+  try {
+    return await loadAppleSalesCached(days);
+  } catch (err) {
+    if (err instanceof AppleSalesFailure) return err.data;
+    return emptyAppleSales({
+      configured: true,
+      error: err instanceof Error ? err.message : "Could not reach Apple.",
+    });
+  }
 }

@@ -212,7 +212,7 @@ export default async function PurchasesPage({
               hint={`${range.label} · excludes testers`}
             />
             <StatCard
-              label="Real sales"
+              label="In-app purchases"
               value={summary.totalCount}
               icon={ShoppingCart}
               hint={
@@ -222,7 +222,7 @@ export default async function PurchasesPage({
               }
             />
             <StatCard
-              label="Revenue (AUD)"
+              label="In-app purchase sales (AUD)"
               value={formatAudTotal(revenue)}
               icon={Receipt}
               hint={
@@ -230,7 +230,7 @@ export default async function PurchasesPage({
                   ? "No counted sales in this period"
                   : revenue.unconverted.length > 0
                     ? "Some currencies have no exchange rate and are shown as-is"
-                    : `What players paid · today's exchange rate (${fx.asOf})`
+                    : `What players paid for in-app items · excludes the paid download (see the store cards above) · today's exchange rate (${fx.asOf})`
               }
             />
             <StatCard

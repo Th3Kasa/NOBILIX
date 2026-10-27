@@ -5,6 +5,7 @@ import { unstable_cache } from "next/cache";
 import { getDb } from "@/lib/firebase/firestore";
 import { CRM } from "@/lib/firebase/collections";
 import {
+  reportDateRange,
   summariseStoreSales,
   type AppleSalesRow,
   type StoreSalesSummary,
@@ -381,7 +382,12 @@ async function loadPlaySales(): Promise<PlaySalesData> {
 
   const now = Date.now();
   const months = new Set(playMonths(now, MONTHS));
-  const cutoff = new Date(now - PLAY_WINDOW_DAYS * 86_400_000).toISOString().slice(0, 10);
+  // The same 30 complete days, ending yesterday, as the App Store card and
+  // Play Console's own "Last 30 days" — not 31 days running into today.
+  const window = reportDateRange(now, PLAY_WINDOW_DAYS);
+  const first = window[0];
+  const last = window[window.length - 1];
+  const inWindow = (date: string) => date >= first && date <= last;
 
   let objects: (StorageObject & { kind: PlayReportKind; month: string })[];
   try {
@@ -420,9 +426,9 @@ async function loadPlaySales(): Promise<PlaySalesData> {
 
   const installDays = current
     .flatMap((f) => f.installs ?? [])
-    .filter((d) => d.date >= cutoff)
+    .filter((d) => inWindow(d.date))
     .sort((a, b) => a.date.localeCompare(b.date));
-  const saleRows = current.flatMap((f) => f.sales ?? []).filter((r) => r.beginDate >= cutoff);
+  const saleRows = current.flatMap((f) => f.sales ?? []).filter((r) => inWindow(r.beginDate));
   const latestInstall = installDays.at(-1);
 
   return {

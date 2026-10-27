@@ -32,6 +32,8 @@ import {
   type FxRates,
 } from "./fx";
 import { getPurchasesData, summarise } from "./purchases/data";
+import { getAppleSales } from "@/lib/trapman/app-store-connect";
+import { getPlaySales } from "@/lib/trapman/play-reports";
 import { getOverviewWidget, resolveOverviewLayout } from "./overview-widgets";
 import { CustomizeOverview } from "./customize-overview";
 import { ActivityChart } from "./activity-chart";
@@ -44,6 +46,7 @@ const FALLBACK_OVERVIEW: TrapManOverview = {
   totalPlayers: null,
   registeredPlayers: null,
   guestPlayers: null,
+  authAccounts: null,
   newPlayers7d: null,
   purchases24h: null,
   revenue24h: null,
@@ -96,7 +99,7 @@ export default async function TrapManOverviewPage() {
   // source failing unexpectedly (outside its own internal try/catch) still
   // renders the rest of the page — with that panel's own honest
   // "unavailable" state — instead of crashing the whole overview.
-  const [mResult, liveResult, ga4Result, fxResult, session, purchasesResult] =
+  const [mResult, liveResult, ga4Result, fxResult, session, purchasesResult, appleResult, playResult] =
     await Promise.allSettled([
       getTrapManOverview(),
       getLiveMetrics(),
@@ -104,6 +107,8 @@ export default async function TrapManOverviewPage() {
       getAudRates(),
       auth(),
       getPurchasesData(),
+      getAppleSales(30),
+      getPlaySales(),
     ]);
 
   const m = mResult.status === "fulfilled" ? mResult.value : FALLBACK_OVERVIEW;
@@ -147,6 +152,29 @@ export default async function TrapManOverviewPage() {
   const sales = purchases ? summarise(purchases.records) : null;
   const salesAud = sales ? sumInAud(sales.revenueByCurrency, fx) : null;
 
+  // What the stores themselves billed over their last 30 days — paid
+  // downloads and in-app purchases, at the price customers paid. This is the
+  // figure App Store Connect ("Sales") and Play Console show, so it is the one
+  // to read beside them. The game's own records above cover in-app purchases
+  // only, because the game never records the paid download itself.
+  const apple =
+    appleResult.status === "fulfilled" && appleResult.value.connected
+      ? appleResult.value.summary
+      : null;
+  const play =
+    playResult.status === "fulfilled" && playResult.value.connected
+      ? playResult.value.sales
+      : null;
+  const appleSalesAud = apple ? sumInAud(apple.salesByCurrency, fx) : null;
+  const playSalesAud = play ? sumInAud(play.salesByCurrency, fx) : null;
+  const storeSalesAud =
+    appleSalesAud || playSalesAud
+      ? sumInAud(
+          [...(apple?.salesByCurrency ?? []), ...(play?.salesByCurrency ?? [])],
+          fx,
+        )
+      : null;
+
   // GA4 reports in the property's own currency, which it states on the report.
   const ga4RevenueAud =
     fx.connected && ga4.connected
@@ -158,7 +186,17 @@ export default async function TrapManOverviewPage() {
   // the same conditions the old hard-coded sections used.
   const widgetNodes: Record<string, ReactNode | null> = {
     "players-total": (
-      <StatCard key="players-total" label="Total players" value={m.totalPlayers} icon={Users} />
+      <StatCard
+        key="players-total"
+        label="Total players"
+        value={m.totalPlayers}
+        icon={Users}
+        hint={
+          m.authAccounts != null
+            ? `Player profiles saved by the game · ${m.authAccounts.toLocaleString()} accounts in Firebase Authentication`
+            : "Player profiles saved by the game"
+        }
+      />
     ),
     "players-registered": (
       <StatCard
@@ -231,10 +269,23 @@ export default async function TrapManOverviewPage() {
         delta={ga4.engagedSessionsDelta}
       />
     ) : null,
+    "store-sales-30d": storeSalesAud ? (
+      <StatCard
+        key="store-sales-30d"
+        label="Store sales (AUD, last 30 days)"
+        value={formatAudTotal(storeSalesAud)}
+        icon={Receipt}
+        hint={[
+          appleSalesAud ? `App Store ${formatAudTotal(appleSalesAud)}` : "App Store not connected",
+          playSalesAud ? `Google Play ${formatAudTotal(playSalesAud)}` : "Google Play not connected",
+          "downloads + in-app purchases, what customers paid",
+        ].join(" · ")}
+      />
+    ) : null,
     "store-purchases": sales ? (
       <StatCard
         key="store-purchases"
-        label="Real sales (all time)"
+        label="In-app purchases (all time)"
         value={sales.totalCount}
         icon={ShoppingCart}
         hint={`${sales.buyerCount} ${sales.buyerCount === 1 ? "person" : "people"} bought · tests and refunds excluded`}
@@ -243,13 +294,13 @@ export default async function TrapManOverviewPage() {
     "store-revenue-aud": sales && salesAud ? (
       <StatCard
         key="store-revenue-aud"
-        label="Revenue (AUD, all time)"
+        label="In-app purchase sales (AUD, all time)"
         value={formatAudTotal(salesAud)}
         icon={Receipt}
         hint={
           salesAud.unconverted.length > 0
             ? "Some currencies have no exchange rate and are shown as-is"
-            : "What players paid, as recorded by the game · matches Purchases"
+            : "What players paid for in-app items, as recorded by the game · excludes the paid download"
         }
       />
     ) : null,
@@ -320,13 +371,16 @@ export default async function TrapManOverviewPage() {
     "revenue-note":
       sales || ga4.connected ? (
         <p key="revenue-note" className="mb-6 text-xs text-muted-foreground">
-          <strong className="text-foreground">Revenue</strong> is what players
-          paid, from the purchases the game saved, with tests and refunds taken
-          out — the same figure as the Purchases page.{" "}
-          <strong className="text-foreground">Google Analytics revenue</strong>{" "}
-          also counts ad income and covers only the last 30 days. For the
-          stores&apos; official numbers after their fees, see the App Store and
-          Google Play cards on the Purchases page.
+          <strong className="text-foreground">Store sales</strong> is what
+          Apple and Google billed customers over their last 30 complete days —
+          the paid download plus in-app purchases — the same figures App Store
+          Connect and Play Console show.{" "}
+          <strong className="text-foreground">In-app purchase sales</strong>{" "}
+          comes from the purchases the game saved and leaves out the download
+          itself. Other currencies are converted to AUD at today&apos;s
+          reference rate, so they can differ by a few cents from the
+          stores&apos; own conversion. For earnings after the stores&apos; fees,
+          see the Purchases page.
         </p>
       ) : null,
     "activity-30d": (

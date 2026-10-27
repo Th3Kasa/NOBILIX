@@ -192,6 +192,46 @@ test("app updates are reported by Apple but never counted as sales", () => {
   assert.equal(s.daily.reduce((n, d) => n + d.appUnits, 0), 10);
 });
 
+test("re-downloads are free and left out of downloads, as App Store Connect does", () => {
+  // TrapMan's real October report: 224 first-time downloads (1F) and 31
+  // re-downloads (3F) at zero proceeds. App Store Connect's Units is 224;
+  // counting both had the console showing 255.
+  assert.equal(classifyProductType("3"), "redownload");
+  assert.equal(classifyProductType("3F"), "redownload");
+  assert.equal(classifyProductType("3T"), "redownload");
+  const s = summariseStoreSales(
+    parseAppleSalesReport(
+      report(
+        row({ productType: "1F", sku: "trapman", units: "224", proceeds: "0.63" }),
+        row({ productType: "3F", sku: "trapman", units: "31", proceeds: "0", customerPrice: "0" }),
+      ),
+    ),
+  );
+  assert.equal(s.appUnits, 224);
+  assert.equal(s.redownloadUnits, 31);
+  assert.equal(s.products.length, 1);
+  assert.equal(s.products[0].units, 224, "the product row matches App Store Connect too");
+});
+
+test("sales are what customers paid, kept apart from proceeds", () => {
+  // App Store Connect's Sales and Trends shows Sales (customer price) by
+  // default; proceeds are what is left after Apple's commission.
+  const s = summariseStoreSales(
+    parseAppleSalesReport(
+      report(
+        row({ productType: "1F", units: "10", proceeds: "0.63", customerPrice: "0.99" }),
+        row({ productType: "IA1", units: "4", proceeds: "0.57", customerPrice: "0.99", customerCurrency: "GBP", proceedsCurrency: "GBP", country: "GB" }),
+        row({ productType: "IA1", units: "-1", proceeds: "0.63", customerPrice: "0.99" }),
+      ),
+    ),
+  );
+  const sales = Object.fromEntries(s.salesByCurrency.map((x) => [x.currency, x.total]));
+  const proceeds = Object.fromEntries(s.proceedsByCurrency.map((x) => [x.currency, x.total]));
+  assert.ok(Math.abs(sales.AUD - 9 * 0.99) < 1e-9, "refunds come off sales too");
+  assert.ok(Math.abs(sales.GBP - 4 * 0.99) < 1e-9);
+  assert.ok(Math.abs(proceeds.AUD - 9 * 0.63) < 1e-9);
+});
+
 test("downloads and in-app purchases are counted separately", () => {
   const s = summariseStoreSales(
     parseAppleSalesReport(

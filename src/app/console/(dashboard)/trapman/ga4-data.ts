@@ -42,7 +42,7 @@ export interface Ga4DailyActivity {
 
 export interface Ga4Snapshot {
   connected: boolean;
-  /** Rolling active-user windows (last 30-day report range) */
+  /** Distinct active users: today so far, and the last 7 / 28 complete days. */
   activeUsers1d: number;
   activeUsers7d: number;
   activeUsers28d: number;
@@ -145,7 +145,7 @@ function formatGa4Date(raw: string | undefined): string {
 
 function findByDateRange(
   report: ReportResult,
-  key: "date_range_0" | "date_range_1",
+  key: `date_range_${number}`,
 ): ReportRow | undefined {
   return report.rows?.find((r) => r.dimensionValues?.[0]?.value === key);
 }
@@ -190,10 +190,12 @@ async function fetchGa4Snapshot(): Promise<Ga4Snapshot> {
   };
 
   try {
-    // GA4 date ranges include both ends and "today" counts as a day, so
-    // "30daysAgo"→"today" is 31 days. These are exactly 30 and 7 days, the
-    // windows the cards' labels promise.
-    const last30 = [{ startDate: "29daysAgo", endDate: "today" }];
+    // The windows Firebase's and Google Analytics' own dashboards mean by
+    // "Last 7 / 28 / 30 days": that many complete days, ending yesterday.
+    // Including today's half-finished day made every card drift from the
+    // Firebase console it is meant to be read beside.
+    const last30 = [{ startDate: "30daysAgo", endDate: "yesterday" }];
+    const last7 = { startDate: "7daysAgo", endDate: "yesterday" };
     const [
       activity,
       events,
@@ -205,14 +207,18 @@ async function fetchGa4Snapshot(): Promise<Ga4Snapshot> {
       engagementDeltaReport,
       adEventsReport,
     ] = await batchRunReports([
+      // Distinct users per window, one date range each. active7DayUsers and
+      // friends are per-day rolling counts: asked for over a 30-day range
+      // with no date dimension, Google adds up all 30 days of them, which put
+      // "3,603 active this week" on a game 1,100 people have ever opened.
       {
-        dateRanges: last30,
-        metrics: [
-          { name: "active1DayUsers" },
-          { name: "active7DayUsers" },
-          { name: "active28DayUsers" },
-          { name: "totalUsers" },
+        dateRanges: [
+          { startDate: "today", endDate: "today" },
+          last7,
+          { startDate: "28daysAgo", endDate: "yesterday" },
+          last30[0],
         ],
+        metrics: [{ name: "activeUsers" }, { name: "totalUsers" }],
       },
       {
         dateRanges: last30,
@@ -238,12 +244,12 @@ async function fetchGa4Snapshot(): Promise<Ga4Snapshot> {
         limit: 8,
       },
       {
-        dateRanges: [{ startDate: "6daysAgo", endDate: "today" }],
+        dateRanges: [last7],
         metrics: [{ name: "newUsers" }],
       },
       // Daily active-user counts for the overview's activity chart.
       {
-        dateRanges: [{ startDate: "29daysAgo", endDate: "today" }],
+        dateRanges: last30,
         dimensions: [{ name: "date" }],
         metrics: [{ name: "activeUsers" }],
         orderBys: [{ dimension: { dimensionName: "date" } }],
@@ -257,18 +263,12 @@ async function fetchGa4Snapshot(): Promise<Ga4Snapshot> {
       // whole batch fails and every GA4 number in the console goes dark.
       // findByDateRange() reads the auto-appended value.
       {
-        dateRanges: [
-          { startDate: "6daysAgo", endDate: "today" },
-          { startDate: "13daysAgo", endDate: "7daysAgo" },
-        ],
-        metrics: [{ name: "active7DayUsers" }],
+        dateRanges: [last7, { startDate: "14daysAgo", endDate: "8daysAgo" }],
+        metrics: [{ name: "activeUsers" }],
       },
       // Same comparison pattern for the 30-day commerce/engagement metrics.
       {
-        dateRanges: [
-          { startDate: "29daysAgo", endDate: "today" },
-          { startDate: "59daysAgo", endDate: "30daysAgo" },
-        ],
+        dateRanges: [last30[0], { startDate: "60daysAgo", endDate: "31daysAgo" }],
         metrics: [
           { name: "totalRevenue" },
           { name: "averageSessionDuration" },
@@ -300,7 +300,7 @@ async function fetchGa4Snapshot(): Promise<Ga4Snapshot> {
         0,
       );
 
-    const activityRow = activity.rows?.[0];
+    const activityIn = (i: number) => findByDateRange(activity, `date_range_${i}`);
     const commerceRow = commerce.rows?.[0];
 
     const dailyActivity: Ga4DailyActivity[] = (dailyActivityReport.rows ?? []).map(
@@ -324,10 +324,10 @@ async function fetchGa4Snapshot(): Promise<Ga4Snapshot> {
 
     return {
       connected: true,
-      activeUsers1d: num(activityRow, 0),
-      activeUsers7d: num(activityRow, 1),
-      activeUsers28d: num(activityRow, 2),
-      totalUsers30d: num(activityRow, 3),
+      activeUsers1d: num(activityIn(0), 0),
+      activeUsers7d: num(activityIn(1), 0),
+      activeUsers28d: num(activityIn(2), 0),
+      totalUsers30d: num(activityIn(3), 1),
       newUsers7d: num(acquisition.rows?.[0], 0),
       events: eventCounts,
       adClicked30d: adEventCount("ad_clicked"),

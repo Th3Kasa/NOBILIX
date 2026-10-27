@@ -184,7 +184,7 @@ function ApplePanel({ apple, fx }: { apple: AppleSalesData; fx: FxRates }) {
     <StoreCard
       title="App Store (iPhone)"
       badge={apple.latestReportDate ? `through ${apple.latestReportDate}` : null}
-      note="Last 30 days, from Apple's daily sales reports (about a day behind). Earnings are after Apple's commission and already net of refunds; sandbox and TestFlight purchases are never included."
+      note="Last 30 complete days, from Apple's daily sales reports (about a day behind) — the same figures as Sales and Trends in App Store Connect. Downloads are first-time downloads only, as App Store Connect counts Units. Sales is what customers paid; proceeds are after Apple's commission. Sandbox and TestFlight purchases are never included."
     >
       {!apple.configured ? (
         <NotConnected>
@@ -203,11 +203,20 @@ function ApplePanel({ apple, fx }: { apple: AppleSalesData; fx: FxRates }) {
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                 <Tile label="Downloads">{s.appUnits.toLocaleString()}</Tile>
                 <Tile label="In-app purchases">{s.iapUnits.toLocaleString()}</Tile>
-                <Tile label="Your earnings">
+                <Tile label="Sales">
+                  <Money amounts={s.salesByCurrency} fx={fx} />
+                </Tile>
+                <Tile label="Proceeds">
                   <Money amounts={s.proceedsByCurrency} fx={fx} />
                 </Tile>
-                <Tile label="Refunded">{s.refundedUnits.toLocaleString()}</Tile>
               </div>
+              <p className="text-xs text-muted-foreground">
+                {s.refundedUnits.toLocaleString()} refunded
+                {s.redownloadUnits > 0
+                  ? ` · ${s.redownloadUnits.toLocaleString()} free re-downloads by people who already own the game, not counted`
+                  : ""}
+                .
+              </p>
               <ProductsTable summary={s} fx={fx} moneyLabel="Earnings" />
               <Countries summary={s} />
             </>
@@ -228,7 +237,7 @@ function PlayPanel({ play, fx }: { play: PlaySalesData; fx: FxRates }) {
     <StoreCard
       title="Google Play (Android)"
       badge={latest ? `through ${latest}` : null}
-      note="Downloads and sales cover the last 30 days and run 2–7 days behind. Sales are what buyers paid, before Google's fee and tax; payouts are what Google actually pays, published once each month closes."
+      note="Installs and sales cover the last 30 complete days and run 2–7 days behind. Sales are what buyers paid, before Google's fee; payouts are what Google actually pays, published once each month closes."
     >
       {!play.configured ? (
         <NotConnected>
@@ -251,30 +260,26 @@ function PlayPanel({ play, fx }: { play: PlaySalesData; fx: FxRates }) {
                 <Tile label="New installs">
                   {play.installs ? play.installs.newUsers.toLocaleString() : "—"}
                 </Tile>
+                <Tile label="Paid downloads">
+                  {s ? s.appUnits.toLocaleString() : "0"}
+                </Tile>
                 <Tile label="In-app purchases">
                   {s ? s.iapUnits.toLocaleString() : "0"}
                 </Tile>
                 <Tile label="Sales (before fees)">
-                  {s ? <Money amounts={s.proceedsByCurrency} fx={fx} /> : formatAud(0)}
+                  {s ? <Money amounts={s.salesByCurrency} fx={fx} /> : formatAud(0)}
                 </Tile>
-                <Tile label="Refunded">{s ? s.refundedUnits.toLocaleString() : "0"}</Tile>
               </div>
 
               {play.installs && (
                 <p className="text-xs text-muted-foreground">
+                  {s ? `${s.refundedUnits.toLocaleString()} refunded · ` : ""}
                   {play.installs.uninstalls.toLocaleString()} uninstalls in the
                   same period
                   {play.installs.activeDevices
                     ? ` · installed on ${play.installs.activeDevices.toLocaleString()} devices as of ${play.installs.latestDate}`
                     : ""}
                   .
-                </p>
-              )}
-
-              {s && s.appUnits > 0 && (
-                <p className="text-xs text-muted-foreground">
-                  Includes {s.appUnits.toLocaleString()} paid download
-                  {s.appUnits === 1 ? "" : "s"}.
                 </p>
               )}
 

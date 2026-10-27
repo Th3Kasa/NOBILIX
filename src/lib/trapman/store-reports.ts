@@ -66,6 +66,12 @@ export type StoreSaleKind =
   | "app"
   /** An update to an already-installed app — not a new customer. */
   | "update"
+  /**
+   * A customer downloading again an app they already own (a new phone, a
+   * reinstall). Free, and not a sale: App Store Connect leaves these out of
+   * its Units figure, so counting them inflated "Downloads".
+   */
+  | "redownload"
   /** An in-app purchase. */
   | "iap";
 
@@ -74,14 +80,15 @@ export type StoreSaleKind =
  *
  * Apple publishes a long and occasionally-extended list of codes. Rather than
  * enumerate every one — and silently misfile anything new — this keys on the
- * documented prefixes: `IA…`/`FI…` are in-app purchases, `7…` are updates, and
- * everything else is an app download. A code Apple adds tomorrow lands in the
+ * documented prefixes: `IA…`/`FI…` are in-app purchases, `7…` are updates,
+ * `3…` are re-downloads, and everything else is an app download. A code Apple adds tomorrow lands in the
  * right bucket instead of being dropped.
  */
 export function classifyProductType(identifier: string): StoreSaleKind {
   const id = identifier.trim().toUpperCase();
   if (id.startsWith("IA") || id.startsWith("FI")) return "iap";
   if (id.startsWith("7")) return "update";
+  if (id.startsWith("3")) return "redownload";
   return "app";
 }
 
@@ -163,6 +170,9 @@ export interface StoreProductSales {
   units: number;
   proceeds: number;
   currency: string;
+  /** What customers paid, in `salesCurrency`. */
+  sales: number;
+  salesCurrency: string;
 }
 
 export interface StoreCountrySales {
@@ -184,10 +194,17 @@ export interface StoreSalesSummary {
   iapUnits: number;
   /** App updates — reported by Apple but never counted as sales. */
   updateUnits: number;
+  /** Re-downloads by existing owners — free, and never counted as sales. */
+  redownloadUnits: number;
   /** Units returned: the negative rows, as a positive number. */
   refundedUnits: number;
   /** Developer proceeds, per currency of proceeds. */
   proceedsByCurrency: { currency: string; total: number }[];
+  /**
+   * What customers paid, per customer currency — App Store Connect's "Sales"
+   * measure. Tax-inclusive wherever the store's prices are (Australia is).
+   */
+  salesByCurrency: { currency: string; total: number }[];
   products: StoreProductSales[];
   countries: StoreCountrySales[];
   daily: StoreDailySales[];
@@ -208,9 +225,11 @@ export function summariseStoreSales(rows: AppleSalesRow[]): StoreSalesSummary {
   let appUnits = 0;
   let iapUnits = 0;
   let updateUnits = 0;
+  let redownloadUnits = 0;
   let refundedUnits = 0;
 
   const proceedsMap = new Map<string, number>();
+  const salesMap = new Map<string, number>();
   const productMap = new Map<string, StoreProductSales>();
   const countryMap = new Map<string, number>();
   const dailyMap = new Map<string, StoreDailySales>();
@@ -221,12 +240,14 @@ export function summariseStoreSales(rows: AppleSalesRow[]): StoreSalesSummary {
 
     if (kind === "app") appUnits += row.units;
     else if (kind === "iap") iapUnits += row.units;
+    else if (kind === "redownload") redownloadUnits += row.units;
     else updateUnits += row.units;
 
-    if (row.units < 0) refundedUnits += Math.abs(row.units);
+    // Updates and re-downloads are neither revenue nor a sale; they must not
+    // reach any total.
+    if (kind === "update" || kind === "redownload") continue;
 
-    // Updates are neither revenue nor a sale; they must not reach any total.
-    if (kind === "update") continue;
+    if (row.units < 0) refundedUnits += Math.abs(row.units);
 
     if (row.beginDate) dates.add(row.beginDate);
 
@@ -237,8 +258,12 @@ export function summariseStoreSales(rows: AppleSalesRow[]): StoreSalesSummary {
         (proceedsMap.get(row.currencyOfProceeds) ?? 0) + proceeds,
       );
     }
+    const sales = row.units * row.customerPrice;
+    if (sales !== 0 && row.customerCurrency) {
+      salesMap.set(row.customerCurrency, (salesMap.get(row.customerCurrency) ?? 0) + sales);
+    }
 
-    const key = `${row.sku}::${row.currencyOfProceeds}`;
+    const key = `${row.sku}::${row.currencyOfProceeds}::${row.customerCurrency}`;
     const product =
       productMap.get(key) ??
       ({
@@ -248,9 +273,12 @@ export function summariseStoreSales(rows: AppleSalesRow[]): StoreSalesSummary {
         units: 0,
         proceeds: 0,
         currency: row.currencyOfProceeds,
+        sales: 0,
+        salesCurrency: row.customerCurrency,
       } satisfies StoreProductSales);
     product.units += row.units;
     product.proceeds += proceeds;
+    product.sales += sales;
     productMap.set(key, product);
 
     if (row.countryCode) {
@@ -280,8 +308,12 @@ export function summariseStoreSales(rows: AppleSalesRow[]): StoreSalesSummary {
     appUnits,
     iapUnits,
     updateUnits,
+    redownloadUnits,
     refundedUnits,
     proceedsByCurrency: [...proceedsMap.entries()]
+      .map(([currency, total]) => ({ currency, total }))
+      .sort((a, b) => b.total - a.total),
+    salesByCurrency: [...salesMap.entries()]
       .map(([currency, total]) => ({ currency, total }))
       .sort((a, b) => b.total - a.total),
     products: [...productMap.values()].sort((a, b) => b.units - a.units),
