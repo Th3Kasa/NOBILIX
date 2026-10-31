@@ -104,7 +104,8 @@ export default async function UserDetailPage({
                   : "—"
               }
             />
-            <Field label="Character" value={user.character ?? "—"} />
+            {/* Only once the game starts saving the chosen character. */}
+            {user.character && <Field label="Character" value={user.character} />}
             <Field
               label="Highest level reached"
               value={

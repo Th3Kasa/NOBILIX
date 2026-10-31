@@ -77,6 +77,10 @@ export function LeaderboardTable({
     );
   }, [entries, query]);
 
+  // The game doesn't record which character a player uses yet, so the column
+  // would be a wall of dashes. It appears by itself once any entry has one.
+  const showCharacter = entries.some((e) => e.character);
+
   const visibleSelectedCount = visible.filter((e) => selected.has(e.uid)).length;
   const allVisibleSelected =
     visible.length > 0 && visibleSelectedCount === visible.length;
@@ -212,7 +216,9 @@ export function LeaderboardTable({
               <th scope="col" className="w-14 px-3 py-3">#</th>
               <th scope="col" className="px-3 py-3">Player</th>
               <th scope="col" className="hidden px-3 py-3 sm:table-cell">Country</th>
-              <th scope="col" className="hidden px-3 py-3 md:table-cell">Character</th>
+              {showCharacter && (
+                <th scope="col" className="hidden px-3 py-3 md:table-cell">Character</th>
+              )}
               <th scope="col" className="px-3 py-3 text-right">Score</th>
               {canWrite && <th scope="col" className="w-36 px-3 py-3" />}
             </tr>
@@ -221,7 +227,7 @@ export function LeaderboardTable({
             {visible.length === 0 ? (
               <tr>
                 <td
-                  colSpan={canWrite ? 7 : 5}
+                  colSpan={(canWrite ? 6 : 4) + (showCharacter ? 1 : 0)}
                   className="px-5 py-10 text-center text-sm text-muted-foreground"
                 >
                   No entries {canSearchAll ? `in the top ${entries.length} ` : ""}match &ldquo;{query}&rdquo;.
@@ -299,9 +305,11 @@ export function LeaderboardTable({
                         <span className="text-xs">—</span>
                       )}
                     </td>
-                    <td className="hidden px-3 py-3 text-xs text-muted-foreground md:table-cell">
-                      {entry.character ?? "—"}
-                    </td>
+                    {showCharacter && (
+                      <td className="hidden px-3 py-3 text-xs text-muted-foreground md:table-cell">
+                        {entry.character ?? "—"}
+                      </td>
+                    )}
                     <td className="px-3 py-3 text-right font-mono font-semibold tabular-nums">
                       {entry.score.toLocaleString()}
                     </td>
