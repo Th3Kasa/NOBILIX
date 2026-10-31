@@ -29,6 +29,7 @@ export interface OverviewWidgetDef {
 }
 
 export const OVERVIEW_WIDGETS: OverviewWidgetDef[] = [
+  { id: "live-players", name: "Playing right now", section: "Activity", kind: "table", source: "ga4" },
   { id: "players-total", name: "Total players", section: "Players", kind: "stat", source: "firestore" },
   { id: "players-registered", name: "Signed-up players", section: "Players", kind: "stat", source: "firestore" },
   { id: "players-guests", name: "Guest players", section: "Players", kind: "stat", source: "firestore" },
@@ -52,20 +53,23 @@ export function getOverviewWidget(id: string): OverviewWidgetDef | undefined {
 }
 
 /**
- * Merge saved prefs with the registry: unknown saved ids are dropped,
- * widgets added after the prefs were saved appear at the end, visible —
- * so every admin sees new widgets by default without a migration.
+ * Merge saved prefs with the registry: unknown saved ids are dropped, and
+ * widgets added after the prefs were saved appear, visible, at their place in
+ * the registry (just after the widget that precedes them there) — so every
+ * admin sees a new widget where it was designed to sit, without a migration.
  */
 export function resolveOverviewLayout(prefs: OverviewPrefs | null | undefined): {
   order: string[];
   hidden: Set<string>;
 } {
-  const savedOrder = (prefs?.order ?? []).filter((id) => WIDGETS_BY_ID.has(id));
-  const seen = new Set(savedOrder);
-  const order = [
-    ...savedOrder,
-    ...OVERVIEW_WIDGET_IDS.filter((id) => !seen.has(id)),
-  ];
+  const order = (prefs?.order ?? []).filter((id) => WIDGETS_BY_ID.has(id));
+  const seen = new Set(order);
+  OVERVIEW_WIDGET_IDS.forEach((id, index) => {
+    if (seen.has(id)) return;
+    const previous = OVERVIEW_WIDGET_IDS.slice(0, index).reverse().find((p) => seen.has(p));
+    order.splice(previous ? order.indexOf(previous) + 1 : 0, 0, id);
+    seen.add(id);
+  });
   const hidden = new Set(
     (prefs?.hidden ?? []).filter((id) => WIDGETS_BY_ID.has(id)),
   );

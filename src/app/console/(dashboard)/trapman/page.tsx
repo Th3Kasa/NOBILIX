@@ -21,6 +21,8 @@ import { getAdminById } from "@/lib/admins";
 import { getTrapManOverview, type TrapManOverview } from "@/lib/trapman/overview";
 import { getLiveMetrics, type LiveMetrics } from "./live-metrics";
 import { getGa4Snapshot, type Ga4Snapshot } from "./ga4-data";
+import { getLivePlayers, type LivePlayers } from "./live-players";
+import { LivePlayersCard } from "./live-players-card";
 import {
   getAudRates,
   formatAudTotal,
@@ -85,6 +87,19 @@ const FALLBACK_GA4: Ga4Snapshot = {
   error: "Panel failed to load",
 };
 
+const FALLBACK_LIVE_PLAYERS: LivePlayers = {
+  connected: false,
+  fetchedAt: 0,
+  now: 0,
+  last30: 0,
+  perMinute: [],
+  countries: [],
+  platforms: [],
+  newInstalls30: 0,
+  purchases30: 0,
+  error: "Panel failed to load",
+};
+
 const FALLBACK_FX: FxRates = {
   connected: false,
   audTo: {},
@@ -97,7 +112,7 @@ export default async function TrapManOverviewPage() {
   // source failing unexpectedly (outside its own internal try/catch) still
   // renders the rest of the page — with that panel's own honest
   // "unavailable" state — instead of crashing the whole overview.
-  const [mResult, liveResult, ga4Result, fxResult, session, purchasesResult, appleResult, playResult] =
+  const [mResult, liveResult, ga4Result, fxResult, session, purchasesResult, appleResult, playResult, livePlayersResult] =
     await Promise.allSettled([
       getTrapManOverview(),
       getLiveMetrics(),
@@ -107,12 +122,15 @@ export default async function TrapManOverviewPage() {
       getPurchasesData(),
       getAppleSales(30),
       getPlaySales(),
+      getLivePlayers(),
     ]);
 
   const m = mResult.status === "fulfilled" ? mResult.value : FALLBACK_OVERVIEW;
   const live = liveResult.status === "fulfilled" ? liveResult.value : FALLBACK_LIVE;
   const ga4 = ga4Result.status === "fulfilled" ? ga4Result.value : FALLBACK_GA4;
   const fx = fxResult.status === "fulfilled" ? fxResult.value : FALLBACK_FX;
+  const livePlayers =
+    livePlayersResult.status === "fulfilled" ? livePlayersResult.value : FALLBACK_LIVE_PLAYERS;
 
   // Every admin arranges their own overview; the layout lives on their
   // admin record and only ever changes for them.
@@ -180,6 +198,9 @@ export default async function TrapManOverviewPage() {
   // to show right now (its data source is not connected) and is skipped —
   // the same conditions the old hard-coded sections used.
   const widgetNodes: Record<string, ReactNode | null> = {
+    // Always rendered: its own card explains when Google can't be reached,
+    // and it keeps retrying in the browser.
+    "live-players": <LivePlayersCard key="live-players" initial={livePlayers} />,
     "players-total": (
       <StatCard
         key="players-total"

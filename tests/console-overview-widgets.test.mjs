@@ -23,6 +23,7 @@ test("overview widget registry exists with unique kebab-case ids", () => {
   // of other pages (GA4 revenue, the two in-app purchase cards, the 30-day
   // store sales card, highest level) were removed deliberately.
   assert.deepEqual(ids, [
+    "live-players",
     "players-total",
     "players-registered",
     "players-guests",

@@ -21,7 +21,7 @@ import type { StatDelta } from "@/components/stat-card";
 // Read lazily (function, not module constant): touching the `env` proxy
 // validates the full schema, which must not happen at build time on
 // machines without secrets.
-const ga4PropertyId = () => env.GA4_PROPERTY_ID ?? "540977563";
+export const ga4PropertyId = () => env.GA4_PROPERTY_ID ?? "540977563";
 const ANALYTICS_SCOPE = "https://www.googleapis.com/auth/analytics.readonly";
 
 export interface Ga4EventCount {
@@ -75,7 +75,7 @@ export interface Ga4Snapshot {
 
 let jwtClient: JWT | null = null;
 
-function getJwtClient(): JWT {
+export function getJwtClient(): JWT {
   if (jwtClient) return jwtClient;
   const b64 = process.env.FIREBASE_SERVICE_ACCOUNT_B64;
   if (!b64) {
