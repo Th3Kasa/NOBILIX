@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { LocalTime } from "@/components/console/local-time";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Bell, BellOff } from "lucide-react";
+import { ArrowLeft, Bell, BellOff, Receipt } from "lucide-react";
 import { auth } from "@/auth";
 import { getUser, getAccountCreatedAt } from "@/lib/users";
 import { getLeaderboardScore } from "@/lib/leaderboard";
@@ -12,7 +12,18 @@ import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { countryFlag, formatNumber } from "@/lib/utils";
 import { classifyPlayerEmail } from "@/lib/trapman/player-email";
+import { productLabel, platformLabel } from "@/lib/trapman/labels";
 import { UserActions } from "./user-actions";
+import { getPurchasesData, summarise } from "../../purchases/data";
+import { EXCLUSION_COPY, VERDICT_BADGE } from "../../purchases/copy";
+import {
+  getAudRates,
+  convertToAud,
+  formatAud,
+  formatAudTotal,
+  formatOriginal,
+  sumInAud,
+} from "../../fx";
 
 export const dynamic = "force-dynamic";
 
@@ -31,11 +42,15 @@ export default async function UserDetailPage({
   params: Promise<{ uid: string }>;
 }) {
   const { uid } = await params;
-  const [user, session, leaderboardScore, createdAt] = await Promise.all([
+  const [user, session, leaderboardScore, createdAt, purchasesData, fx] = await Promise.all([
     getUser(uid),
     auth(),
     getLeaderboardScore(uid),
     getAccountCreatedAt(uid),
+    // The Purchases page's own classified records (cached, shared), so a
+    // purchase reads the same here as there — counted, test, refunded…
+    getPurchasesData(),
+    getAudRates(),
   ]);
   if (!user) notFound();
 
@@ -47,6 +62,15 @@ export default async function UserDetailPage({
   // The same field rules every other tab uses (see player-fields), so this
   // page can't show a different level, name or status than the Players list.
   const player = readPlayerFields(user as unknown as Record<string, unknown>);
+
+  const purchases = summarise(
+    purchasesData.records.filter((r) => r.buyerUid === uid),
+  );
+  const spent = sumInAud(purchases.revenueByCurrency, fx);
+  const aud = (amount: number, currency: string) => {
+    const converted = fx.connected ? convertToAud(amount, currency, fx) : null;
+    return converted != null ? formatAud(converted) : formatOriginal(amount, currency);
+  };
 
   return (
     <>
@@ -185,6 +209,94 @@ export default async function UserDetailPage({
           />
         </div>
       </div>
+
+      <Card className="console-glass mt-6">
+        <CardHeader>
+          <CardTitle className="flex flex-wrap items-center gap-2">
+            <Receipt className="size-4 text-[var(--console-violet)]" aria-hidden="true" />
+            Purchases
+            {purchases.all.length > 0 && (
+              <span className="ml-auto text-sm font-normal text-muted-foreground">
+                {purchases.totalCount} counted · {formatAudTotal(spent)} spent
+                {purchases.excludedTotal > 0 && ` · ${purchases.excludedTotal} not counted`}
+              </span>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="pt-0">
+          {!purchasesData.connected ? (
+            <p className="text-sm text-muted-foreground">
+              Purchases couldn&apos;t be loaded right now.
+            </p>
+          ) : purchases.all.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              This player hasn&apos;t bought anything.
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border text-left text-xs uppercase tracking-wide text-muted-foreground">
+                    <th scope="col" className="py-2 pr-4 font-medium">Product</th>
+                    <th scope="col" className="py-2 pr-4 font-medium">Price (AUD)</th>
+                    <th scope="col" className="py-2 pr-4 font-medium">Platform</th>
+                    <th scope="col" className="py-2 pr-4 font-medium">Counted?</th>
+                    <th scope="col" className="py-2 font-medium">When</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {purchases.all.map((p) => {
+                    const badge = VERDICT_BADGE[p.verification.verdict];
+                    return (
+                      <tr
+                        key={p.purchaseId}
+                        className="border-b border-border/60 last:border-0 hover:bg-accent/40"
+                      >
+                        <td className="py-2.5 pr-4">
+                          <div className="font-medium">{productLabel(p.productId)}</div>
+                          <div className="font-mono text-[11px] text-muted-foreground">
+                            {p.productId}
+                          </div>
+                        </td>
+                        <td className="py-2.5 pr-4 font-mono tabular-nums">
+                          {aud(p.price, p.currency)}
+                          {p.currency !== "AUD" && (
+                            <span className="ml-1.5 text-[11px] text-muted-foreground">
+                              {formatOriginal(p.price, p.currency)}
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-2.5 pr-4 text-xs">{platformLabel(p.platform)}</td>
+                        <td className="py-2.5 pr-4">
+                          {p.exclusion ? (
+                            <span
+                              className="text-xs text-muted-foreground"
+                              title={EXCLUSION_COPY[p.exclusion].detail}
+                            >
+                              {EXCLUSION_COPY[p.exclusion].label}
+                            </span>
+                          ) : (
+                            <Badge
+                              variant={badge.variant}
+                              className="font-mono text-[10px] uppercase"
+                              title={p.verification.reason ?? undefined}
+                            >
+                              {badge.label}
+                            </Badge>
+                          )}
+                        </td>
+                        <td className="py-2.5 font-mono text-xs tabular-nums text-muted-foreground">
+                          <LocalTime ms={p.timestamp} variant="datetime" />
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </>
   );
 }
