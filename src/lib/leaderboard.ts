@@ -94,6 +94,35 @@ export async function listLeaderboard(
   }
 }
 
+/**
+ * Every entry on the board whose name, player ID or country contains `query`,
+ * with its true rank.
+ *
+ * The standings page loads only the top 100, so a player further down could
+ * not be found at all. This reads the whole board once, on demand — never on
+ * the page's auto-refresh unless a search is active — because Firestore has no
+ * case-insensitive "contains" query to do it more cheaply.
+ */
+export async function searchLeaderboard(
+  query: string,
+): Promise<ListLeaderboardResult> {
+  const all = await listLeaderboard(SEARCH_SCAN_CAP, 0);
+  const q = query.trim().toLowerCase();
+  if (!all.connected || !q) return all;
+  return {
+    ...all,
+    entries: all.entries.filter(
+      (e) =>
+        e.uid.toLowerCase().includes(q) ||
+        (e.displayName ?? "").toLowerCase().includes(q) ||
+        (e.country ?? "").toLowerCase().includes(q),
+    ),
+  };
+}
+
+/** Entries one search reads; far above today's board, bounded all the same. */
+const SEARCH_SCAN_CAP = 2000;
+
 // ─── Event boards ────────────────────────────────────────────────────────────
 
 export interface EventBoard {

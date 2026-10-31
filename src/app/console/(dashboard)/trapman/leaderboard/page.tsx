@@ -1,9 +1,11 @@
+import Link from "next/link";
 import { auth } from "@/auth";
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
 import { formatNumber } from "@/lib/utils";
 import {
   listLeaderboard,
+  searchLeaderboard,
   listEventBoards,
   getCompetitionHistory,
 } from "@/lib/leaderboard";
@@ -18,7 +20,12 @@ import { LeaderboardTable } from "./leaderboard-table";
 
 export const dynamic = "force-dynamic";
 
-export default async function LeaderboardPage() {
+export default async function LeaderboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
+  const search = ((await searchParams).q ?? "").trim().slice(0, 60);
   const [
     session,
     { entries, totalCount, connected, error },
@@ -27,7 +34,8 @@ export default async function LeaderboardPage() {
     prizeStatuses,
   ] = await Promise.all([
     auth(),
-    listLeaderboard(100, 0),
+    // A search looks through the whole board; otherwise the top 100.
+    search ? searchLeaderboard(search) : listLeaderboard(100, 0),
     // Enough history for the winners list to span many competitions.
     getCompetitionHistory(50),
     listEventBoards(),
@@ -133,7 +141,27 @@ export default async function LeaderboardPage() {
             )}
           </div>
 
-          {entries.length === 0 ? (
+          {search && (
+            <div className="flex flex-wrap items-center gap-3 border-b border-border bg-[var(--console-violet-tint)] px-5 py-3 text-sm">
+              <span>
+                {entries.length} player{entries.length === 1 ? "" : "s"} matching{" "}
+                <strong>&ldquo;{search}&rdquo;</strong> across all{" "}
+                {formatNumber(totalCount)} on the board
+              </span>
+              <Link
+                href="/console/trapman/leaderboard"
+                className="ml-auto text-sm font-medium text-[var(--console-violet)] hover:underline"
+              >
+                Clear search
+              </Link>
+            </div>
+          )}
+
+          {entries.length === 0 && search ? (
+            <p className="px-5 py-12 text-center text-sm text-muted-foreground">
+              No player on the board matches &ldquo;{search}&rdquo;.
+            </p>
+          ) : entries.length === 0 ? (
             <div className="console-empty-state">
               <p className="relative px-5 py-12 text-center text-sm text-muted-foreground">
                 {connected
@@ -142,10 +170,17 @@ export default async function LeaderboardPage() {
               </p>
             </div>
           ) : (
-            <LeaderboardTable entries={entries} canWrite={canWrite} emails={emails} />
+            <LeaderboardTable
+              key={search}
+              entries={entries}
+              canWrite={canWrite}
+              emails={emails}
+              totalCount={totalCount}
+              searchQuery={search}
+            />
           )}
 
-          {connected && totalCount > entries.length && (
+          {connected && !search && totalCount > entries.length && (
             <p className="border-t border-border/60 px-5 py-3 text-xs text-muted-foreground">
               Showing the top {entries.length} of {formatNumber(totalCount)}{" "}
               entries.

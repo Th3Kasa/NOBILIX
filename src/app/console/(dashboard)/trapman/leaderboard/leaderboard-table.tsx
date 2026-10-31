@@ -42,14 +42,27 @@ export function LeaderboardTable({
   entries,
   canWrite,
   emails = {},
+  totalCount,
+  searchQuery = "",
 }: {
   entries: LeaderboardEntry[];
   canWrite: boolean;
   /** Player emails by uid, for the prize-email button. */
   emails?: Record<string, string>;
+  /** Players on the whole board — more than `entries` when only the top is loaded. */
+  totalCount: number;
+  /** The whole-board search these entries came from, if any. */
+  searchQuery?: string;
 }) {
   const router = useRouter();
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(searchQuery);
+  // Only the top of the board is loaded, so a name further down can't match
+  // locally; offer to look through every entry instead.
+  const canSearchAll = !searchQuery && totalCount > entries.length;
+  const searchAll = () => {
+    const q = query.trim();
+    if (q) router.push(`/console/trapman/leaderboard?q=${encodeURIComponent(q)}`);
+  };
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [confirmOpen, setConfirmOpen] = useState(false);
 
@@ -113,7 +126,14 @@ export function LeaderboardTable({
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Filter by name, player ID or country…"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && canSearchAll) searchAll();
+              }}
+              placeholder={
+                canSearchAll
+                  ? `Filter the top ${entries.length} — press Enter to search all ${totalCount}…`
+                  : "Filter by name, player ID or country…"
+              }
               aria-label="Filter leaderboard entries"
               className="pl-8"
             />
@@ -123,6 +143,13 @@ export function LeaderboardTable({
             <span className="text-sm text-muted-foreground">
               {visible.length} of {entries.length} shown
             </span>
+          )}
+
+          {query.trim() && canSearchAll && (
+            <Button type="button" variant="outline" size="sm" onClick={searchAll} className="gap-1.5">
+              <Search className="size-3.5" aria-hidden="true" />
+              Search all {totalCount} players
+            </Button>
           )}
 
           {selected.size > 0 && (
@@ -197,7 +224,19 @@ export function LeaderboardTable({
                   colSpan={canWrite ? 7 : 5}
                   className="px-5 py-10 text-center text-sm text-muted-foreground"
                 >
-                  No entries match &ldquo;{query}&rdquo;.
+                  No entries {canSearchAll ? `in the top ${entries.length} ` : ""}match &ldquo;{query}&rdquo;.
+                  {canSearchAll && (
+                    <>
+                      {" "}
+                      <button
+                        type="button"
+                        onClick={searchAll}
+                        className="font-medium text-[var(--console-violet)] hover:underline"
+                      >
+                        Search all {totalCount} players
+                      </button>
+                    </>
+                  )}
                 </td>
               </tr>
             ) : (
